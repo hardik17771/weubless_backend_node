@@ -7,10 +7,24 @@ const userSchema = new mongoose.Schema({
   dob: Date,
   email: String,
   password: String,
-  user_type: String,
-  is_deleted: Boolean,
+  user_type: Number,
+  is_deleted: Number,
 });
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = User;
+async function getUser(email, id) {
+  try {
+    let user;
+    if (email) {
+      user = await User.findOne({ email });
+    } else {
+      user = await User.findById(id);
+    }
+    return user;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = { User, getUser };
