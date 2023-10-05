@@ -27,6 +27,8 @@ class ApiService {
     const apiRepository = new ApiRepository();
     const create_user = await apiRepository.register(arg);
     if (create_user) {
+      console.log("API Service create_user");
+      console.log(create_user);
       return { error_code: 636 };
     } else {
       return { error_code: 637 };

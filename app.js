@@ -11,7 +11,9 @@ const app = express();
 connectDB();
 
 app.use(express.json());
-app.use("/api", routes);
+app.use("", routes);
+app.use(express.urlencoded({ extended: true }));
+// app.use(expressValidator());
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

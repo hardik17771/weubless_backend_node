@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  username: String,
   name: String,
   country_code: String,
   phone: String,
@@ -8,6 +9,8 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   user_type: Number,
+  latitude: String,
+  longitude: String,
   is_deleted: Number,
 });
 

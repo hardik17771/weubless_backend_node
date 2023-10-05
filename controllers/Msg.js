@@ -129,7 +129,7 @@ class Msg {
       612: "Sorry! The invitation link you clicked has already been consumed for creating another user account. Please click an unused invitation link or use fresh signup option by going back to the login screen.",
       613: "Sorry, you need to enter your company`s identity information in order to receive payments. Do you wish to add that now?",
       614: "Sorry, you need to enter your company`s identity information in order to receive payments. Do you wish to add that now?",
-      614: "Sorry! It seems your identity information is not complete hence your account is unable to receive payments. Please add missing Identity Information from Profile Settings before submitting invoice.",
+      // 614: "Sorry! It seems your identity information is not complete hence your account is unable to receive payments. Please add missing Identity Information from Profile Settings before submitting invoice.",
       615: "You are already listed as the owner for this company, therefore you cannot sell it to yourself.",
       616: "This user is already assigned as a service provider employee for this company.",
       617: "Sorry! It seems you cannot add this role because it has already been associated with some other user. Please contact the sender or admin if you find this is incorrect or if you want to merge your 2 different accounts.",

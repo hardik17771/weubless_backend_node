@@ -47,8 +47,10 @@ class ApiRepository {
     }
   }
 
-  register(data) {
-    const user = new User({
+  async register(data) {
+    console.log("Register API Repository data");
+    console.log(data);
+    const user = new User.User({
       username: data.username,
       name: data.name,
       country_code: data.country_code,
@@ -60,14 +62,14 @@ class ApiRepository {
       longitude: data.longitude,
     });
 
-    user.save();
+    await user.save(); // Use await here
 
-    // Assuming Mail.sendEmail is implemented elsewhere
-    Mail.sendEmail({
-      to: data.email,
-      subject: "Information Recorded",
-      body: `Dear ${data.name}, your information has been recorded.`,
-    });
+    // // Assuming Mail.sendEmail is implemented elsewhere
+    // Mail.sendEmail({
+    //   to: data.email,
+    //   subject: "Information Recorded",
+    //   body: `Dear ${data.name}, your information has been recorded.`,
+    // });
 
     return user;
   }
@@ -113,15 +115,10 @@ class ApiRepository {
 
 // Hash password function
 function hashPassword(password) {
+  console.log(password);
   // Assuming hashPassword function is implemented elsewhere
   // Use a secure hashing algorithm (e.g., bcrypt) in a real application
   return crypto.createHash("sha256").update(password).digest("hex");
 }
 
-// Sample usage
-// const apiRepo = new ApiRepository();
-// const user = apiRepo.login({ id: 123 });
-// console.log(user);
-
-// Initialize Express app and handle routes (if applicable)
-// ...
+module.exports = ApiRepository;

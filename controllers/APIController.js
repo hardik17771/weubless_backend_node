@@ -1,23 +1,26 @@
+const { validationResult, check } = require("express-validator");
 const Msg = require("./Msg");
 const ApiService = require("./Service/ApiService");
-const Validator = require("validator");
 
 // Login
 const login = async (req) => {
   const data = req.body;
-  const error_msg = new Msg();
-  const ApiService = new ApiService();
+  const errorMsg = new Msg();
+  const apiService = new ApiService();
 
-  const rules = { email: "required", password: "required" };
-  const validation = Validator.validate(data, rules);
+  const validationRules = [
+    check("email").isEmail().withMessage("Invalid email format"),
+    check("password").notEmpty().withMessage("Password is required"),
+  ];
 
-  if (validation !== true) {
-    const msg = error_msg.responseMsg(403);
-    return { status: "0", message: validation[0] };
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const msg = errorMsg.responseMsg(403);
+    return { status: "0", message: errors.array()[0].msg };
   }
 
-  const Check = await ApiService.login(data);
-  const msg = error_msg.responseMsg(Check.error_code);
+  const Check = await apiService.login(data);
+  const msg = errorMsg.responseMsg(Check.error_code);
 
   if (Check.error_code === 200) {
     return { status: "1", message: msg, data: Check.data };
@@ -29,24 +32,23 @@ const login = async (req) => {
 // Change Password
 const changePassword = async (req) => {
   const data = req.body;
-  const error_msg = new Msg();
-  const ApiService = new ApiService();
-  const ApiRepository = new ApiRepository();
+  const errorMsg = new Msg();
+  const apiService = new ApiService();
 
-  const rules = {
-    country_code: "required",
-    password: "required",
-    phone: "required",
-  };
-  const validation = Validator.validate(data, rules);
+  const validationRules = [
+    check("country_code").notEmpty().withMessage("Country code is required"),
+    check("password").notEmpty().withMessage("Password is required"),
+    check("phone").notEmpty().withMessage("Phone is required"),
+  ];
 
-  if (validation !== true) {
-    const msg = error_msg.responseMsg(403);
-    return { status: "0", message: validation[0] };
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const msg = errorMsg.responseMsg(403);
+    return { status: "0", message: errors.array()[0].msg };
   }
 
-  const Check = await ApiService.changePassword(data);
-  const msg = error_msg.responseMsg(Check.error_code);
+  const Check = await apiService.changePassword(data);
+  const msg = errorMsg.responseMsg(Check.error_code);
 
   if (Check.error_code === 204) {
     return { status: "1", message: msg };
@@ -57,38 +59,78 @@ const changePassword = async (req) => {
 
 // Logout
 const logout = async (req) => {
-  const error_msg = new Msg();
-  const msg = error_msg.responseMsg(216);
+  const errorMsg = new Msg();
+  const msg = errorMsg.responseMsg(216);
   return { status: "1", message: msg };
 };
 
+const registerValidation = [
+  check("username").notEmpty().withMessage("Username is required"),
+  check("name")
+    .notEmpty()
+    .withMessage("Name is required")
+    .isLength({ max: 255 })
+    .withMessage("Name is too long"),
+  check("country_code")
+    .notEmpty()
+    .withMessage("Country code is required")
+    .isLength({ max: 3 })
+    .withMessage("Invalid country code"),
+  check("phone")
+    .notEmpty()
+    .withMessage("Phone is required")
+    .isLength({ max: 255 })
+    .withMessage("Phone is too long")
+    .custom(async (value) => {
+      const user = await apiService.getUserByPhone(value);
+      if (user) {
+        return Promise.reject("Phone number already in use");
+      }
+    }),
+  check("email")
+    .notEmpty()
+    .withMessage("Email is required")
+    .isEmail()
+    .withMessage("Invalid email format")
+    .isLength({ max: 255 })
+    .withMessage("Email is too long")
+    .custom(async (value) => {
+      const user = await apiService.getUserByEmail(value);
+      if (user) {
+        return Promise.reject("Email already in use");
+      }
+    }),
+  check("password").notEmpty().withMessage("Password is required"),
+  check("user_type").notEmpty().withMessage("User type is required"),
+  check("latitude").notEmpty().withMessage("Latitude is required"),
+  check("longitude").notEmpty().withMessage("Longitude is required"),
+];
+
 // Register User
 const register = async (req) => {
+  // console.log("req: ", req);
   const data = req.body;
-  const error_msg = new Msg();
-  const ApiService = new ApiService();
+  console.log("API Controller data");
+  console.log(data);
+  const errorMsg = new Msg();
+  const apiService = new ApiService();
 
-  const rules = {
-    username: "required",
-    name: "required|max:255",
-    country_code: "required|max:3",
-    phone: "required|max:255|unique:users",
-    email: "required|email|max:255|unique:users",
-    password: "required",
-    user_type: "required",
-    latitude: "required",
-    longitude: "required",
-  };
-
-  const validation = Validator.validate(data, rules);
-
-  if (validation !== true) {
-    const msg = error_msg.responseMsg(403);
-    return { status: "0", message: validation[0] };
+  const errors = validationResult(req);
+  console.log("errors isEmpty: ", errors.isEmpty());
+  if (!errors.isEmpty()) {
+    const msg = errorMsg.responseMsg(403);
+    return { status: "0", message: errors.array()[0].msg };
   }
 
-  const Check = await ApiService.register(data);
-  const msg = error_msg.responseMsg(Check.error_code);
+  // const validationRules = [];
+
+  console.log("Before Check");
+  const Check = await apiService.register(data);
+  console.log("Check error code message: ", Check);
+  console.log("After Check Before msg");
+  const msg = errorMsg.responseMsg(Check.error_code);
+  console.log("message is : ", msg);
+  console.log("After msg");
 
   if (Check.error_code === 636) {
     return { status: "1", message: msg };
@@ -100,44 +142,74 @@ const register = async (req) => {
 // Save Token
 const save_token = async (req) => {
   const data = req.body;
-  const error_msg = new Msg();
-  const ApiService = new ApiService();
+  const errorMsg = new Msg();
+  const apiService = new ApiService();
   const token = req.headers.authorization;
 
-  if (token) {
-    const userId = await Authorization(token);
-    const Check = await ApiService.save_token(data, userId);
-    const msg = error_msg.responseMsg(Check.error_code);
-
-    if (Check.error_code === 661) {
-      return { status: "1", message: msg };
-    } else {
-      return { status: "0", message: msg };
-    }
-  } else {
+  if (!token) {
     return { status: "0", message: "unauthenticate" };
+  }
+
+  const userId = await Authorization(token);
+  if (!userId) {
+    return { status: "0", message: "unauthenticated" };
+  }
+
+  const validationRules = [
+    check("token_data").notEmpty().withMessage("Token data is required"),
+    // Add more validation rules as needed
+  ];
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const msg = errorMsg.responseMsg(403);
+    return { status: "0", message: errors.array()[0].msg };
+  }
+
+  const Check = await apiService.save_token(data, userId);
+  const msg = errorMsg.responseMsg(Check.error_code);
+
+  if (Check.error_code === 661) {
+    return { status: "1", message: msg };
+  } else {
+    return { status: "0", message: msg };
   }
 };
 
 // Delete Account
 const delete_account = async (req) => {
   const data = req.body;
-  const error_msg = new Msg();
-  const ApiService = new ApiService();
+  const errorMsg = new Msg();
+  const apiService = new ApiService();
   const token = req.headers.authorization;
 
-  if (token) {
-    const userId = await Authorization(token);
-    const Check = await ApiService.delete_account(data, userId);
-    const msg = error_msg.responseMsg(Check.error_code);
-
-    if (Check.error_code === 661) {
-      return { status: "1", message: msg };
-    } else {
-      return { status: "0", message: msg };
-    }
-  } else {
+  if (!token) {
     return { status: "0", message: "unauthenticate" };
+  }
+
+  const userId = await Authorization(token);
+  if (!userId) {
+    return { status: "0", message: "unauthenticated" };
+  }
+
+  const validationRules = [
+    check("account_id").notEmpty().withMessage("Account ID is required"),
+    // Add more validation rules as needed
+  ];
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const msg = errorMsg.responseMsg(403);
+    return { status: "0", message: errors.array()[0].msg };
+  }
+
+  const Check = await apiService.delete_account(data, userId);
+  const msg = errorMsg.responseMsg(Check.error_code);
+
+  if (Check.error_code === 661) {
+    return { status: "1", message: msg };
+  } else {
+    return { status: "0", message: msg };
   }
 };
 
@@ -148,4 +220,5 @@ module.exports = {
   register,
   save_token,
   delete_account,
+  registerValidation,
 };
