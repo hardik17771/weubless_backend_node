@@ -111,7 +111,17 @@ const registerUser = async (req, res) => {
   console.log(data);
 
   try {
-    const newUser = new User.User2(req.body);
+    const newUser = new User.User2({
+      username: data.username,
+      name: data.name,
+      country_code: data.country_code,
+      phone: data.phone,
+      email: data.email,
+      password: hashPassword(data.password),
+      user_type: data.user_type,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    });
     await newUser.save();
     res.json({
       status: 1,
