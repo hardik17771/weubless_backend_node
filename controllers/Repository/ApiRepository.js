@@ -48,32 +48,27 @@ class ApiRepository {
   }
 
   async register(data) {
-    console.log("Register API Repository data");
-    console.log(data);
-    const user = new User.User({
-      username: data.username,
-      name: data.name,
-      country_code: data.country_code,
-      phone: data.phone,
-      email: data.email,
-      password: hashPassword(data.password),
-      user_type: data.user_type,
-      latitude: data.latitude,
-      longitude: data.longitude,
-    });
+    try {
+      console.log("Register API Repository data");
+      console.log(data);
+      const user = new User.User2({
+        username: data.username,
+        name: data.name,
+        country_code: data.country_code,
+        phone: data.phone,
+        email: data.email,
+        password: hashPassword(data.password),
+        user_type: data.user_type,
+        latitude: data.latitude,
+        longitude: data.longitude,
+      });
 
-    await user.save(); // Use await here
-
-    // // Assuming Mail.sendEmail is implemented elsewhere
-    // Mail.sendEmail({
-    //   to: data.email,
-    //   subject: "Information Recorded",
-    //   body: `Dear ${data.name}, your information has been recorded.`,
-    // });
-
-    return user;
+      await user.save();
+      return user;
+    } catch (error) {
+      throw error; // Rethrow the error to be caught in the higher level
+    }
   }
-
   // Change password
   changePassword(data) {
     const { phone, country_code, password } = data;

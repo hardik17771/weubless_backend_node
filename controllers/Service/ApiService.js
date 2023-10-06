@@ -24,14 +24,19 @@ class ApiService {
   }
 
   async register(arg) {
-    const apiRepository = new ApiRepository();
-    const create_user = await apiRepository.register(arg);
-    if (create_user) {
-      console.log("API Service create_user");
-      console.log(create_user);
-      return { error_code: 636 };
-    } else {
-      return { error_code: 637 };
+    try {
+      const apiRepository = new ApiRepository();
+      const create_user = await apiRepository.register(arg);
+      // console.log("create user:" , create_user)
+      if (create_user) {
+        console.log("API Service create_user");
+        console.log(create_user);
+        return { error_code: 636 };
+      } else {
+        return { error_code: 637 };
+      }
+    } catch (error) {
+      throw error; // Rethrow the error to be caught in the higher level
     }
   }
 

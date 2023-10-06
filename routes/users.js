@@ -43,8 +43,8 @@ const apiController = require("../controllers/APIController");
 
 router.post(
   "/api/register",
-  apiController.registerValidation,
-  apiController.register
+  // apiController.registerValidation,
+  apiController.registerUser
 );
 router.post("/api/login", apiController.login);
 router.post("/api/save_token", apiController.save_token);
