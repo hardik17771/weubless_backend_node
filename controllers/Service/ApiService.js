@@ -20,10 +20,8 @@ class ApiService {
     const update = await apiRepository.changePassword(arg);
     if (update.code === 200) {
       return { error_code: 204, data: update };
-    } else if (update.code === 410) {
-      return { error_code: update.code };
     } else {
-      return { error_code: 681 };
+      return { error_code: update.code };
     }
   }
 

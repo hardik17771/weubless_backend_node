@@ -33,30 +33,30 @@ const login = async (req, res) => {
 };
 
 // Change Password
-const changePassword = async (req) => {
+const changePassword = async (req, res) => {
   const data = req.body;
   const errorMsg = new Msg();
   const apiService = new ApiService();
 
-  const validationRules = [
-    check("country_code").notEmpty().withMessage("Country code is required"),
-    check("password").notEmpty().withMessage("Password is required"),
-    check("phone").notEmpty().withMessage("Phone is required"),
-  ];
+  // const validationRules = [
+  //   check("country_code").notEmpty().withMessage("Country code is required"),
+  //   check("password").notEmpty().withMessage("Password is required"),
+  //   check("phone").notEmpty().withMessage("Phone is required"),
+  // ];
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const msg = errorMsg.responseMsg(403);
-    return { status: "0", message: errors.array()[0].msg };
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   const msg = errorMsg.responseMsg(403);
+  //   res.status(401).json({ status: "0", message: errors.array()[0].msg });
+  // }
 
   const Check = await apiService.changePassword(data);
   const msg = errorMsg.responseMsg(Check.error_code);
 
   if (Check.error_code === 204) {
-    return { status: "1", message: msg };
+    res.status(200).json({ status: "1", message: msg });
   } else {
-    return { status: "0", message: msg };
+    res.status(200).json({ status: "0", message: msg });
   }
 };
 

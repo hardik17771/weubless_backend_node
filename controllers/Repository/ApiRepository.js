@@ -18,11 +18,11 @@ class ApiRepository {
   async login(data) {
     try {
       const accessToken = this.access_token;
-      console.log("login for API Repository is hit");
-      console.log("data.email", data.email);
+      // console.log("login for API Repository is hit");
+      // console.log("data.email", data.email);
 
       if (data.email && data.password) {
-        console.log("email password not null");
+        // console.log("email password not null");
         const user = await User.getUser(data.email);
 
         if (user) {
@@ -35,7 +35,7 @@ class ApiRepository {
             const userId = user.id;
             const check = await token.countDocuments({ userId });
 
-            console.log(check);
+            // console.log(check);
 
             if (check > 0) {
               await token
@@ -55,10 +55,10 @@ class ApiRepository {
               code: 200,
             };
           } else {
-            return { code: 430 }; // Incorrect password
+            return { code: 430 };
           }
         } else {
-          return { code: 431 }; // User not found
+          return { code: 431 };
         }
       } else {
         if (data.email === "") {
@@ -69,7 +69,7 @@ class ApiRepository {
       }
     } catch (error) {
       console.error(error);
-      return { code: 500, message: "Internal server error." };
+      return { code: 468 };
     }
   }
 
@@ -96,17 +96,37 @@ class ApiRepository {
     }
   }
   // Change password
-  changePassword(data) {
-    const { phone, country_code, password } = data;
-    const user = User.findOne({ phone, country_code });
+  async changePassword(data) {
+    try {
+      if (data.email && data.password && data.phone && data.country_code) {
+        const user = await User.getUser(data.email);
+        if (user) {
+          console.log("user.password", user.password);
+          console.log("data.password", data.password);
+          const isPasswordSame = await bcrypt.compare(
+            data.password,
+            user.password
+          );
+          if (isPasswordSame) {
+            return { code: 420 };
+          }
+          console.log("isPasswordSame", isPasswordSame);
 
-    if (user) {
-      user.password = hashPassword(password);
-      user.save();
-      return { code: 200 };
-    } else {
-      return { code: 410 };
+          user.password = await hashPassword(data.password);
+          user.save();
+          console.log(user);
+          return { code: 200 };
+        } else {
+          return { code: 411 };
+        }
+      } else {
+        return { code: 411 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 468 };
     }
+    // const { email, phone, country_code, password } = data;
   }
 
   save_token(data, userId) {
@@ -134,12 +154,14 @@ class ApiRepository {
   }
 }
 
-// Hash password function
-function hashPassword(password) {
-  console.log(password);
-  // Assuming hashPassword function is implemented elsewhere
-  // Use a secure hashing algorithm (e.g., bcrypt) in a real application
-  return crypto.createHash("sha256").update(password).digest("hex");
+async function hashPassword(password) {
+  const saltRounds = 10;
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
+  } catch (error) {
+    throw new Error("Error hashing password");
+  }
 }
 
 module.exports = ApiRepository;

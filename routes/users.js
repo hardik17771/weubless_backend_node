@@ -52,19 +52,19 @@ router.post("/api/delete_account", apiController.delete_account);
 router.get("/api/logout", apiController.logout);
 router.post("/api/changePassword", apiController.changePassword);
 
-router.get("/api/register", async (req, res) => {
-  try {
-    res.json("register get route");
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-router.get("/api/login", async (req, res) => {
-  try {
-    res.json("login get route");
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// router.get("/api/register", async (req, res) => {
+//   try {
+//     res.json("register get route");
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+// router.get("/api/login", async (req, res) => {
+//   try {
+//     res.json("login get route");
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 module.exports = router;
