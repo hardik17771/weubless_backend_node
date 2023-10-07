@@ -47,6 +47,7 @@ router.post(
   apiController.registerUser
 );
 router.post("/api/login", apiController.login);
+router.post("/api/fetch_user", apiController.fetchUser);
 router.post("/api/save_token", apiController.save_token);
 router.post("/api/delete_account", apiController.delete_account);
 router.get("/api/logout", apiController.logout);

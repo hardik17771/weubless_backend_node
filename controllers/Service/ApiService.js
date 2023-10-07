@@ -3,10 +3,24 @@ const ApiRepository = require("../Repository/ApiRepository"); // Importing the e
 class ApiService {
   async login(arg) {
     const apiRepository = new ApiRepository();
-    console.log("login for API Service is hit");
+    // console.log("login for API Service is hit");
 
     const data = await apiRepository.login(arg);
-    console.log("API SERVICE DATA", data);
+    // console.log("API SERVICE DATA", data);
+    if (data.code === 200) {
+      console.log("data", data);
+      return { error_code: data.code, data };
+    } else {
+      return { error_code: data.code };
+    }
+  }
+
+  async fetchUser(arg) {
+    const apiRepository = new ApiRepository();
+    // console.log("login for API Service is hit");
+
+    const data = await apiRepository.fetchUser(arg);
+    console.log("API fetch User SERVICE DATA", data);
     if (data.code === 200) {
       console.log("data", data);
       return { error_code: data.code, data };

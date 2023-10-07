@@ -73,6 +73,45 @@ class ApiRepository {
     }
   }
 
+  async fetchUser(data) {
+    try {
+      const accessToken = this.access_token;
+      // console.log("login for API Repository is hit");
+      // console.log("data.email", data.email);
+      console.log("data.id = ", data.id);
+      if (data.id) {
+        // console.log("email password not null");
+        const user = await User.getUserById(data.id);
+        console.log(user);
+        if (user) {
+          return {
+            id: user.id,
+            name: user.name,
+            country_code: user.country_code,
+            phone: user.phone,
+            email: user.email,
+            user_type: user.user_type,
+            dob: user.dob,
+            country: user.country,
+            state: user.state,
+            city: user.city,
+            postal_code: user.postal_code,
+            image: user.image,
+            access_token: accessToken,
+            code: 200,
+          };
+        } else {
+          return { code: 422 };
+        }
+      } else {
+        return { code: 422 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 468 };
+    }
+  }
+
   async register(data) {
     try {
       console.log("Register API Repository data");
