@@ -14,32 +14,33 @@ class ApiRepository {
       .digest("hex");
   }
 
-  login(data) {
+  async login(data) {
     let getUsers;
     let accessToken = this.access_token;
-
-    if (data.id) {
+    console.log("login for API Repository is hit");
+    console.log("data.email", data.email);
+    if (data.email) {
       // Assuming User.getUser and token are implemented elsewhere
-      getUsers = User.getUser(null, data.id);
+      getUsers = await User.getUser(data.email);
 
-      const check = token.count({ userId: data.id });
-
-      if (check > 0) {
-        token
-          .findOneAndUpdate({ userId: data.id }, { token: accessToken })
-          .exec();
-      } else {
-        const newToken = new token({ userId: data.id, token: accessToken });
-        newToken.save();
-      }
+      // const check = token.count({ userId: data.id });
+      // console.log(check);
+      // if (check > 0) {
+      //   token
+      //     .findOneAndUpdate({ userId: data.id }, { token: accessToken })
+      //     .exec();
+      // } else {
+      //   const newToken = new token({ userId: data.id, token: accessToken });
+      //   newToken.save();
+      // }
     }
-
+    console.log("getUsers", getUsers);
     if (getUsers) {
       return {
         id: getUsers.id,
-        name: getUsers.name || "",
-        country_code: getUsers.country_code || "",
-        email: getUsers.email || "",
+        name: getUsers.name,
+        country_code: getUsers.country_code,
+        email: getUsers.email,
         access_token: accessToken,
       };
     } else {

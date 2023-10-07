@@ -111,18 +111,14 @@ const userSchema2 = new mongoose.Schema({
 
 const User2 = mongoose.model("User2", userSchema2);
 
-async function getUser(email, id) {
+const getUser = async (email) => {
   try {
-    let user;
-    if (email) {
-      user = await User2.findOne({ email });
-    } else {
-      user = await User2.findById(id);
-    }
+    const user = await User2.findOne({ email });
+    console.log(user);
     return user;
   } catch (error) {
-    throw error;
+    throw new Error(`Error fetching user: ${error.message}`);
   }
-}
+};
 
 module.exports = { getUser, User2 };

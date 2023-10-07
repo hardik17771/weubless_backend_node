@@ -3,8 +3,11 @@ const ApiRepository = require("../Repository/ApiRepository"); // Importing the e
 class ApiService {
   async login(arg) {
     const apiRepository = new ApiRepository();
+    console.log("login for API Service is hit");
+
     const data = await apiRepository.login(arg);
     if (data) {
+      console.log("data", data);
       return { error_code: 200, data };
     } else {
       return { error_code: 430 };

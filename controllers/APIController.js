@@ -5,7 +5,7 @@ const User = require("../models/User");
 const crypto = require("crypto");
 
 // Login
-const login = async (req) => {
+const login = async (req, res) => {
   const data = req.body;
   const errorMsg = new Msg();
   const apiService = new ApiService();
@@ -23,11 +23,12 @@ const login = async (req) => {
 
   const Check = await apiService.login(data);
   const msg = errorMsg.responseMsg(Check.error_code);
-
+  console.log(Check);
   if (Check.error_code === 200) {
-    return { status: "1", message: msg, data: Check.data };
+    console.log("Check.data", Check.data);
+    res.status(200).json({ status: "1", message: msg, data: Check.data });
   } else {
-    return { status: "0", message: msg };
+    res.status(401).json({ status: "0", message: msg });
   }
 };
 
@@ -123,7 +124,7 @@ const registerUser = async (req, res) => {
       longitude: data.longitude,
     });
     await newUser.save();
-    res.json({
+    res.status(200).json({
       status: 1,
       message: "User registered successfully",
       user: newUser,
@@ -144,7 +145,7 @@ const registerUser = async (req, res) => {
       errorMessage = error.errors[field].message;
     }
 
-    res.json({ status: 0, message: errorMessage });
+    res.status(401).json({ status: 0, message: errorMessage });
   }
 };
 
