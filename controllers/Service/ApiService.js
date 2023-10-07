@@ -6,11 +6,12 @@ class ApiService {
     console.log("login for API Service is hit");
 
     const data = await apiRepository.login(arg);
-    if (data) {
+    console.log("API SERVICE DATA", data);
+    if (data.code === 200) {
       console.log("data", data);
-      return { error_code: 200, data };
+      return { error_code: data.code, data };
     } else {
-      return { error_code: 430 };
+      return { error_code: data.code };
     }
   }
 

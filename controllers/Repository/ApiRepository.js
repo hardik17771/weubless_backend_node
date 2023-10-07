@@ -3,11 +3,12 @@ const app = express();
 const crypto = require("crypto");
 const User = require("../../models/User");
 const token = require("../../models/Token");
+const bcrypt = require("bcrypt");
 
 class ApiRepository {
   constructor() {
     // Access token
-    this.token_id = Math.floor(Math.random() * 1000);
+    this.token_id = Math.random().toString(36).substring(2, 15);
     this.access_token = crypto
       .createHash("sha1")
       .update(`WUECART${this.token_id}!@#$%^&*!!`)
@@ -15,36 +16,60 @@ class ApiRepository {
   }
 
   async login(data) {
-    let getUsers;
-    let accessToken = this.access_token;
-    console.log("login for API Repository is hit");
-    console.log("data.email", data.email);
-    if (data.email) {
-      // Assuming User.getUser and token are implemented elsewhere
-      getUsers = await User.getUser(data.email);
+    try {
+      const accessToken = this.access_token;
+      console.log("login for API Repository is hit");
+      console.log("data.email", data.email);
 
-      // const check = token.count({ userId: data.id });
-      // console.log(check);
-      // if (check > 0) {
-      //   token
-      //     .findOneAndUpdate({ userId: data.id }, { token: accessToken })
-      //     .exec();
-      // } else {
-      //   const newToken = new token({ userId: data.id, token: accessToken });
-      //   newToken.save();
-      // }
-    }
-    console.log("getUsers", getUsers);
-    if (getUsers) {
-      return {
-        id: getUsers.id,
-        name: getUsers.name,
-        country_code: getUsers.country_code,
-        email: getUsers.email,
-        access_token: accessToken,
-      };
-    } else {
-      return { code: 461 };
+      if (data.email && data.password) {
+        console.log("email password not null");
+        const user = await User.getUser(data.email);
+
+        if (user) {
+          const isPasswordValid = await bcrypt.compare(
+            data.password,
+            user.password
+          );
+
+          if (isPasswordValid) {
+            const userId = user.id;
+            const check = await token.countDocuments({ userId });
+
+            console.log(check);
+
+            if (check > 0) {
+              await token
+                .findOneAndUpdate({ userId }, { token: accessToken })
+                .exec();
+            } else {
+              const newToken = new token({ userId, token: accessToken });
+              await newToken.save();
+            }
+
+            return {
+              id: user.id,
+              name: user.name,
+              country_code: user.country_code,
+              email: user.email,
+              access_token: accessToken,
+              code: 200,
+            };
+          } else {
+            return { code: 430 }; // Incorrect password
+          }
+        } else {
+          return { code: 431 }; // User not found
+        }
+      } else {
+        if (data.email === "") {
+          return { code: 531 }; // Empty email
+        } else {
+          return { code: 532 }; // Empty password
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 500, message: "Internal server error." };
     }
   }
 

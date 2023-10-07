@@ -115,6 +115,8 @@ class Msg {
       528: "The invoice has already been accepted for this project.",
       529: "This is user already assigned as a service provider owner for this company.",
       530: "This is user already assigned as a service provider employee for this company.",
+      531: "Email is required.",
+      532: "Password is required.",
       601: "An OTP sent to your registered email address/ phone no.. Please use that OTP to verify your account, then follow the instructions to reset your password.",
       602: "An OTP sent to your registered phone number. Please use that OTP to verify your account, then follow the instructions to reset your password.",
       603: "Your username has been sent to the email address you entered. Please check it and try again.",

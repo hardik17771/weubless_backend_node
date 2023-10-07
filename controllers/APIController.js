@@ -2,7 +2,7 @@ const { validationResult, check } = require("express-validator");
 const Msg = require("./Msg");
 const ApiService = require("./Service/ApiService");
 const User = require("../models/User");
-const crypto = require("crypto");
+const bcrypt = require("bcrypt");
 
 // Login
 const login = async (req, res) => {
@@ -15,11 +15,11 @@ const login = async (req, res) => {
     check("password").notEmpty().withMessage("Password is required"),
   ];
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const msg = errorMsg.responseMsg(403);
-    return { status: "0", message: errors.array()[0].msg };
-  }
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   const msg = errorMsg.responseMsg(403);
+  //   return { status: "0", message: errors.array()[0].msg };
+  // }
 
   const Check = await apiService.login(data);
   const msg = errorMsg.responseMsg(Check.error_code);
@@ -118,7 +118,7 @@ const registerUser = async (req, res) => {
       country_code: data.country_code,
       phone: data.phone,
       email: data.email,
-      password: hashPassword(data.password),
+      password: await hashPassword(data.password),
       user_type: data.user_type,
       latitude: data.latitude,
       longitude: data.longitude,
@@ -223,11 +223,14 @@ const delete_account = async (req) => {
   }
 };
 
-function hashPassword(password) {
-  console.log(password);
-  // Assuming hashPassword function is implemented elsewhere
-  // Use a secure hashing algorithm (e.g., bcrypt) in a real application
-  return crypto.createHash("sha256").update(password).digest("hex");
+async function hashPassword(password) {
+  const saltRounds = 10;
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
+  } catch (error) {
+    throw new Error("Error hashing password");
+  }
 }
 
 module.exports = {
