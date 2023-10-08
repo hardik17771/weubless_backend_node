@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const User = require("../../models/User");
 const token = require("../../models/Token");
 const bcrypt = require("bcrypt");
+const axios = require("axios");
 
 class ApiRepository {
   constructor() {
@@ -37,6 +38,9 @@ class ApiRepository {
 
             // console.log(check);
 
+            user.access_token = accessToken;
+            user.save();
+
             if (check > 0) {
               await token
                 .findOneAndUpdate({ userId }, { token: accessToken })
@@ -58,7 +62,7 @@ class ApiRepository {
             return { code: 430 };
           }
         } else {
-          return { code: 431 };
+          return { code: 461 };
         }
       } else {
         if (data.email === "") {
@@ -76,13 +80,9 @@ class ApiRepository {
   async fetchUser(data) {
     try {
       const accessToken = this.access_token;
-      // console.log("login for API Repository is hit");
-      // console.log("data.email", data.email);
-      console.log("data.id = ", data.id);
+
       if (data.id) {
-        // console.log("email password not null");
         const user = await User.getUserById(data.id);
-        console.log(user);
         if (user) {
           return {
             id: user.id,
@@ -100,6 +100,69 @@ class ApiRepository {
             access_token: accessToken,
             code: 200,
           };
+        } else {
+          return { code: 422 };
+        }
+      } else {
+        return { code: 422 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 468 };
+    }
+  }
+
+  async updateProfile(data) {
+    console.log("data", data);
+    try {
+      const accessToken = this.access_token;
+      if (data) {
+        const user = await User.getUser(data.email);
+
+        if (user) {
+          user.name = data.name || "";
+          user.phone = data.phone || "";
+          user.username = data.username || "";
+          user.email = data.email || "";
+          user.dob = data.dob || "";
+          user.address = data.address || "";
+          user.country = data.country || "";
+          user.state = data.state || "";
+          user.city = data.city || "";
+          user.postal_code = data.postal_code || "";
+          user.image = data.image || "";
+
+          user.save();
+
+          const response = await axios.post(
+            "http://localhost:8080/api/update_profile",
+            {},
+            {
+              headers: {
+                Authorization: accessToken,
+              },
+            }
+          );
+
+          console.log("response.data", response.data);
+          return { data: response.data, code: 200 };
+
+          // return {
+          //   id: user.id,
+          //   name: user.name,
+          //   country_code: user.country_code,
+          //   phone: user.phone,
+          //   email: user.email,
+          //   user_type: user.user_type,
+          //   dob: user.dob,
+          //   country: user.country,
+          //   state: user.state,
+          //   city: user.city,
+          //   postal_code: user.postal_code,
+          //   image: user.image,
+          //   access_token: accessToken,
+          //   code: 200,
+          // };
         } else {
           return { code: 422 };
         }

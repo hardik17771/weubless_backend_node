@@ -48,23 +48,28 @@ const fetchUser = async (req, res) => {
   }
 };
 
+// Update Profile
+const updateProfile = async (req, res) => {
+  const data = req.body;
+  const errorMsg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.updateProfile(data);
+  const msg = errorMsg.responseMsg(Check.error_code);
+  console.log(Check);
+  if (Check.error_code === 200) {
+    console.log("Check.data", Check.data);
+    res.status(200).json({ status: "1", message: msg, data: Check.data });
+  } else {
+    res.status(401).json({ status: "0", message: msg });
+  }
+};
+
 // Change Password
 const changePassword = async (req, res) => {
   const data = req.body;
   const errorMsg = new Msg();
   const apiService = new ApiService();
-
-  // const validationRules = [
-  //   check("country_code").notEmpty().withMessage("Country code is required"),
-  //   check("password").notEmpty().withMessage("Password is required"),
-  //   check("phone").notEmpty().withMessage("Phone is required"),
-  // ];
-
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   const msg = errorMsg.responseMsg(403);
-  //   res.status(401).json({ status: "0", message: errors.array()[0].msg });
-  // }
 
   const Check = await apiService.changePassword(data);
   const msg = errorMsg.responseMsg(Check.error_code);
@@ -258,4 +263,5 @@ module.exports = {
   delete_account,
   registerUser,
   fetchUser,
+  updateProfile,
 };

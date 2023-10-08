@@ -17,9 +17,19 @@ class ApiService {
 
   async fetchUser(arg) {
     const apiRepository = new ApiRepository();
-    // console.log("login for API Service is hit");
 
     const data = await apiRepository.fetchUser(arg);
+    if (data.code === 200) {
+      console.log("data", data);
+      return { error_code: data.code, data };
+    } else {
+      return { error_code: data.code };
+    }
+  }
+
+  async updateProfile(arg) {
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.updateProfile(arg);
     console.log("API fetch User SERVICE DATA", data);
     if (data.code === 200) {
       console.log("data", data);

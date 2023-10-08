@@ -1,12 +1,12 @@
 const express = require("express");
 // const {validationResult} = require('express-validator')
-
 const router = express.Router();
 // const { createUser, getAllUsers } = require("../controllers/UserController");
 const authenticate = require("../middleware/Authenticate");
 const AuthController = require("../controllers/AuthController");
 const PasswordResetController = require("../controllers/API/V2/PasswordResetController");
 const apiController = require("../controllers/APIController");
+const verifyAccessToken = require("../middleware/VerifyAccessToken");
 
 // v2/auth routes
 // router.post("/v2/auth/login", AuthController.login);
@@ -70,11 +70,16 @@ router.post(
   apiController.registerUser
 );
 router.post("/api/login", apiController.login);
-router.post("/api/fetch_user", apiController.fetchUser);
 router.post("/api/save_token", apiController.save_token);
 router.post("/api/delete_account", apiController.delete_account);
 router.get("/api/logout", apiController.logout);
 router.post("/api/changePassword", apiController.changePassword);
+router.post("/api/fetch_user", apiController.fetchUser);
+router.post(
+  "/api/update_profile",
+  verifyAccessToken,
+  apiController.updateProfile
+);
 
 // router.get("/api/register", async (req, res) => {
 //   try {

@@ -118,6 +118,11 @@ const userSchema2 = new mongoose.Schema({
         `${props.value} is not a valid date. Please use the format MM/DD/YYYY.`,
     },
   },
+  access_token: {
+    type: String,
+    default: null,
+    required: false,
+  },
   country: {
     type: String,
     default: null,
@@ -149,7 +154,7 @@ const User2 = mongoose.model("User2", userSchema2);
 
 const getUser = async (email) => {
   try {
-    const user = await User2.findOne({ email });
+    const user = await User2.findOne({ email }).exec();
     console.log(user);
     return user;
   } catch (error) {
@@ -158,7 +163,7 @@ const getUser = async (email) => {
 };
 const getUserById = async (id) => {
   try {
-    const user = await User2.findOne({ _id: id });
+    const user = await User2.findOne({ _id: id }).exec();
     console.log(user);
     return user;
   } catch (error) {
