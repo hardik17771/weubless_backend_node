@@ -4,6 +4,7 @@ const connectDB = require("./config/db");
 const bodyParser = require("body-parser");
 const routes = require("./routes");
 const dotenv = require("dotenv");
+const setUpSwagger = require("./swaggerSetup");
 
 dotenv.config();
 
@@ -13,6 +14,8 @@ connectDB();
 app.use(bodyParser.json());
 app.use("", routes);
 app.use(express.urlencoded({ extended: true }));
+
+setUpSwagger(app);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

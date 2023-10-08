@@ -19,6 +19,8 @@
     "mongoose": "^7.5.3",
     "mysql2": "^3.6.1",
     "sequelize": "^6.33.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {

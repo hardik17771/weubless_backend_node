@@ -41,6 +41,29 @@ const apiController = require("../controllers/APIController");
 // Middleware for the routes under /api
 // router.use("/api", authenticate); // Assuming authenticate is your authentication middleware
 
+/**
+ * @swagger
+ * /api/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [User]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               // Add properties here like name, email, password, etc.
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.post(
   "/api/register",
   // apiController.registerValidation,
