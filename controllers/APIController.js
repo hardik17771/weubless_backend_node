@@ -1,8 +1,11 @@
 const { validationResult, check } = require("express-validator");
 const Msg = require("./Msg");
 const ApiService = require("./Service/ApiService");
+const ApiRepository = require("./Repository/ApiRepository");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+
+/*********************************************** AUTH  ***********************************/
 
 // Login
 const login = async (req, res) => {
@@ -254,6 +257,24 @@ async function hashPassword(password) {
   }
 }
 
+/*********************************************** CATEGORY ***********************************/
+
+const categoryListing = async (req, res) => {
+  const apiRepository = new ApiRepository();
+  const categoryListing = await apiRepository.getAllCategory();
+  const error_msg = new Msg();
+
+  if (categoryListing) {
+    const msg = error_msg.responseMsg(674);
+    const response = { status: "1", message: msg, data: categoryListing };
+    res.status(200).json(response);
+  } else {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 module.exports = {
   login,
   changePassword,
@@ -264,4 +285,5 @@ module.exports = {
   registerUser,
   fetchUser,
   updateProfile,
+  categoryListing,
 };

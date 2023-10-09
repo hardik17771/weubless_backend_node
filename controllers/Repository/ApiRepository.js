@@ -5,6 +5,7 @@ const User = require("../../models/User");
 const token = require("../../models/Token");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const Category = require("../../models/Category");
 
 class ApiRepository {
   constructor() {
@@ -252,6 +253,17 @@ class ApiRepository {
       return { code: 200 };
     } else {
       return { code: 632 };
+    }
+  }
+
+  async getAllCategory() {
+    try {
+      // console.log(Category.Category);
+      const categoryList = await Category.Category.find();
+      console.log("categoryList", categoryList);
+      return categoryList;
+    } catch (error) {
+      throw new Error("Error fetching categories: " + error.message);
     }
   }
 }

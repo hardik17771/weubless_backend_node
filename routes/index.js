@@ -1,10 +1,10 @@
 const express = require("express");
-const userRoutes = require("./users");
-// const apiController = require("../controllers/APIController");
+const userRoutes = require("./usersRoutes");
+const categoryRoutes = require("./categoryRoutes");
 
 const router = express.Router();
 
 router.use("", userRoutes);
-// router.post("/register", apiController.registerUser3);
+router.use("", categoryRoutes);
 
 module.exports = router;

@@ -193,6 +193,7 @@ class Msg {
       671: "Cart Fatched Detail",
       672: "Past Order Detail",
       673: "Current Order Detail",
+      674: "Category Listing Fetched Successfully",
       675: "State Listing",
       676: "City Listing",
       677: "Form Submitted",
