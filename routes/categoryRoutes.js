@@ -13,7 +13,8 @@ const categoryListingMiddleware = async (req, res, next) => {
 
 router.get("/api/category", categoryListingMiddleware);
 router.post("/api/category", apiController.createCategory);
-router.post("/api/sub-category", apiController.createSubCategory);
+router.post("/api/create-sub-category", apiController.createSubCategory);
 router.post("/api/main_subcategory", apiController.mainSubCategory);
+router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
 
 module.exports = router;

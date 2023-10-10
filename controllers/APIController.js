@@ -333,6 +333,41 @@ const createSubCategory = async (req, res) => {
   }
 };
 
+const createSubSubCategory = async (req, res) => {
+  const { name, main_subcategory_id } = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create sub sub category api controller hit");
+  // try {
+  const newSubSubCategory = await apiRepository.createSubSubCategory({
+    name,
+    main_subcategory_id,
+  });
+
+  const msg = error_msg.responseMsg(newSubSubCategory.code); //706
+  if (newSubSubCategory.code === 712) {
+    const response = {
+      status: "1",
+      message: msg,
+      data: newSubSubCategory.data,
+    };
+    res.status(201).json(response);
+  } else {
+    const response = {
+      status: "0",
+      message: msg,
+      data: newSubSubCategory.data,
+    };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(707); //707
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
+};
+
 const mainSubCategory = async (req, res) => {
   const data = req.body;
   const error_msg = new Msg();
@@ -373,4 +408,5 @@ module.exports = {
   createCategory,
   createSubCategory,
   mainSubCategory,
+  createSubSubCategory,
 };

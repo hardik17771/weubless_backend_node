@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 const Category = require("../../models/Category");
 const SubCategory = require("../../models/SubCategory");
+const SubSubCategory = require("../../models/SubSubCategory");
 
 class ApiRepository {
   constructor() {
@@ -309,6 +310,39 @@ class ApiRepository {
 
         console.log(newSubCategory);
         return { data: newSubCategory, code: 712 };
+      } else if (data.name == "") {
+        console.log("name absent");
+        return { code: 710 };
+      } else {
+        return { code: 711 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 713 };
+    }
+  }
+
+  async createSubSubCategory(data) {
+    try {
+      console.log("Create sub category api repo hit");
+
+      if (data.name && data.main_subcategory_id) {
+        const newSubSubCategory = new SubSubCategory.SubSubCategory(data);
+        // console.log("new category present");
+        await newSubSubCategory.save();
+
+        const subCategory = await SubCategory.getSubCategoryById(
+          data.main_subcategory_id
+        );
+        if (subCategory) {
+          subCategory.subsubCategories.push(newSubSubCategory._id);
+          await subCategory.save();
+        } else {
+          return { code: 714 };
+        }
+
+        // console.log(newSubCategory);
+        return { data: newSubSubCategory, code: 712 };
       } else if (data.name == "") {
         console.log("name absent");
         return { code: 710 };
