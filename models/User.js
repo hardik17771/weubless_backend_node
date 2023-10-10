@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 
 // const userSchema = new mongoose.Schema({
+
 //   username: {
 //     type: String,
 //     required: [true, "Username is required"],
@@ -57,6 +58,8 @@ const validator = require("validator");
 // const User = mongoose.model("User", userSchema);
 
 const userSchema2 = new mongoose.Schema({
+  user_id: { type: Number, unique: true },
+
   username: {
     type: String,
     required: [true, "Username is required"],
@@ -150,7 +153,18 @@ const userSchema2 = new mongoose.Schema({
   },
 });
 
-const User2 = mongoose.model("User2", userSchema2);
+userSchema2.pre("save", async function (next) {
+  try {
+    if (!this.isNew) {
+      return next();
+    }
+    const count = await this.constructor.countDocuments({});
+    this.user_id = count + 1;
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 const getUser = async (email) => {
   try {
@@ -172,4 +186,5 @@ const getUserById = async (id) => {
   }
 };
 
+const User2 = mongoose.model("User2", userSchema2);
 module.exports = { User2, getUser, getUserById };
