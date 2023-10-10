@@ -101,6 +101,18 @@ class ApiService {
       return { code: data.code };
     }
   }
+
+  async SubCategory(arg) {
+    const apiRepository = new ApiRepository(); // Assuming ApiRepository is properly imported and initialized
+
+    const data = await apiRepository.SubCategory(arg);
+    // console.log("service data", data);
+    if (data.code === 689) {
+      return { code: data.code, list: data.subSubCategoriesList };
+    } else {
+      return { code: data.code };
+    }
+  }
 }
 
 module.exports = ApiService;

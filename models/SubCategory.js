@@ -44,7 +44,7 @@ const getSubCategoryById = async (main_subcategory_id) => {
 const getSubSubCategoriesByMainSubCategoryId = async (main_subcategory_id) => {
   try {
     const subCategory = await SubCategory.findOne({
-      subCategory,
+      main_subcategory_id,
     }).exec();
     return subCategory ? subCategory.subsubCategories : [];
   } catch (error) {

@@ -357,9 +357,7 @@ class ApiRepository {
 
   async mainSubCategory(data) {
     const { category_id } = data;
-
     let subCategoriesList = [];
-
     try {
       const subCategoryIds = await Category.getSubCategoriesByCategoryId(
         category_id
@@ -383,6 +381,35 @@ class ApiRepository {
     } catch (error) {
       return { code: 642, subCategoriesList: subCategoriesList };
     }
+  }
+
+  async SubCategory(data) {
+    const { main_subcategory_id } = data;
+    let subSubCategoriesList = [];
+    // try {
+    const subSubCategoryIds =
+      await SubCategory.getSubSubCategoriesByMainSubCategoryId(
+        main_subcategory_id
+      );
+
+    const subSubCategoriesObjects = await SubCategory.findSubSubCategories(
+      subSubCategoryIds
+    );
+    if (subSubCategoriesObjects && subSubCategoriesObjects.length > 0) {
+      subSubCategoriesObjects.forEach((subSubCategory) => {
+        const item = {
+          subcategory_id: subSubCategory.subcategory_id,
+          subcategory: subSubCategory.name || "",
+        };
+        subSubCategoriesList.push(item);
+      });
+      return { code: 689, subSubCategoriesList: subSubCategoriesList };
+    } else {
+      return { code: 715, subSubCategoriesList: subSubCategoriesList };
+    }
+    // } catch (error) {
+    //   return { code: 642, subSubCategoriesList: subSubCategoriesList };
+    // }
   }
 
   /******************************************** END OF FUNCTION *********************/

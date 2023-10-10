@@ -394,6 +394,32 @@ const mainSubCategory = async (req, res) => {
   // }
 };
 
+const SubCategory = async (req, res) => {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.SubCategory(data);
+  // console.log("controller data", Check);
+  const msg = error_msg.responseMsg(Check.code);
+
+  if (Check.code == 689) {
+    // console.log("code: ", Check.code);
+    const response = { status: "1", message: msg, data: Check.list };
+    return res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    return res.status(200).json(response);
+  }
+  // }
+  // } catch (error) {
+  //   console.error(error);
+  //   const msg = error_msg.responseMsg(642);
+  //   const response = { status: "0", message: msg };
+  //   return res.status(500).json(response);
+  // }
+};
+
 module.exports = {
   login,
   changePassword,
@@ -409,4 +435,5 @@ module.exports = {
   createSubCategory,
   mainSubCategory,
   createSubSubCategory,
+  SubCategory,
 };
