@@ -225,6 +225,10 @@ class Msg {
       703: "Buy Now",
       704: "Past Order Total Amount",
       705: "Order Return List",
+      706: "Category added successfully",
+      707: "Category cannot be added",
+      708: "Category Name is required",
+      709: "Category Image is required",
     };
 
     return msg[msgId] || "";

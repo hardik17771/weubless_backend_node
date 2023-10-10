@@ -266,6 +266,28 @@ class ApiRepository {
       throw new Error("Error fetching categories: " + error.message);
     }
   }
+
+  async createCategory(data) {
+    // try {
+    console.log("Create category api repo hit");
+
+    if (data.name && data.image) {
+      console.log("name and image present");
+      const newCategory = new Category.Category(data);
+      console.log("new category present");
+      await newCategory.save();
+      console.log(newCategory);
+      return { data: newCategory, code: 706 };
+    } else if (data.name == "") {
+      console.log("name absent");
+      return { code: 708 };
+    } else {
+      return { code: 709 };
+    }
+    // } catch (error) {
+    //   return { code: 707 };
+    // }
+  }
 }
 
 async function hashPassword(password) {

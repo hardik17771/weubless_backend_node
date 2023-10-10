@@ -275,6 +275,37 @@ const categoryListing = async (req, res) => {
   }
 };
 
+const createCategory = async (req, res) => {
+  const { name, banner, icon, image, featured, top } = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create category api controller hit");
+  // try {
+  const newCategory = await apiRepository.createCategory({
+    name,
+    banner,
+    icon,
+    image,
+    featured,
+    top,
+  });
+
+  const msg = error_msg.responseMsg(newCategory.code); //706
+  if (newCategory.code === 706) {
+    const response = { status: "1", message: msg, data: newCategory.data };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg, data: newCategory.data };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(newCategory.code); //707
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
+};
+
 module.exports = {
   login,
   changePassword,
@@ -286,4 +317,5 @@ module.exports = {
   fetchUser,
   updateProfile,
   categoryListing,
+  createCategory,
 };
