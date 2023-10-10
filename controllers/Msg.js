@@ -158,9 +158,9 @@ class Msg {
       638: "The email and code you entered is incorrect.  Please check your email and code and try again.",
       639: "Successfully reset your password.",
       640: "Old password you enter is incorrect.please check and try again.",
-      641: "User Detail Fatch Succesfull",
-      642: "Error in Fatching Details",
-      643: "Fatched Detail",
+      641: "User Detail Fetch Succesfull",
+      642: "Error in Fetching Details",
+      643: "Fetched Detail",
       644: "FAQ Fatched Detail",
       645: "Your Query Sent Successfull",
       646: "Not Sent",
@@ -229,6 +229,12 @@ class Msg {
       707: "Category cannot be added",
       708: "Category Name is required",
       709: "Category Image is required",
+      710: "Sub Category Name is required",
+      711: "Category ID for subcategory is required",
+      712: "Sub Category added successfully",
+      713: "Sub Category cannot be added",
+      714: "Category ID not found",
+      715: "No Sub-Categories for the Category ID found",
     };
 
     return msg[msgId] || "";

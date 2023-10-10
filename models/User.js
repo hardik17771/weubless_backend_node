@@ -161,6 +161,7 @@ const getUser = async (email) => {
     throw new Error(`Error fetching user: ${error.message}`);
   }
 };
+
 const getUserById = async (id) => {
   try {
     const user = await User2.findOne({ _id: id }).exec();

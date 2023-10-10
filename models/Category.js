@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { SubCategory } = require("./SubCategory");
 
 const categorySchema = new mongoose.Schema(
   {
@@ -9,6 +10,9 @@ const categorySchema = new mongoose.Schema(
     image: { type: String, required: true },
     featured: Number,
     top: Number,
+    subCategories: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "SubCategory" },
+    ],
   },
   { timestamps: true }
 );
@@ -30,6 +34,42 @@ categorySchema.pre("save", async function (next) {
   }
 });
 
+const getCategoryById = async (category_id) => {
+  try {
+    const category = await Category.findOne({
+      category_id,
+    }).exec();
+    return category;
+  } catch (error) {
+    throw new Error(`Error fetching category: ${error.message}`);
+  }
+};
+
+const getSubCategoriesByCategoryId = async (category_id) => {
+  try {
+    const category = await Category.findOne({
+      category_id,
+    }).exec();
+    return category ? category.subCategories : [];
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
+const findSubCategories = async (objectIds) => {
+  try {
+    const subCategories = await SubCategory.find({ _id: { $in: objectIds } });
+    return subCategories;
+  } catch (error) {
+    throw new Error(`Error fetching categories: ${error.message}`);
+  }
+};
+
 const Category = mongoose.model("Category", categorySchema);
 
-module.exports = { Category };
+module.exports = {
+  Category,
+  getCategoryById,
+  getSubCategoriesByCategoryId,
+  findSubCategories,
+};

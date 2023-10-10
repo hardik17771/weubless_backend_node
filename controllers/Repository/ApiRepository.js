@@ -6,6 +6,7 @@ const token = require("../../models/Token");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 const Category = require("../../models/Category");
+const SubCategory = require("../../models/SubCategory");
 
 class ApiRepository {
   constructor() {
@@ -26,7 +27,7 @@ class ApiRepository {
       if (data.email && data.password) {
         // console.log("email password not null");
         const user = await User.getUser(data.email);
-
+        console.log("usere heheheeh is ", user);
         if (user) {
           const isPasswordValid = await bcrypt.compare(
             data.password,
@@ -268,26 +269,89 @@ class ApiRepository {
   }
 
   async createCategory(data) {
-    // try {
-    console.log("Create category api repo hit");
+    try {
+      console.log("Create category api repo hit");
 
-    if (data.name && data.image) {
-      console.log("name and image present");
-      const newCategory = new Category.Category(data);
-      console.log("new category present");
-      await newCategory.save();
-      console.log(newCategory);
-      return { data: newCategory, code: 706 };
-    } else if (data.name == "") {
-      console.log("name absent");
-      return { code: 708 };
-    } else {
-      return { code: 709 };
+      if (data.name && data.image) {
+        console.log("name and image present");
+        const newCategory = new Category.Category(data);
+        console.log("new category present");
+        await newCategory.save();
+        console.log(newCategory);
+        return { data: newCategory, code: 706 };
+      } else if (data.name == "") {
+        console.log("name absent");
+        return { code: 708 };
+      } else {
+        return { code: 709 };
+      }
+    } catch (error) {
+      return { code: 707 };
     }
-    // } catch (error) {
-    //   return { code: 707 };
-    // }
   }
+
+  async createSubCategory(data) {
+    try {
+      console.log("Create sub category api repo hit");
+
+      if (data.name && data.category_id) {
+        const newSubCategory = new SubCategory.SubCategory(data);
+        console.log("new category present");
+        await newSubCategory.save();
+
+        const category = await Category.getCategoryById(data.category_id);
+        if (category) {
+          category.subCategories.push(newSubCategory._id);
+          await category.save();
+        } else {
+          return { code: 714 };
+        }
+
+        console.log(newSubCategory);
+        return { data: newSubCategory, code: 712 };
+      } else if (data.name == "") {
+        console.log("name absent");
+        return { code: 710 };
+      } else {
+        return { code: 711 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 713 };
+    }
+  }
+
+  async mainSubCategory(data) {
+    const { category_id } = data;
+
+    let subCategoriesList = [];
+
+    try {
+      const subCategoryIds = await Category.getSubCategoriesByCategoryId(
+        category_id
+      );
+
+      const subCategoriesObjects = await Category.findSubCategories(
+        subCategoryIds
+      );
+      if (subCategoriesObjects && subCategoriesObjects.length > 0) {
+        subCategoriesObjects.forEach((subCategory) => {
+          const item = {
+            main_subcategory_id: subCategory.main_subcategory_id,
+            main_subcategory: subCategory.name || "",
+          };
+          subCategoriesList.push(item);
+        });
+        return { code: 689, subCategoriesList: subCategoriesList };
+      } else {
+        return { code: 715, subCategoriesList: subCategoriesList };
+      }
+    } catch (error) {
+      return { code: 642, subCategoriesList: subCategoriesList };
+    }
+  }
+
+  /******************************************** END OF FUNCTION *********************/
 }
 
 async function hashPassword(password) {

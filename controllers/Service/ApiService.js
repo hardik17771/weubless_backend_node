@@ -89,6 +89,18 @@ class ApiService {
       return { error_code: 632 };
     }
   }
+
+  async mainSubCategory(arg) {
+    const apiRepository = new ApiRepository(); // Assuming ApiRepository is properly imported and initialized
+
+    const data = await apiRepository.mainSubCategory(arg);
+    // console.log("service data", data);
+    if (data.code === 689) {
+      return { code: data.code, list: data.subCategoriesList };
+    } else {
+      return { code: data.code };
+    }
+  }
 }
 
 module.exports = ApiService;

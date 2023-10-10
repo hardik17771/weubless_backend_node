@@ -281,28 +281,81 @@ const createCategory = async (req, res) => {
   const error_msg = new Msg();
 
   console.log("Create category api controller hit");
-  // try {
-  const newCategory = await apiRepository.createCategory({
-    name,
-    banner,
-    icon,
-    image,
-    featured,
-    top,
-  });
+  try {
+    const newCategory = await apiRepository.createCategory({
+      name,
+      banner,
+      icon,
+      image,
+      featured,
+      top,
+    });
 
-  const msg = error_msg.responseMsg(newCategory.code); //706
-  if (newCategory.code === 706) {
-    const response = { status: "1", message: msg, data: newCategory.data };
-    res.status(201).json(response);
-  } else {
-    const response = { status: "0", message: msg, data: newCategory.data };
-    res.status(201).json(response);
+    const msg = error_msg.responseMsg(newCategory.code); //706
+    if (newCategory.code === 706) {
+      const response = { status: "1", message: msg, data: newCategory.data };
+      res.status(201).json(response);
+    } else {
+      const response = { status: "0", message: msg, data: newCategory.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(newCategory.code); //707
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
   }
+};
+
+const createSubCategory = async (req, res) => {
+  const { name, category_id } = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create category api controller hit");
+  try {
+    const newSubCategory = await apiRepository.createSubCategory({
+      name,
+      category_id,
+    });
+
+    const msg = error_msg.responseMsg(newSubCategory.code); //706
+    if (newSubCategory.code === 712) {
+      const response = { status: "1", message: msg, data: newSubCategory.data };
+      res.status(201).json(response);
+    } else {
+      const response = { status: "0", message: msg, data: newSubCategory.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(707); //707
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
+const mainSubCategory = async (req, res) => {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.mainSubCategory(data);
+  // console.log("controller data", Check);
+  const msg = error_msg.responseMsg(Check.code);
+
+  if (Check.code == 689) {
+    // console.log("code: ", Check.code);
+    const response = { status: "1", message: msg, data: Check.list };
+    return res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    return res.status(200).json(response);
+  }
+  // }
   // } catch (error) {
-  //   const msg = error_msg.responseMsg(newCategory.code); //707
+  //   console.error(error);
+  //   const msg = error_msg.responseMsg(642);
   //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
+  //   return res.status(500).json(response);
   // }
 };
 
@@ -318,4 +371,6 @@ module.exports = {
   updateProfile,
   categoryListing,
   createCategory,
+  createSubCategory,
+  mainSubCategory,
 };
