@@ -113,6 +113,18 @@ class ApiService {
       return { code: data.code };
     }
   }
+
+  async main_subcategoryproductLocation(arg) {
+    // const data = new DataService();
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.main_subcategoryproductLocation(arg);
+
+    if (data.code === 689) {
+      return { code: data.code, list: data.subSubCategoriesList };
+    } else {
+      return { code: data.code };
+    }
+  }
 }
 
 module.exports = ApiService;

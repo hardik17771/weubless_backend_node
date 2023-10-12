@@ -9,6 +9,7 @@ const Category = require("../../models/Category");
 const SubCategory = require("../../models/SubCategory");
 const SubSubCategory = require("../../models/SubSubCategory");
 const Product = require("../../models/Product");
+const Shop = require("../../models/Shop");
 
 class ApiRepository {
   constructor() {
@@ -433,6 +434,29 @@ class ApiRepository {
     // }
   }
 
+  async createShop(data) {
+    console.log(data);
+    try {
+      console.log("Create newShop api repo hit");
+      console.log("name is ", data.name);
+      console.log("data is ", data);
+      if (data.name && data.latitude && data.longitude) {
+        console.log("name and image present");
+        const newShop = new Shop.Shop(data);
+        console.log("new newShop present");
+        await newShop.save();
+        console.log(newShop);
+        return { data: newShop, code: 720 };
+      } else if (!data.name) {
+        return { code: 708 };
+      } else {
+        return { code: 719 };
+      }
+    } catch (error) {
+      return { code: 721 };
+    }
+  }
+
   async productDetails(data) {
     try {
       if (data.product_id) {
@@ -537,6 +561,47 @@ class ApiRepository {
     } catch (error) {
       console.error(error);
       return { code: 642 };
+    }
+  }
+
+  async shopDetails(data) {
+    try {
+      if (data.shop_id) {
+        console.log("name and image present");
+        const shop = await Shop.getShopById(data.shop_id);
+
+        if (shop) {
+          const {
+            name,
+            createdAt,
+            updatedAt,
+            shop_id,
+            latitude,
+            longitude,
+            // user_id,
+          } = shop;
+
+          return {
+            data: {
+              name,
+              createdAt,
+              updatedAt,
+              shop_id,
+              latitude,
+              longitude,
+              // user_id,
+            },
+            code: 667,
+          };
+        } else {
+          return { code: 722 };
+        }
+      } else {
+        return { code: 723 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 724 };
     }
   }
 

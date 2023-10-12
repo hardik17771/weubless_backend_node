@@ -13,16 +13,6 @@ const login = async (req, res) => {
   const errorMsg = new Msg();
   const apiService = new ApiService();
 
-  // const validationRules = [
-  //   check("email").isEmail().withMessage("Invalid email format"),
-  //   check("password").notEmpty().withMessage("Password is required"),
-  // ];
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   const msg = errorMsg.responseMsg(403);
-  //   return { status: "0", message: errors.array()[0].msg };
-  // }
-
   const Check = await apiService.login(data);
   const msg = errorMsg.responseMsg(Check.error_code);
   console.log(Check);
@@ -470,6 +460,75 @@ const productDetails = async (req, res) => {
   }
 };
 
+const createShop = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create product api controller hit");
+  try {
+    const newShop = await apiRepository.createShop(data);
+
+    const msg = error_msg.responseMsg(newShop.code); //706
+    if (newShop.code === 720) {
+      const response = { status: "1", message: msg, data: newShop.data };
+      res.status(201).json(response);
+    } else {
+      const response = { status: "0", message: msg, data: newShop.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(721); //707
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
+const shopDetails = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  // try {
+  const shop = await apiRepository.shopDetails(data);
+
+  const msg = error_msg.responseMsg(shop.code);
+  console.log(shop.code);
+  if (shop.code === 667) {
+    // console.log("status 1");
+    const response = { status: "1", message: msg, data: shop.data };
+    res.status(201).json(response);
+  } else {
+    // console.log("status 0");
+    const response = { status: "0", message: msg, data: shop.data };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(717);
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
+};
+
+const main_subcategoryproductLocation = async (req, res) => {
+  try {
+    const data = req.body;
+    const error_msg = new Msg();
+    const ApiService = new ApiService();
+
+    const Check = await ApiService.main_subcategoryproductLocation(data);
+    const msg = error_msg.responseMsg(Check.error_code);
+
+    if (Check.error_code === 664) {
+      const response = { status: "1", message: msg, data: Check.data };
+      return response;
+    } else {
+      const response = { status: "0", message: msg };
+      return response;
+    }
+  } catch (error) {}
+};
+
 module.exports = {
   login,
   changePassword,
@@ -488,4 +547,7 @@ module.exports = {
   SubCategory,
   createProduct,
   productDetails,
+  main_subcategoryproductLocation,
+  createShop,
+  shopDetails,
 };
