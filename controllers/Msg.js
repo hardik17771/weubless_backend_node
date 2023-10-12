@@ -183,7 +183,7 @@ class Msg {
       661: "Token saved successfully",
       662: "Privacy Policy Fatched Detail",
       663: "Inquery has been recorded",
-      664: "Product Fatched Detail",
+      664: "Product Fetched Detail",
       665: "Terms and Condition Fatched Detail",
       666: "Category Fatched Detail",
       667: "Shop Fatched Detail",
@@ -227,7 +227,7 @@ class Msg {
       705: "Order Return List",
       706: "Category added successfully",
       707: "Category cannot be added",
-      708: "Category Name is required",
+      708: "Name is required",
       709: "Category Image is required",
       710: "Sub Category Name is required",
       711: "Category ID for subcategory is required",
@@ -235,6 +235,9 @@ class Msg {
       713: "Sub Category cannot be added",
       714: "Category ID not found",
       715: "No Sub-Categories for the Category ID found",
+      716: "Product Added successfully",
+      717: "Product cannot be added",
+      718: "Product ID is required!! ",
     };
 
     return msg[msgId] || "";

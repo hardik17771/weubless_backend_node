@@ -333,6 +333,32 @@ const createSubCategory = async (req, res) => {
   }
 };
 
+const mainSubCategory = async (req, res) => {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.mainSubCategory(data);
+  // console.log("controller data", Check);
+  const msg = error_msg.responseMsg(Check.code);
+
+  if (Check.code == 689) {
+    // console.log("code: ", Check.code);
+    const response = { status: "1", message: msg, data: Check.list };
+    return res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    return res.status(200).json(response);
+  }
+  // }
+  // } catch (error) {
+  //   console.error(error);
+  //   const msg = error_msg.responseMsg(642);
+  //   const response = { status: "0", message: msg };
+  //   return res.status(500).json(response);
+  // }
+};
+
 const createSubSubCategory = async (req, res) => {
   const { name, main_subcategory_id } = req.body;
   const apiRepository = new ApiRepository();
@@ -368,32 +394,6 @@ const createSubSubCategory = async (req, res) => {
   // }
 };
 
-const mainSubCategory = async (req, res) => {
-  const data = req.body;
-  const error_msg = new Msg();
-  const apiService = new ApiService();
-
-  const Check = await apiService.mainSubCategory(data);
-  // console.log("controller data", Check);
-  const msg = error_msg.responseMsg(Check.code);
-
-  if (Check.code == 689) {
-    // console.log("code: ", Check.code);
-    const response = { status: "1", message: msg, data: Check.list };
-    return res.status(200).json(response);
-  } else {
-    const response = { status: "0", message: msg };
-    return res.status(200).json(response);
-  }
-  // }
-  // } catch (error) {
-  //   console.error(error);
-  //   const msg = error_msg.responseMsg(642);
-  //   const response = { status: "0", message: msg };
-  //   return res.status(500).json(response);
-  // }
-};
-
 const SubCategory = async (req, res) => {
   const data = req.body;
   const error_msg = new Msg();
@@ -420,6 +420,56 @@ const SubCategory = async (req, res) => {
   // }
 };
 
+const createProduct = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  // console.log("Create product api controller hit");
+  try {
+    const newProduct = await apiRepository.createProduct(data);
+
+    const msg = error_msg.responseMsg(newProduct.code); //706
+    if (newProduct.code === 716) {
+      const response = { status: "1", message: msg, data: newProduct.data };
+      res.status(201).json(response);
+    } else {
+      const response = { status: "0", message: msg, data: newProduct.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717); //707
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
+const productDetails = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  try {
+    const product = await apiRepository.productDetails(data);
+
+    const msg = error_msg.responseMsg(product.code);
+    console.log(product.code);
+    if (product.code === 664) {
+      console.log("status 1");
+      const response = { status: "1", message: msg, data: product.data };
+      res.status(201).json(response);
+    } else {
+      console.log("status 0");
+      const response = { status: "0", message: msg, data: product.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 module.exports = {
   login,
   changePassword,
@@ -436,4 +486,6 @@ module.exports = {
   mainSubCategory,
   createSubSubCategory,
   SubCategory,
+  createProduct,
+  productDetails,
 };

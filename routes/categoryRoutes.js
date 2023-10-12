@@ -17,5 +17,8 @@ router.post("/api/create-sub-category", apiController.createSubCategory);
 router.post("/api/main_subcategory", apiController.mainSubCategory);
 router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
 router.post("/api/subcategory", apiController.SubCategory);
+router.post("/api/create-product", apiController.createProduct);
+router.post("/api/product_detail", apiController.productDetails);
+// router.post("/api/subcategory", apiController.SubCategory);
 
 module.exports = router;

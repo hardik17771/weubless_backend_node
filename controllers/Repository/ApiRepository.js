@@ -8,6 +8,7 @@ const axios = require("axios");
 const Category = require("../../models/Category");
 const SubCategory = require("../../models/SubCategory");
 const SubSubCategory = require("../../models/SubSubCategory");
+const Product = require("../../models/Product");
 
 class ApiRepository {
   constructor() {
@@ -322,6 +323,34 @@ class ApiRepository {
     }
   }
 
+  async mainSubCategory(data) {
+    const { category_id } = data;
+    let subCategoriesList = [];
+    try {
+      const subCategoryIds = await Category.getSubCategoriesByCategoryId(
+        category_id
+      );
+
+      const subCategoriesObjects = await Category.findSubCategories(
+        subCategoryIds
+      );
+      if (subCategoriesObjects && subCategoriesObjects.length > 0) {
+        subCategoriesObjects.forEach((subCategory) => {
+          const item = {
+            main_subcategory_id: subCategory.main_subcategory_id,
+            main_subcategory: subCategory.name || "",
+          };
+          subCategoriesList.push(item);
+        });
+        return { code: 689, subCategoriesList: subCategoriesList };
+      } else {
+        return { code: 715, subCategoriesList: subCategoriesList };
+      }
+    } catch (error) {
+      return { code: 642, subCategoriesList: subCategoriesList };
+    }
+  }
+
   async createSubSubCategory(data) {
     try {
       console.log("Create sub category api repo hit");
@@ -355,34 +384,6 @@ class ApiRepository {
     }
   }
 
-  async mainSubCategory(data) {
-    const { category_id } = data;
-    let subCategoriesList = [];
-    try {
-      const subCategoryIds = await Category.getSubCategoriesByCategoryId(
-        category_id
-      );
-
-      const subCategoriesObjects = await Category.findSubCategories(
-        subCategoryIds
-      );
-      if (subCategoriesObjects && subCategoriesObjects.length > 0) {
-        subCategoriesObjects.forEach((subCategory) => {
-          const item = {
-            main_subcategory_id: subCategory.main_subcategory_id,
-            main_subcategory: subCategory.name || "",
-          };
-          subCategoriesList.push(item);
-        });
-        return { code: 689, subCategoriesList: subCategoriesList };
-      } else {
-        return { code: 715, subCategoriesList: subCategoriesList };
-      }
-    } catch (error) {
-      return { code: 642, subCategoriesList: subCategoriesList };
-    }
-  }
-
   async SubCategory(data) {
     const { main_subcategory_id } = data;
     let subSubCategoriesList = [];
@@ -410,6 +411,133 @@ class ApiRepository {
     // } catch (error) {
     //   return { code: 642, subSubCategoriesList: subSubCategoriesList };
     // }
+  }
+
+  async createProduct(data) {
+    // try {
+    console.log("Create newProduct api repo hit");
+    console.log("name is ", data.name);
+    console.log("data is ", data);
+    if (data.name) {
+      console.log("name and image present");
+      const newProduct = new Product.Product(data);
+      console.log("new newProduct present");
+      await newProduct.save();
+      console.log(newProduct);
+      return { data: newProduct, code: 716 };
+    } else {
+      return { code: 708 };
+    }
+    // } catch (error) {
+    //   return { code: 717 };
+    // }
+  }
+
+  async productDetails(data) {
+    try {
+      if (data.product_id) {
+        console.log("name and image present");
+        const product = await Product.getProductById(data.product_id);
+
+        if (product) {
+          const {
+            name,
+            createdAt,
+            updatedAt,
+            product_id,
+            quantity,
+            added_by,
+            user_id,
+            category_id,
+            brand_id,
+            photos,
+            thumbnail_img,
+            featured_img,
+            flash_deal_img,
+            video_provider,
+            video_link,
+            tags,
+            description,
+            unit_price,
+            purchase_price,
+            choice_options,
+            colors,
+            variations,
+            todays_deal,
+            published,
+            featured,
+            current_stock,
+            unit,
+            discount,
+            discount_type,
+            tax,
+            tax_type,
+            shipping_type,
+            shipping_cost,
+            num_of_sale,
+            meta_title,
+            meta_description,
+            meta_img,
+            pdf,
+            slug,
+            rating,
+          } = product;
+
+          return {
+            data: {
+              name,
+              createdAt,
+              updatedAt,
+              product_id,
+              quantity,
+              added_by,
+              user_id,
+              category_id,
+              brand_id,
+              photos,
+              thumbnail_img,
+              featured_img,
+              flash_deal_img,
+              video_provider,
+              video_link,
+              tags,
+              description,
+              unit_price,
+              purchase_price,
+              choice_options,
+              colors,
+              variations,
+              todays_deal,
+              published,
+              featured,
+              current_stock,
+              unit,
+              discount,
+              discount_type,
+              tax,
+              tax_type,
+              shipping_type,
+              shipping_cost,
+              num_of_sale,
+              meta_title,
+              meta_description,
+              meta_img,
+              pdf,
+              slug,
+              rating,
+            },
+            code: 664,
+          };
+        } else {
+          return { code: 422 }; // Assuming 422 is the appropriate error code
+        }
+      } else {
+        return { code: 718 }; // Assuming 422 is the appropriate error code
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 642 };
+    }
   }
 
   /******************************************** END OF FUNCTION *********************/
