@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const { SubSubCategory } = require("./SubSubCategory");
-// const { SubCategory } = require("./SubCategory");
+// const { SubSubCategory } = require("./SubSubCategory");
 
 const productSchema = new mongoose.Schema(
   {
@@ -8,7 +7,7 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     quantity: { type: Number, default: 0 },
     added_by: { type: String, default: "" },
-    main_subcategory_id: { type: Number, ref: "SubCategory" },
+    main_subcategory_id: { type: Number, ref: "SubCategory", default: 0 },
     subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
 
     user_id: {
@@ -85,8 +84,29 @@ const getProductById = async (product_id) => {
   }
 };
 
+const populateMainSubcategory = async (main_subcategory_id, product_id) => {
+  // try {
+  console.log(main_subcategory_id);
+  const product = await Product.findOne({ product_id }).exec();
+
+  if (main_subcategory_id) {
+    product.main_subcategory_id = main_subcategory_id;
+
+    await product.save();
+    console.log(product);
+    return product;
+  } else {
+    throw new Error(
+      `SubSubCategory with subcategory_id ${subcategory_id} not found`
+    );
+  }
+  // } catch (error) {
+  //   throw new Error(`Error populating main_subcategory_id: ${error.message}`);
+  // }
+};
+
 productSchema.index({ name: 1 }, { unique: false });
 
 const Product = mongoose.model("Product", productSchema);
 
-module.exports = { Product, getProductById };
+module.exports = { Product, getProductById, populateMainSubcategory };

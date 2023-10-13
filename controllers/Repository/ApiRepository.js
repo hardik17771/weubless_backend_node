@@ -388,30 +388,48 @@ class ApiRepository {
   async SubCategory(data) {
     const { main_subcategory_id } = data;
     let subSubCategoriesList = [];
-    // try {
-    const subSubCategoryIds =
-      await SubCategory.getSubSubCategoriesByMainSubCategoryId(
-        main_subcategory_id
+    try {
+      const subSubCategoryIds =
+        await SubCategory.getSubSubCategoriesByMainSubCategoryId(
+          main_subcategory_id
+        );
+      const subSubCategoriesObjects = await SubCategory.findSubSubCategories(
+        subSubCategoryIds
       );
 
-    const subSubCategoriesObjects = await SubCategory.findSubSubCategories(
-      subSubCategoryIds
-    );
-    if (subSubCategoriesObjects && subSubCategoriesObjects.length > 0) {
-      subSubCategoriesObjects.forEach((subSubCategory) => {
-        const item = {
-          subcategory_id: subSubCategory.subcategory_id,
-          subcategory: subSubCategory.name || "",
-        };
-        subSubCategoriesList.push(item);
-      });
-      return { code: 689, subSubCategoriesList: subSubCategoriesList };
-    } else {
-      return { code: 715, subSubCategoriesList: subSubCategoriesList };
+      if (subSubCategoriesObjects && subSubCategoriesObjects.length > 0) {
+        for (const subSubCategory of subSubCategoriesObjects) {
+          let productsList = [];
+          const productIds = await SubSubCategory.getProdutsBySubCategoryId(
+            subSubCategory.subcategory_id
+          );
+          const productObjects = await SubSubCategory.findProducts(productIds);
+
+          if (productObjects && productObjects.length > 0) {
+            for (const product of productObjects) {
+              const productItem = {
+                product_id: product.product_id,
+                subcategory: product.name || "",
+              };
+              productsList.push(productItem);
+            }
+          }
+
+          const item = {
+            subcategory_id: subSubCategory.subcategory_id,
+            subcategory: subSubCategory.name || "",
+            products: productsList,
+          };
+          subSubCategoriesList.push(item);
+        }
+
+        return { code: 689, subSubCategoriesList: subSubCategoriesList };
+      } else {
+        return { code: 715, subSubCategoriesList: subSubCategoriesList };
+      }
+    } catch (error) {
+      return { code: 642, subSubCategoriesList: subSubCategoriesList };
     }
-    // } catch (error) {
-    //   return { code: 642, subSubCategoriesList: subSubCategoriesList };
-    // }
   }
 
   async createProduct(data) {
@@ -426,18 +444,27 @@ class ApiRepository {
       const subSubCategory = await SubSubCategory.getSubSubCategoryById(
         data.subcategory_id
       );
+
+      console.log(subSubCategory.main_subcategory_id);
+
       if (subSubCategory) {
+        const mainSubcategoryId = subSubCategory.main_subcategory_id;
         subSubCategory.products.push(newProduct._id);
         await subSubCategory.save();
         await newProduct.save();
+        console.log(newProduct);
+        const updated_product = await Product.populateMainSubcategory(
+          mainSubcategoryId,
+          newProduct.product_id
+        );
+        return { data: updated_product, code: 716 };
       } else {
         return { code: 727 };
       }
-
+      // await newProduct.save();
       // console.log("new newProduct present");
       // await newProduct.save();
       // console.log(newProduct);
-      return { data: newProduct, code: 716 };
     } else if (!data.category_id) {
       return { code: 725 };
     } else {
@@ -460,6 +487,8 @@ class ApiRepository {
             createdAt,
             updatedAt,
             product_id,
+            main_subcategory_id,
+            subcategory_id,
             quantity,
             added_by,
             user_id,
