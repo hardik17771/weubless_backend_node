@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { Product } = require("./Product");
 const subSubCategorySchema = new mongoose.Schema(
   {
     subcategory_id: { type: Number, unique: true },
@@ -10,7 +10,9 @@ const subSubCategorySchema = new mongoose.Schema(
       ref: "SubCategory",
       required: true,
     },
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
+
   { timestamps: true }
 );
 
@@ -27,6 +29,44 @@ subSubCategorySchema.pre("save", async function (next) {
   }
 });
 
+const getSubSubCategoryById = async (subcategory_id) => {
+  try {
+    const sub_sub_Category = await SubSubCategory.findOne({
+      subcategory_id,
+    }).exec();
+    return sub_sub_Category;
+  } catch (error) {
+    throw new Error(`Error fetching category: ${error.message}`);
+  }
+};
+
+const getProdutsBySubCategoryId = async (subcategory_id) => {
+  try {
+    const sub_sub_Category = await SubSubCategory.findOne({
+      subcategory_id,
+    }).exec();
+    return sub_sub_Category ? sub_sub_Category.products : [];
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
+const findProducts = async (objectIds) => {
+  try {
+    const products = await Product.find({
+      _id: { $in: objectIds },
+    });
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching categories: ${error.message}`);
+  }
+};
+
 const SubSubCategory = mongoose.model("SubSubCategory", subSubCategorySchema);
 
-module.exports = { SubSubCategory };
+module.exports = {
+  SubSubCategory,
+  getSubSubCategoryById,
+  getProdutsBySubCategoryId,
+  findProducts,
+};

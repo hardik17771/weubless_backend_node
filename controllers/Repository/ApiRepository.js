@@ -300,11 +300,11 @@ class ApiRepository {
       if (data.name && data.category_id) {
         const newSubCategory = new SubCategory.SubCategory(data);
         console.log("new category present");
-        await newSubCategory.save();
 
         const category = await Category.getCategoryById(data.category_id);
         if (category) {
           category.subCategories.push(newSubCategory._id);
+          await newSubCategory.save();
           await category.save();
         } else {
           return { code: 714 };
@@ -359,7 +359,6 @@ class ApiRepository {
       if (data.name && data.main_subcategory_id) {
         const newSubSubCategory = new SubSubCategory.SubSubCategory(data);
         // console.log("new category present");
-        await newSubSubCategory.save();
 
         const subCategory = await SubCategory.getSubCategoryById(
           data.main_subcategory_id
@@ -367,8 +366,9 @@ class ApiRepository {
         if (subCategory) {
           subCategory.subsubCategories.push(newSubSubCategory._id);
           await subCategory.save();
+          await newSubSubCategory.save();
         } else {
-          return { code: 714 };
+          return { code: 726 };
         }
 
         // console.log(newSubCategory);
@@ -419,42 +419,33 @@ class ApiRepository {
     console.log("Create newProduct api repo hit");
     console.log("name is ", data.name);
     console.log("data is ", data);
-    if (data.name) {
-      console.log("name and image present");
+    if (data.name && data.subcategory_id) {
+      // console.log("name and image present");
       const newProduct = new Product.Product(data);
-      console.log("new newProduct present");
-      await newProduct.save();
-      console.log(newProduct);
+
+      const subSubCategory = await SubSubCategory.getSubSubCategoryById(
+        data.subcategory_id
+      );
+      if (subSubCategory) {
+        subSubCategory.products.push(newProduct._id);
+        await subSubCategory.save();
+        await newProduct.save();
+      } else {
+        return { code: 727 };
+      }
+
+      // console.log("new newProduct present");
+      // await newProduct.save();
+      // console.log(newProduct);
       return { data: newProduct, code: 716 };
+    } else if (!data.category_id) {
+      return { code: 725 };
     } else {
       return { code: 708 };
     }
     // } catch (error) {
     //   return { code: 717 };
     // }
-  }
-
-  async createShop(data) {
-    console.log(data);
-    try {
-      console.log("Create newShop api repo hit");
-      console.log("name is ", data.name);
-      console.log("data is ", data);
-      if (data.name && data.latitude && data.longitude) {
-        console.log("name and image present");
-        const newShop = new Shop.Shop(data);
-        console.log("new newShop present");
-        await newShop.save();
-        console.log(newShop);
-        return { data: newShop, code: 720 };
-      } else if (!data.name) {
-        return { code: 708 };
-      } else {
-        return { code: 719 };
-      }
-    } catch (error) {
-      return { code: 721 };
-    }
   }
 
   async productDetails(data) {
@@ -513,6 +504,8 @@ class ApiRepository {
               createdAt,
               updatedAt,
               product_id,
+              main_subcategory_id,
+              subcategory_id,
               quantity,
               added_by,
               user_id,
@@ -564,6 +557,55 @@ class ApiRepository {
     }
   }
 
+  async productsFromSubCategoryId(data) {
+    const { subcategory_id } = data;
+    let productsList = [];
+    // try {
+    const productIds = await SubSubCategory.getProdutsBySubCategoryId(
+      subcategory_id
+    );
+
+    const productObjects = await SubSubCategory.findProducts(productIds);
+    if (productObjects && productObjects.length > 0) {
+      productObjects.forEach((product) => {
+        const item = {
+          product_id: product.product_id,
+          product_name: product.name || "",
+        };
+        productsList.push(item);
+      });
+      return { code: 684, productsList: productsList };
+    } else {
+      return { code: 728, productsList: productsList };
+    }
+    // } catch (error) {
+    //   return { code: 642, productsList: productsList };
+    // }
+  }
+
+  async createShop(data) {
+    console.log(data);
+    try {
+      console.log("Create newShop api repo hit");
+      console.log("name is ", data.name);
+      console.log("data is ", data);
+      if (data.name && data.latitude && data.longitude) {
+        console.log("name and image present");
+        const newShop = new Shop.Shop(data);
+        console.log("new newShop present");
+        await newShop.save();
+        console.log(newShop);
+        return { data: newShop, code: 720 };
+      } else if (!data.name) {
+        return { code: 708 };
+      } else {
+        return { code: 719 };
+      }
+    } catch (error) {
+      return { code: 721 };
+    }
+  }
+
   async shopDetails(data) {
     try {
       if (data.shop_id) {
@@ -606,6 +648,27 @@ class ApiRepository {
   }
 
   /******************************************** END OF FUNCTION *********************/
+}
+
+async function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = degToRad(lat2 - lat1);
+  const dLon = degToRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(degToRad(lat1)) *
+      Math.cos(degToRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in kilometers
+  return distance;
+}
+
+function degToRad(deg) {
+  return deg * (Math.PI / 180);
 }
 
 async function hashPassword(password) {

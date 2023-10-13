@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { SubSubCategory } = require("./SubSubCategory");
+// const { SubCategory } = require("./SubCategory");
 
 const productSchema = new mongoose.Schema(
   {
@@ -6,6 +8,9 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     quantity: { type: Number, default: 0 },
     added_by: { type: String, default: "" },
+    main_subcategory_id: { type: Number, ref: "SubCategory" },
+    subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
+
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users2",
@@ -79,6 +84,8 @@ const getProductById = async (product_id) => {
     throw new Error(`Error fetching user: ${error.message}`);
   }
 };
+
+productSchema.index({ name: 1 }, { unique: false });
 
 const Product = mongoose.model("Product", productSchema);
 

@@ -13,16 +13,26 @@ const categoryListingMiddleware = async (req, res, next) => {
 
 router.get("/api/category", categoryListingMiddleware);
 router.post("/api/category", apiController.createCategory);
-router.post("/api/create-sub-category", apiController.createSubCategory);
+router.post("/api/create-subcategory", apiController.createSubCategory);
 router.post("/api/main_subcategory", apiController.mainSubCategory);
 router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
 router.post("/api/subcategory", apiController.SubCategory);
 router.post("/api/create-product", apiController.createProduct);
 router.post("/api/product-details", apiController.productDetails);
 router.post(
-  "/api/main_subcategoryproductLocation",
+  "/api/products-subCategoryId",
+  apiController.productsFromSubCategoryId
+);
+
+router.post(
+  "/api/main-subcategoryproductLocation",
   apiController.main_subcategoryproductLocation
 );
+// router.post(
+//   "/api/fetch-product-from-main-subcategory",
+//   apiController.fetchProductFromMainSubCategory
+// );
+
 router.post("/api/create-shop", apiController.createShop);
 router.post("/api/shop-details", apiController.shopDetails);
 // router.post("/api/subcategory", apiController.SubCategory);

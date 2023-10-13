@@ -355,33 +355,33 @@ const createSubSubCategory = async (req, res) => {
   const error_msg = new Msg();
 
   console.log("Create sub sub category api controller hit");
-  // try {
-  const newSubSubCategory = await apiRepository.createSubSubCategory({
-    name,
-    main_subcategory_id,
-  });
+  try {
+    const newSubSubCategory = await apiRepository.createSubSubCategory({
+      name,
+      main_subcategory_id,
+    });
 
-  const msg = error_msg.responseMsg(newSubSubCategory.code); //706
-  if (newSubSubCategory.code === 712) {
-    const response = {
-      status: "1",
-      message: msg,
-      data: newSubSubCategory.data,
-    };
-    res.status(201).json(response);
-  } else {
-    const response = {
-      status: "0",
-      message: msg,
-      data: newSubSubCategory.data,
-    };
-    res.status(201).json(response);
+    const msg = error_msg.responseMsg(newSubSubCategory.code); //706
+    if (newSubSubCategory.code === 712) {
+      const response = {
+        status: "1",
+        message: msg,
+        data: newSubSubCategory.data,
+      };
+      res.status(201).json(response);
+    } else {
+      const response = {
+        status: "0",
+        message: msg,
+        data: newSubSubCategory.data,
+      };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(707); //707
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(707); //707
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
 };
 
 const SubCategory = async (req, res) => {
@@ -458,6 +458,32 @@ const productDetails = async (req, res) => {
     const response = { status: "0", message: msg };
     res.status(400).json(response);
   }
+};
+
+const productsFromSubCategoryId = async (req, res) => {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.productsFromSubCategoryId(data);
+  // console.log("controller data", Check);
+  const msg = error_msg.responseMsg(Check.code);
+
+  if (Check.code == 684) {
+    // console.log("code: ", Check.code);
+    const response = { status: "1", message: msg, data: Check.list };
+    return res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    return res.status(200).json(response);
+  }
+  // }
+  // } catch (error) {
+  //   console.error(error);
+  //   const msg = error_msg.responseMsg(642);
+  //   const response = { status: "0", message: msg };
+  //   return res.status(500).json(response);
+  // }
 };
 
 const createShop = async (req, res) => {
@@ -550,4 +576,5 @@ module.exports = {
   main_subcategoryproductLocation,
   createShop,
   shopDetails,
+  productsFromSubCategoryId,
 };
