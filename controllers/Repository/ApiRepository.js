@@ -437,36 +437,59 @@ class ApiRepository {
     console.log("Create newProduct api repo hit");
     console.log("name is ", data.name);
     console.log("data is ", data);
-    if (data.name && data.subcategory_id) {
+    if (data.name && data.subcategory_id && data.shop_id) {
       // console.log("name and image present");
       const newProduct = new Product.Product(data);
 
       const subSubCategory = await SubSubCategory.getSubSubCategoryById(
         data.subcategory_id
       );
+      const shop = await Shop.getShopById(data.shop_id);
 
-      console.log(subSubCategory.main_subcategory_id);
+      // console.log(subSubCategory.main_subcategory_id);
 
-      if (subSubCategory) {
+      if (subSubCategory && shop) {
+        // Sub Sub Categories
         const mainSubcategoryId = subSubCategory.main_subcategory_id;
         subSubCategory.products.push(newProduct._id);
         await subSubCategory.save();
+
+        // Shop
+        console.log("shop data is", shop);
+        const lat = shop.latitude;
+        const long = shop.longitude;
+        console.log("shop lat long is", lat, long);
+        shop.products.push(newProduct._id);
+        await shop.save();
+
         await newProduct.save();
-        console.log(newProduct);
+        // console.log(newProduct);
+
         const updated_product = await Product.populateMainSubcategory(
           mainSubcategoryId,
           newProduct.product_id
         );
-        return { data: updated_product, code: 716 };
-      } else {
+
+        const new_updated_product = await Product.populateLatLong(
+          lat,
+          long,
+          updated_product.product_id
+        );
+
+        return { data: new_updated_product, code: 716 };
+      } else if (!subSubCategory) {
         return { code: 727 };
+      } else {
+        return { code: 729 };
       }
       // await newProduct.save();
       // console.log("new newProduct present");
       // await newProduct.save();
       // console.log(newProduct);
-    } else if (!data.category_id) {
+    } else if (!data.subcategory_id) {
       return { code: 725 };
+    } else if (!data.shop_id) {
+      return { code: 729 };
     } else {
       return { code: 708 };
     }
@@ -489,6 +512,8 @@ class ApiRepository {
             product_id,
             main_subcategory_id,
             subcategory_id,
+            latitude,
+            longitude,
             quantity,
             added_by,
             user_id,
@@ -535,6 +560,8 @@ class ApiRepository {
               product_id,
               main_subcategory_id,
               subcategory_id,
+              latitude,
+              longitude,
               quantity,
               added_by,
               user_id,
@@ -649,8 +676,22 @@ class ApiRepository {
             shop_id,
             latitude,
             longitude,
+            products,
             // user_id,
           } = shop;
+
+          let productsList = [];
+
+          const productObjects = await Shop.findProducts(products);
+          if (productObjects && productObjects.length > 0) {
+            productObjects.forEach((product) => {
+              const item = {
+                product_id: product.product_id,
+                product_name: product.name || "",
+              };
+              productsList.push(item);
+            });
+          }
 
           return {
             data: {
@@ -660,6 +701,7 @@ class ApiRepository {
               shop_id,
               latitude,
               longitude,
+              productsList,
               // user_id,
             },
             code: 667,

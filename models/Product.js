@@ -9,7 +9,15 @@ const productSchema = new mongoose.Schema(
     added_by: { type: String, default: "" },
     main_subcategory_id: { type: Number, ref: "SubCategory", default: 0 },
     subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
-
+    shop_id: { type: Number, ref: "Shop", required: true },
+    latitude: {
+      type: String,
+      // required: [true, "Latitude is required"],
+    },
+    longitude: {
+      type: String,
+      // required: [true, "Longitude is required"],
+    },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users2",
@@ -59,6 +67,7 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 productSchema.pre("save", async function (next) {
   try {
     if (!this.isNew) {
@@ -104,9 +113,33 @@ const populateMainSubcategory = async (main_subcategory_id, product_id) => {
   //   throw new Error(`Error populating main_subcategory_id: ${error.message}`);
   // }
 };
+const populateLatLong = async (lat, long, product_id) => {
+  // try {
+  console.log(lat, long);
+  const product = await Product.findOne({ product_id }).exec();
+
+  if (lat && long) {
+    product.latitude = lat;
+    product.longitude = long;
+
+    await product.save();
+    console.log(product);
+    return product;
+  } else {
+    throw new Error(`lat long not defined`);
+  }
+  // } catch (error) {
+  //   throw new Error(`Error populating main_subcategory_id: ${error.message}`);
+  // }
+};
 
 productSchema.index({ name: 1 }, { unique: false });
 
 const Product = mongoose.model("Product", productSchema);
 
-module.exports = { Product, getProductById, populateMainSubcategory };
+module.exports = {
+  Product,
+  getProductById,
+  populateMainSubcategory,
+  populateLatLong,
+};
