@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { SubSubCategory } = require("./SubSubCategory");
-// const { Product } = require("./Product");
+const { Product } = require("./Product");
 const subCategorySchema = new mongoose.Schema(
   {
     main_subcategory_id: { type: Number, unique: true },
@@ -64,6 +64,17 @@ const findSubSubCategories = async (objectIds) => {
   }
 };
 
+const findProducts = async (objectIds) => {
+  try {
+    const products = await Product.find({
+      _id: { $in: objectIds },
+    });
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching categories: ${error.message}`);
+  }
+};
+
 const SubCategory = mongoose.model("SubCategory", subCategorySchema);
 
 module.exports = {
@@ -71,4 +82,5 @@ module.exports = {
   getSubCategoryById,
   getSubSubCategoriesByMainSubCategoryId,
   findSubSubCategories,
+  findProducts,
 };

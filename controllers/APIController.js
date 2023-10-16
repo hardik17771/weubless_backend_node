@@ -537,22 +537,81 @@ const shopDetails = async (req, res) => {
 };
 
 const main_subcategoryproductLocation = async (req, res) => {
-  try {
-    const data = req.body;
-    const error_msg = new Msg();
-    const ApiService = new ApiService();
+  // try {
+  const { user_id, shop_id, main_subcategory_id } = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
 
-    const Check = await ApiService.main_subcategoryproductLocation(data);
-    const msg = error_msg.responseMsg(Check.error_code);
+  const Check = await apiService.main_subcategoryproductLocation({
+    user_id,
+    shop_id,
+    main_subcategory_id,
+  });
 
-    if (Check.error_code === 664) {
-      const response = { status: "1", message: msg, data: Check.data };
-      return response;
-    } else {
-      const response = { status: "0", message: msg };
-      return response;
-    }
-  } catch (error) {}
+  const msg = error_msg.responseMsg(Check.code);
+  console.log("controller msg", msg);
+  if (Check.code === 900) {
+    console.log(Check.productsList);
+    const response = { status: "1", message: msg, data: Check.productsList };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    res.status(201).json(response);
+  }
+  // } catch (error) {}
+};
+
+const main_subcategoryproductDistance = async (req, res) => {
+  // try {
+  const { latitude, longitude, distance, main_subcategory_id } = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.main_subcategoryproductDistance({
+    latitude,
+    longitude,
+    distance,
+    main_subcategory_id,
+  });
+
+  const msg = error_msg.responseMsg(Check.code);
+  console.log("controller msg", msg);
+  if (Check.code === 900) {
+    console.log(Check.productsList);
+    const response = { status: "1", message: msg, data: Check.productsList };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    res.status(201).json(response);
+  }
+  // } catch (error) {}
+};
+
+const main_subcategoryproductLatLong = async (req, res) => {
+  // try {
+  const { lat1, long1, lat2, long2, main_subcategory_id } = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.main_subcategoryproductLatLong({
+    lat1,
+    long1,
+    lat2,
+    long2,
+    main_subcategory_id,
+  });
+
+  const msg = error_msg.responseMsg(Check.code);
+  console.log("controller msg", msg);
+  if (Check.code === 900) {
+    console.log(Check.productsList);
+    const response = { status: "1", message: msg, data: Check.productsList };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    res.status(201).json(response);
+  }
+  // } catch (error) {}
 };
 
 module.exports = {
@@ -573,8 +632,10 @@ module.exports = {
   SubCategory,
   createProduct,
   productDetails,
-  main_subcategoryproductLocation,
   createShop,
   shopDetails,
   productsFromSubCategoryId,
+  main_subcategoryproductLocation,
+  main_subcategoryproductDistance,
+  main_subcategoryproductLatLong,
 };

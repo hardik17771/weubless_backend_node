@@ -24,10 +24,6 @@ router.post(
   apiController.productsFromSubCategoryId
 );
 
-router.post(
-  "/api/main-subcategoryproductLocation",
-  apiController.main_subcategoryproductLocation
-);
 // router.post(
 //   "/api/fetch-product-from-main-subcategory",
 //   apiController.fetchProductFromMainSubCategory
@@ -36,5 +32,20 @@ router.post(
 router.post("/api/create-shop", apiController.createShop);
 router.post("/api/shop-details", apiController.shopDetails);
 // router.post("/api/subcategory", apiController.SubCategory);
+
+router.post(
+  "/api/main-subcategoryproductLocation",
+  apiController.main_subcategoryproductLocation
+);
+
+router.post(
+  "/api/main-subcategoryproductDistance",
+  apiController.main_subcategoryproductDistance
+);
+
+router.post(
+  "/api/main-subcategoryproductLatLong",
+  apiController.main_subcategoryproductLatLong
+);
 
 module.exports = router;

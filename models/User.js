@@ -176,9 +176,9 @@ const getUser = async (email) => {
   }
 };
 
-const getUserById = async (id) => {
+const getUserById = async (user_id) => {
   try {
-    const user = await User2.findOne({ _id: id }).exec();
+    const user = await User2.findOne({ user_id: user_id }).exec();
     console.log(user);
     return user;
   } catch (error) {

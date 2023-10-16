@@ -130,9 +130,39 @@ class ApiService {
     // const data = new DataService();
     const apiRepository = new ApiRepository();
     const data = await apiRepository.main_subcategoryproductLocation(arg);
+    // console.log("service code", data.code);
+    if (data.code === 900) {
+      console.log("data.productsList", data.productsList);
+      console.log("data ", data);
+      return { code: data.code, productsList: data.productsList };
+    } else {
+      return { code: data.code };
+    }
+  }
 
-    if (data.code === 689) {
-      return { code: data.code, list: data.subSubCategoriesList };
+  async main_subcategoryproductDistance(arg) {
+    // const data = new DataService();
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.main_subcategoryproductDistance(arg);
+    // console.log("service code", data.code);
+    if (data.code === 900) {
+      console.log("data.productsList", data.productsList);
+      console.log("data ", data);
+      return { code: data.code, productsList: data.productsList };
+    } else {
+      return { code: data.code };
+    }
+  }
+
+  async main_subcategoryproductLatLong(arg) {
+    // const data = new DataService();
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.main_subcategoryproductLatLong(arg);
+    // console.log("service code", data.code);
+    if (data.code === 900) {
+      console.log("data.productsList", data.productsList);
+      console.log("data ", data);
+      return { code: data.code, productsList: data.productsList };
     } else {
       return { code: data.code };
     }

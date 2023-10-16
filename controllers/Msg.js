@@ -248,7 +248,10 @@ class Msg {
       726: "Sub Category ID not found!!",
       727: "Sub Sub Category ID not found!!",
       728: "No products found for the given subCategory ID!",
-      729: "Shop Id is required !!!",
+      // 729: "Shop Id is required !!!",
+      730: "User Id is required!!!",
+      731: "Distance is required",
+      900: "Success",
     };
 
     return msg[msgId] || "";

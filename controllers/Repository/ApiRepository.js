@@ -1,4 +1,6 @@
 const express = require("express");
+const turf = require("@turf/turf");
+
 const app = express();
 const crypto = require("crypto");
 const User = require("../../models/User");
@@ -86,12 +88,15 @@ class ApiRepository {
     try {
       const accessToken = this.access_token;
 
-      if (data.id) {
-        const user = await User.getUserById(data.id);
+      if (data.user_id) {
+        const user = await User.getUserById(data.user_id);
         if (user) {
           return {
+            user_id: user.user_id,
             id: user.id,
             name: user.name,
+            latitude: user.latitude,
+            longitude: user.longitude,
             country_code: user.country_code,
             phone: user.phone,
             email: user.email,
@@ -454,6 +459,14 @@ class ApiRepository {
         subSubCategory.products.push(newProduct._id);
         await subSubCategory.save();
 
+        // Sub Category
+        const subCategory = await SubCategory.getSubCategoryById(
+          mainSubcategoryId
+        );
+        subCategory.products.push(newProduct._id);
+        await subCategory.save();
+        console.log(subCategory);
+
         // Shop
         console.log("shop data is", shop);
         const lat = shop.latitude;
@@ -480,7 +493,7 @@ class ApiRepository {
       } else if (!subSubCategory) {
         return { code: 727 };
       } else {
-        return { code: 729 };
+        return { code: 723 };
       }
       // await newProduct.save();
       // console.log("new newProduct present");
@@ -489,7 +502,7 @@ class ApiRepository {
     } else if (!data.subcategory_id) {
       return { code: 725 };
     } else if (!data.shop_id) {
-      return { code: 729 };
+      return { code: 723 };
     } else {
       return { code: 708 };
     }
@@ -616,27 +629,27 @@ class ApiRepository {
   async productsFromSubCategoryId(data) {
     const { subcategory_id } = data;
     let productsList = [];
-    // try {
-    const productIds = await SubSubCategory.getProdutsBySubCategoryId(
-      subcategory_id
-    );
+    try {
+      const productIds = await SubSubCategory.getProdutsBySubCategoryId(
+        subcategory_id
+      );
 
-    const productObjects = await SubSubCategory.findProducts(productIds);
-    if (productObjects && productObjects.length > 0) {
-      productObjects.forEach((product) => {
-        const item = {
-          product_id: product.product_id,
-          product_name: product.name || "",
-        };
-        productsList.push(item);
-      });
-      return { code: 684, productsList: productsList };
-    } else {
-      return { code: 728, productsList: productsList };
+      const productObjects = await SubSubCategory.findProducts(productIds);
+      if (productObjects && productObjects.length > 0) {
+        productObjects.forEach((product) => {
+          const item = {
+            product_id: product.product_id,
+            product_name: product.name || "",
+          };
+          productsList.push(item);
+        });
+        return { code: 684, productsList: productsList };
+      } else {
+        return { code: 728, productsList: productsList };
+      }
+    } catch (error) {
+      return { code: 642, productsList: productsList };
     }
-    // } catch (error) {
-    //   return { code: 642, productsList: productsList };
-    // }
   }
 
   async createShop(data) {
@@ -718,29 +731,261 @@ class ApiRepository {
     }
   }
 
-  /******************************************** END OF FUNCTION *********************/
+  async main_subcategoryproductLocation(data) {
+    try {
+      if (data.shop_id && data.user_id && data.main_subcategory_id) {
+        const productsList = [];
+
+        const shop = await Shop.getShopById(data.shop_id);
+        const user = await User.getUserById(data.user_id);
+
+        const subCategory = await SubCategory.getSubCategoryById(
+          data.main_subcategory_id
+        );
+
+        // console.log("produtObjects", productObjects);
+
+        if (shop && user && subCategory) {
+          const productObjects = await SubCategory.findProducts(
+            subCategory.products
+          );
+          const distanceUserShop = await calculateDistance(
+            user.latitude,
+            user.longitude,
+            shop.latitude,
+            shop.longitude
+          );
+          console.log(
+            "user.latitude,user.longitude, shop.latitude,shop.longitude",
+            user.latitude,
+            user.longitude,
+            shop.latitude,
+            shop.longitude
+          );
+          console.log("subCategory products Ids", subCategory.products);
+          console.log("Distance between user and shop", distanceUserShop);
+
+          if (productObjects && productObjects.length > 0) {
+            for (const product of productObjects) {
+              const distanceUserProduct = await calculateDistance(
+                user.latitude,
+                user.longitude,
+                product.latitude,
+                product.longitude
+              );
+              console.log(
+                "user.latitude,user.longitude,product.latitude,product.longitude",
+                user.latitude,
+                user.longitude,
+                product.latitude,
+                product.longitude
+              );
+
+              console.log(
+                `distanceUserProduct ${product.name} and ${user.name}: `,
+                distanceUserProduct
+              );
+
+              if (distanceUserProduct <= distanceUserShop) {
+                const item = {
+                  product_id: product.product_id,
+                  product_name: product.name || "",
+                };
+                productsList.push(item);
+              }
+            }
+          }
+          console.log("Available products : ", productsList);
+          // console.log(shop);
+          // console.log(user);
+        } else if (!shop) {
+          return { code: 722 };
+        } else if (!User) {
+          return { code: 404 };
+        } else {
+          return { code: 726 };
+        }
+        // console.log(data);
+        // console.log("Repository productsList ", productsList);
+        return { code: 900, productsList: productsList };
+      } else if (!data.shop_id) {
+        return { code: 723 };
+      } else if (!data.user_id) {
+        return { code: 730 };
+      } else {
+        return { code: 725 };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async main_subcategoryproductDistance(data) {
+    try {
+      if (
+        data.distance &&
+        data.main_subcategory_id &&
+        data.latitude &&
+        data.longitude
+      ) {
+        const productsList = [];
+        const subCategory = await SubCategory.getSubCategoryById(
+          data.main_subcategory_id
+        );
+        if (subCategory) {
+          const productObjects = await SubCategory.findProducts(
+            subCategory.products
+          );
+          console.log("subCategory products Ids", subCategory.products);
+          console.log("Distance given", data.distance);
+
+          if (productObjects && productObjects.length > 0) {
+            for (const product of productObjects) {
+              const distanceUserProduct = await calculateDistance(
+                data.latitude,
+                data.longitude,
+                product.latitude,
+                product.longitude
+              );
+              console.log(
+                "user.latitude,user.longitude,product.latitude,product.longitude",
+                data.latitude,
+                data.longitude,
+                product.latitude,
+                product.longitude
+              );
+
+              if (distanceUserProduct <= data.distance) {
+                const item = {
+                  product_id: product.product_id,
+                  product_name: product.name || "",
+                };
+                productsList.push(item);
+              }
+            }
+          }
+          console.log("Available products : ", productsList);
+        } else {
+          return { code: 726 };
+        }
+        return { code: 900, productsList: productsList };
+      } else if (!(data.latitude && data.longitude)) {
+        return { code: 719 };
+      } else if (!data.distance) {
+        return { code: 731 };
+      } else {
+        return { code: 725 };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async main_subcategoryproductLatLong(data) {
+    try {
+      if (
+        data.lat1 &&
+        data.long1 &&
+        data.lat2 &&
+        data.long2 &&
+        data.main_subcategory_id
+      ) {
+        const productsList = [];
+        const subCategory = await SubCategory.getSubCategoryById(
+          data.main_subcategory_id
+        );
+        if (subCategory) {
+          const distanceBetween = await calculateDistance(
+            data.lat1,
+            data.long1,
+            data.lat2,
+            data.long2
+          );
+
+          const productObjects = await SubCategory.findProducts(
+            subCategory.products
+          );
+
+          console.log("subCategory products Ids", subCategory.products);
+          // console.log("Distance given", data.distance);
+
+          if (productObjects && productObjects.length > 0) {
+            for (const product of productObjects) {
+              const distanceUserProduct = await calculateDistance(
+                data.lat1,
+                data.long1,
+                parseFloat(product.latitude),
+                parseFloat(product.longitude)
+              );
+              console.log(
+                "user.latitude,user.longitude,product.latitude,product.longitude",
+                data.lat1,
+                data.long1,
+                product.latitude,
+                product.longitude
+              );
+              console.log(
+                "distance User Product",
+                distanceUserProduct,
+                " distance between ",
+                distanceBetween
+              );
+              if (distanceUserProduct <= distanceBetween) {
+                const item = {
+                  product_id: product.product_id,
+                  product_name: product.name || "",
+                };
+                productsList.push(item);
+              }
+            }
+          }
+          console.log("Available products : ", productsList);
+        } else {
+          return { code: 726 };
+        }
+        return { code: 900, productsList: productsList };
+      } else if (!(data.lat1 && data.long1 && data.lat2 && data.long2)) {
+        return { code: 719 };
+      } else {
+        return { code: 725 };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  /******************************************** END OF FUNCTION ********************************************/
 }
 
 async function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Radius of the Earth in kilometers
-  const dLat = degToRad(lat2 - lat1);
-  const dLon = degToRad(lon2 - lon1);
+  const point1 = turf.point([lon1, lat1]);
+  const point2 = turf.point([lon2, lat2]);
+  const options = { units: "kilometers" };
+  const distance = turf.distance(point1, point2, options);
 
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(degToRad(lat1)) *
-      Math.cos(degToRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c; // Distance in kilometers
   return distance;
 }
 
-function degToRad(deg) {
-  return deg * (Math.PI / 180);
-}
+// async function calculateDistance(lat1, lon1, lat2, lon2) {
+//   const R = 6371; // Radius of the Earth in kilometers
+//   const dLat = degToRad(lat2 - lat1);
+//   const dLon = degToRad(lon2 - lon1);
+
+//   const a =
+//     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+//     Math.cos(degToRad(lat1)) *
+//       Math.cos(degToRad(lat2)) *
+//       Math.sin(dLon / 2) *
+//       Math.sin(dLon / 2);
+
+//   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+//   const distance = R * c; // Distance in kilometers
+//   return distance;
+// }
+
+// function degToRad(deg) {
+//   return deg * (Math.PI / 180);
+// }
 
 async function hashPassword(password) {
   const saltRounds = 10;
