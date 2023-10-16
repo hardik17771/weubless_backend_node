@@ -954,6 +954,67 @@ class ApiRepository {
     }
   }
 
+  async main_subcategoryproductUserDistance(data) {
+    try {
+      if (data.user_id && data.main_subcategory_id && data.distance) {
+        const productsList = [];
+
+        const user = await User.getUserById(data.user_id);
+
+        const subCategory = await SubCategory.getSubCategoryById(
+          data.main_subcategory_id
+        );
+        if (subCategory && user) {
+          const productObjects = await SubCategory.findProducts(
+            subCategory.products
+          );
+          console.log("subCategory products Ids", subCategory.products);
+          console.log("Distance given", data.distance);
+
+          if (productObjects && productObjects.length > 0) {
+            for (const product of productObjects) {
+              const distanceUserProduct = await calculateDistance(
+                user.latitude,
+                user.longitude,
+                product.latitude,
+                product.longitude
+              );
+              console.log(
+                "user.latitude,user.longitude,product.latitude,product.longitude",
+                user.latitude,
+                user.longitude,
+                product.latitude,
+                product.longitude
+              );
+
+              console.log("distance User Product", distanceUserProduct);
+
+              if (distanceUserProduct <= data.distance) {
+                const item = {
+                  product_id: product.product_id,
+                  product_name: product.name || "",
+                };
+                productsList.push(item);
+              }
+            }
+          }
+          console.log("Available products : ", productsList);
+        } else {
+          return { code: 726 };
+        }
+        return { code: 900, productsList: productsList };
+      } else if (!data.user_id) {
+        return { code: 730 };
+      } else if (!data.distance) {
+        return { code: 731 };
+      } else {
+        return { code: 725 };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 

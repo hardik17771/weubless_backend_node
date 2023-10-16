@@ -4,7 +4,8 @@ const connectDB = require("./config/db");
 const bodyParser = require("body-parser");
 const routes = require("./routes");
 const dotenv = require("dotenv");
-const setUpSwagger = require("./swaggerSetup");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpecs = require("./swaggerConfig");
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ app.use(bodyParser.json());
 app.use("", routes);
 app.use(express.urlencoded({ extended: true }));
 
-setUpSwagger(app);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

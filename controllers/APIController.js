@@ -614,6 +614,31 @@ const main_subcategoryproductLatLong = async (req, res) => {
   // } catch (error) {}
 };
 
+const main_subcategoryproductUserDistance = async (req, res) => {
+  // try {
+  const { user_id, distance, main_subcategory_id } = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.main_subcategoryproductUserDistance({
+    distance,
+    user_id,
+    main_subcategory_id,
+  });
+
+  const msg = error_msg.responseMsg(Check.code);
+  console.log("controller msg", msg);
+  if (Check.code === 900) {
+    console.log(Check.productsList);
+    const response = { status: "1", message: msg, data: Check.productsList };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    res.status(201).json(response);
+  }
+  // } catch (error) {}
+};
+
 module.exports = {
   login,
   changePassword,
@@ -638,4 +663,5 @@ module.exports = {
   main_subcategoryproductLocation,
   main_subcategoryproductDistance,
   main_subcategoryproductLatLong,
+  main_subcategoryproductUserDistance,
 };

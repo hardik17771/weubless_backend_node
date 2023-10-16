@@ -46,29 +46,379 @@ const verifyAccessToken = require("../middleware/VerifyAccessToken");
  * /api/register:
  *   post:
  *     summary: Register a new user
- *     tags: [User]
+ *     tags:
+ *       - User
  *     requestBody:
+ *       description: User data
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               // Add properties here like name, email, password, etc.
+ *               username:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               country_code:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               user_type:
+ *                 type: string
+ *               latitude:
+ *                 type: number
+ *               longitude:
+ *                 type: number
  *     responses:
  *       200:
- *         description: Success
- *       400:
- *         description: Bad Request
- *       500:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Registration failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: number
+ *                 message:
+ *                   type: string
+ */
+router.post("/api/register", apiController.registerUser);
+
+/**
+ * @swagger
+ * /api/login:
+ *   post:
+ *     summary: Login a user
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       description: User login credentials
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User logged in successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 country_code:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 access_token:
+ *                   type: string
+ *                 code:
+ *                   type: integer
+ *                   enum: [200]
+ *       430:
+ *         description: Invalid password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [430]
+ *       461:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [461]
+ *       531:
+ *         description: Empty email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [531]
+ *       532:
+ *         description: Empty password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [532]
+ *       468:
  *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [468]
  */
 
-// Working
-router.post("/api/register", apiController.registerUser);
 router.post("/api/login", apiController.login);
+
+/**
+ * @swagger
+ * /api/changePassword:
+ *   post:
+ *     summary: Change user password
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       description: User email, current password, new password, phone, and country code
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               country_code:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [200]
+ *       411:
+ *         description: User not found or missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [411]
+ *       420:
+ *         description: New password is the same as the old password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [420]
+ *       468:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [468]
+ */
 router.post("/api/changePassword", apiController.changePassword);
+
+/**
+ * @swagger
+ * /api/fetch_user:
+ *   post:
+ *     summary: Fetch user details by user ID
+ *     tags:
+ *       - User
+ *     requestBody:
+ *       description: User ID
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User details fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user_id:
+ *                   type: string
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 latitude:
+ *                   type: number
+ *                 longitude:
+ *                   type: number
+ *                 country_code:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 user_type:
+ *                   type: string
+ *                 dob:
+ *                   type: string
+ *                 country:
+ *                   type: string
+ *                 state:
+ *                   type: string
+ *                 city:
+ *                   type: string
+ *                 postal_code:
+ *                   type: string
+ *                 image:
+ *                   type: string
+ *                 access_token:
+ *                   type: string
+ *                 code:
+ *                   type: integer
+ *                   enum: [200]
+ *       422:
+ *         description: User not found or missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [422]
+ *       468:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [468]
+ */
 router.post("/api/fetch_user", apiController.fetchUser);
+
+/**
+ * @swagger
+ * /api/update_profile:
+ *   post:
+ *     summary: Update user profile
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       description: User profile information to update
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               postal_code:
+ *                 type: string
+ *               image:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User profile updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                 code:
+ *                   type: integer
+ *                   enum: [200]
+ *       422:
+ *         description: User not found or missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [422]
+ *       468:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [468]
+ */
 router.post(
   "/api/update_profile",
   verifyAccessToken,

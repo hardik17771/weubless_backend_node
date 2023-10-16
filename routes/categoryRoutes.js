@@ -48,4 +48,9 @@ router.post(
   apiController.main_subcategoryproductLatLong
 );
 
+router.post(
+  "/api/main-subcategoryproductUserDistance",
+  apiController.main_subcategoryproductUserDistance
+);
+
 module.exports = router;

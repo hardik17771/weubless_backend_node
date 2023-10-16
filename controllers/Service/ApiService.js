@@ -167,6 +167,20 @@ class ApiService {
       return { code: data.code };
     }
   }
+
+  async main_subcategoryproductUserDistance(arg) {
+    // const data = new DataService();
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.main_subcategoryproductUserDistance(arg);
+    // console.log("service code", data.code);
+    if (data.code === 900) {
+      console.log("data.productsList", data.productsList);
+      console.log("data ", data);
+      return { code: data.code, productsList: data.productsList };
+    } else {
+      return { code: data.code };
+    }
+  }
 }
 
 module.exports = ApiService;
