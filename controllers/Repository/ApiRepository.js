@@ -270,9 +270,20 @@ class ApiRepository {
       // console.log(Category.Category);
       const categoryList = await Category.Category.find();
       console.log("categoryList", categoryList);
-      return categoryList;
+      return { list: categoryList, code: 674 };
     } catch (error) {
-      throw new Error("Error fetching categories: " + error.message);
+      return { code: 425 };
+    }
+  }
+
+  async subCategoryListing() {
+    try {
+      // console.log(Category.Category);
+      const subCategoryList = await SubCategory.SubCategory.find();
+      console.log("subCategoryList", subCategoryList);
+      return { list: subCategoryList, code: 690 };
+    } catch (error) {
+      return { code: 425 };
     }
   }
 
@@ -987,7 +998,12 @@ class ApiRepository {
                 product.longitude
               );
 
-              console.log("distance User Product", distanceUserProduct);
+              console.log(
+                "distance User Product",
+                user.name,
+                product.name,
+                distanceUserProduct
+              );
 
               if (distanceUserProduct <= data.distance) {
                 const item = {
@@ -1018,7 +1034,7 @@ class ApiRepository {
   /******************************************** END OF FUNCTION ********************************************/
 }
 
-function calculateDistance(lat1, lon1, lat2, lon2) {
+async function calculateDistance(lat1, lon1, lat2, lon2) {
   // Convert latitude and longitude from degrees to radians
   const toRadians = (angle) => angle * (Math.PI / 180);
   lat1 = toRadians(lat1);

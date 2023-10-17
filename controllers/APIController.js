@@ -251,14 +251,40 @@ async function hashPassword(password) {
 
 const categoryListing = async (req, res) => {
   const apiRepository = new ApiRepository();
-  const categoryListing = await apiRepository.categoryListing();
+  const data = await apiRepository.categoryListing();
   const error_msg = new Msg();
+  try {
+    if (data.code == 674) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
 
-  if (categoryListing) {
-    const msg = error_msg.responseMsg(674);
-    const response = { status: "1", message: msg, data: categoryListing };
-    res.status(200).json(response);
-  } else {
+const subCategoryListing = async (req, res) => {
+  const apiRepository = new ApiRepository();
+  const data = await apiRepository.subCategoryListing();
+  const error_msg = new Msg();
+  try {
+    if (data.code == 690) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
     const msg = error_msg.responseMsg(425);
     const response = { status: "0", message: msg };
     res.status(400).json(response);
@@ -651,6 +677,7 @@ module.exports = {
   updateProfile,
   categoryListing,
   createCategory,
+  subCategoryListing,
   createSubCategory,
   mainSubCategory,
   createSubSubCategory,

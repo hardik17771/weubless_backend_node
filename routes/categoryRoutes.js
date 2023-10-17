@@ -124,6 +124,9 @@ router.get("/api/category", categoryListingMiddleware);
  */
 router.post("/api/category", apiController.createCategory);
 router.post("/api/create-subcategory", apiController.createSubCategory);
+
+router.get("/api/subcategory-list", apiController.subCategoryListing);
+
 router.post("/api/main_subcategory", apiController.mainSubCategory);
 router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
 router.post("/api/subcategory", apiController.SubCategory);
