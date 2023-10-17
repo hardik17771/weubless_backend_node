@@ -29,6 +29,27 @@ const options = {
             longitude: { type: "number" },
           },
         },
+        Category: {
+          type: "object",
+          properties: {
+            category_id: { type: "number" },
+            name: { type: "string" },
+            banner: { type: "string" },
+            icon: { type: "string" },
+            feature: { type: "number" },
+            subCategories: { type: "array" },
+          },
+        },
+        SubCategory: {
+          type: "object",
+          properties: {
+            main_subcategory_id: { type: "number" },
+            name: { type: "string" },
+            category_id: { type: "number" },
+            subsubCategories: { type: "array" },
+            products: { type: "array" },
+          },
+        },
       },
     },
   },

@@ -265,7 +265,7 @@ class ApiRepository {
     }
   }
 
-  async getAllCategory() {
+  async categoryListing() {
     try {
       // console.log(Category.Category);
       const categoryList = await Category.Category.find();
@@ -1018,11 +1018,27 @@ class ApiRepository {
   /******************************************** END OF FUNCTION ********************************************/
 }
 
-async function calculateDistance(lat1, lon1, lat2, lon2) {
-  const point1 = turf.point([lon1, lat1]);
-  const point2 = turf.point([lon2, lat2]);
-  const options = { units: "kilometers" };
-  const distance = turf.distance(point1, point2, options);
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  // Convert latitude and longitude from degrees to radians
+  const toRadians = (angle) => angle * (Math.PI / 180);
+  lat1 = toRadians(lat1);
+  lon1 = toRadians(lon1);
+  lat2 = toRadians(lat2);
+  lon2 = toRadians(lon2);
+
+  // Haversine formula
+  const dLat = lat2 - lat1;
+  const dLon = lon2 - lon1;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  // Radius of the Earth in kilometers
+  const R = 6371;
+
+  // Calculate the distance
+  const distance = R * c;
 
   return distance;
 }

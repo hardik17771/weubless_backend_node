@@ -11,7 +11,117 @@ const categoryListingMiddleware = async (req, res, next) => {
   //   }
 };
 
+/**
+ * @swagger
+ * /api/category:
+ *   get:
+ *     summary: Get a list of categories
+ *     tags:
+ *       - Category
+ *     responses:
+ *       200:
+ *         description: List of categories
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
 router.get("/api/category", categoryListingMiddleware);
+
+/**
+ * @swagger
+ * /api/category:
+ *   post:
+ *     summary: Create a new category
+ *     tags:
+ *       - Category
+ *     parameters:
+ *       - in: body
+ *         name: category
+ *         description: Category information
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             name:
+ *               type: string
+ *             image:
+ *               type: string
+ *             banner:
+ *               type: string
+ *             icon:
+ *               type: string
+ *             featured:
+ *               type: integer
+ *             top:
+ *               type: integer
+ *             subCategories:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/SubCategory'
+ *     responses:
+ *       706:
+ *         description: Category created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Category'
+ *                 code:
+ *                   type: integer
+ *                   enum: [706]
+ *       708:
+ *         description: Name is missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [708]
+ *       709:
+ *         description: Image is missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [709]
+ *       707:
+ *         description: Error creating category
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [707]
+ */
 router.post("/api/category", apiController.createCategory);
 router.post("/api/create-subcategory", apiController.createSubCategory);
 router.post("/api/main_subcategory", apiController.mainSubCategory);

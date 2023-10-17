@@ -251,7 +251,7 @@ async function hashPassword(password) {
 
 const categoryListing = async (req, res) => {
   const apiRepository = new ApiRepository();
-  const categoryListing = await apiRepository.getAllCategory();
+  const categoryListing = await apiRepository.categoryListing();
   const error_msg = new Msg();
 
   if (categoryListing) {
