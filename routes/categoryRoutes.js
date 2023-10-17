@@ -145,6 +145,8 @@ router.post(
 // );
 
 router.post("/api/create-shop", apiController.createShop);
+router.get("/api/shop-list", apiController.shopListing);
+
 router.post("/api/shop-details", apiController.shopDetails);
 // router.post("/api/subcategory", apiController.SubCategory);
 

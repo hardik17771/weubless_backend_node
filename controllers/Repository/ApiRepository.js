@@ -276,28 +276,6 @@ class ApiRepository {
     }
   }
 
-  async subCategoryListing() {
-    try {
-      // console.log(Category.Category);
-      const subCategoryList = await SubCategory.SubCategory.find();
-      console.log("subCategoryList", subCategoryList);
-      return { list: subCategoryList, code: 690 };
-    } catch (error) {
-      return { code: 425 };
-    }
-  }
-
-  async productListing() {
-    try {
-      // console.log(Category.Category);
-      const productList = await Product.Product.find();
-      console.log("productList", productList);
-      return { list: productList, code: 732 };
-    } catch (error) {
-      return { code: 425 };
-    }
-  }
-
   async createCategory(data) {
     try {
       console.log("Create category api repo hit");
@@ -348,6 +326,17 @@ class ApiRepository {
     } catch (error) {
       console.error(error);
       return { code: 713 };
+    }
+  }
+
+  async subCategoryListing() {
+    try {
+      // console.log(Category.Category);
+      const subCategoryList = await SubCategory.SubCategory.find();
+      console.log("subCategoryList", subCategoryList);
+      return { list: subCategoryList, code: 690 };
+    } catch (error) {
+      return { code: 425 };
     }
   }
 
@@ -533,6 +522,17 @@ class ApiRepository {
     // }
   }
 
+  async productListing() {
+    try {
+      // console.log(Category.Category);
+      const productList = await Product.Product.find();
+      console.log("productList", productList);
+      return { list: productList, code: 732 };
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
   async productDetails(data) {
     try {
       if (data.product_id) {
@@ -694,6 +694,17 @@ class ApiRepository {
       }
     } catch (error) {
       return { code: 721 };
+    }
+  }
+
+  async shopListing() {
+    try {
+      // console.log(Category.Category);
+      const shopList = await Shop.Shop.find();
+      console.log("shopList", shopList);
+      return { list: shopList, code: 733 };
+    } catch (error) {
+      return { code: 425 };
     }
   }
 

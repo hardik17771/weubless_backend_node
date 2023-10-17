@@ -252,6 +252,7 @@ class Msg {
       730: "User Id is required!!!",
       731: "Distance is required",
       732: "Products List Fetched",
+      733: "Shops List Fetched",
       900: "Success",
     };
 
