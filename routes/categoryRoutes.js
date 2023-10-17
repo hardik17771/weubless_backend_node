@@ -131,6 +131,8 @@ router.post("/api/main_subcategory", apiController.mainSubCategory);
 router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
 router.post("/api/subcategory", apiController.SubCategory);
 router.post("/api/create-product", apiController.createProduct);
+router.get("/api/product-list", apiController.productListing);
+
 router.post("/api/product-details", apiController.productDetails);
 router.post(
   "/api/products-subCategoryId",

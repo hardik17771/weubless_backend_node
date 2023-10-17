@@ -291,6 +291,27 @@ const subCategoryListing = async (req, res) => {
   }
 };
 
+const productListing = async (req, res) => {
+  const apiRepository = new ApiRepository();
+  const data = await apiRepository.productListing();
+  const error_msg = new Msg();
+  try {
+    if (data.code == 732) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 const createCategory = async (req, res) => {
   const { name, banner, icon, image, featured, top } = req.body;
   const apiRepository = new ApiRepository();
@@ -683,6 +704,7 @@ module.exports = {
   createSubSubCategory,
   SubCategory,
   createProduct,
+  productListing,
   productDetails,
   createShop,
   shopDetails,

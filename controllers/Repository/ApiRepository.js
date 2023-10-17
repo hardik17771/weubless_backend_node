@@ -287,6 +287,17 @@ class ApiRepository {
     }
   }
 
+  async productListing() {
+    try {
+      // console.log(Category.Category);
+      const productList = await Product.Product.find();
+      console.log("productList", productList);
+      return { list: productList, code: 732 };
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
   async createCategory(data) {
     try {
       console.log("Create category api repo hit");
