@@ -358,7 +358,7 @@ const mainSubCategory = async (req, res) => {
   const Check = await apiService.mainSubCategory(data);
   // console.log("controller data", Check);
   const msg = error_msg.responseMsg(Check.code);
-
+  // console.log(Check);
   if (Check.code == 689) {
     // console.log("code: ", Check.code);
     const response = { status: "1", message: msg, data: Check.list };
@@ -757,8 +757,8 @@ module.exports = {
   subCategoryListing,
   createSubCategory,
   mainSubCategory,
-  createSubSubCategory,
-  SubCategory,
+  // createSubSubCategory,
+  // SubCategory,
   createProduct,
   productListing,
   productDetails,

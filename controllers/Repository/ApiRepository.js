@@ -345,30 +345,31 @@ class ApiRepository {
 
   async mainSubCategory(data) {
     const { category_id } = data;
+    // console.log(category_id);
     let subCategoriesList = [];
-    try {
-      const subCategoryIds = await Category.getSubCategoriesByCategoryId(
-        category_id
-      );
-
-      const subCategoriesObjects = await Category.findSubCategories(
-        subCategoryIds
-      );
-      if (subCategoriesObjects && subCategoriesObjects.length > 0) {
-        subCategoriesObjects.forEach((subCategory) => {
-          const item = {
-            main_subcategory_id: subCategory.main_subcategory_id,
-            main_subcategory: subCategory.name || "",
-          };
-          subCategoriesList.push(item);
-        });
-        return { code: 689, subCategoriesList: subCategoriesList };
-      } else {
-        return { code: 715, subCategoriesList: subCategoriesList };
-      }
-    } catch (error) {
-      return { code: 642, subCategoriesList: subCategoriesList };
+    // try {
+    const subCategoryIds = await Category.getSubCategoriesByCategoryId(
+      category_id
+    );
+    const subCategoriesObjects = await Category.findSubCategories(
+      subCategoryIds
+    );
+    // console.log("Main SUbcategories by the category Id", subCategoriesObjects);
+    if (subCategoriesObjects && subCategoriesObjects.length > 0) {
+      subCategoriesObjects.forEach((subCategory) => {
+        const item = {
+          main_subcategory_id: subCategory.main_subcategory_id,
+          main_subcategory: subCategory.name || "",
+        };
+        subCategoriesList.push(item);
+      });
+      return { code: 689, subCategoriesList: subCategoriesList };
+    } else {
+      return { code: 715, subCategoriesList: subCategoriesList };
     }
+    // } catch (error) {
+    //   return { code: 642, subCategoriesList: subCategoriesList };
+    // }
   }
 
   // async createSubSubCategory(data) {
