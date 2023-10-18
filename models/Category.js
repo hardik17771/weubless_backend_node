@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { SubCategory } = require("./SubCategory");
+const { Product } = require("./Product");
 
 const categorySchema = new mongoose.Schema(
   {
@@ -13,6 +14,7 @@ const categorySchema = new mongoose.Schema(
     subCategories: [
       { type: mongoose.Schema.Types.ObjectId, ref: "SubCategory" },
     ],
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
   { timestamps: true }
 );
@@ -65,6 +67,28 @@ const findSubCategories = async (objectIds) => {
   }
 };
 
+const getProdutsByCategoryId = async (category_id) => {
+  try {
+    const category = await Category.findOne({
+      category_id,
+    }).exec();
+    return category ? category.products : [];
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
+const findProducts = async (objectIds) => {
+  try {
+    const products = await Product.find({
+      _id: { $in: objectIds },
+    });
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching products: ${error.message}`);
+  }
+};
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = {
@@ -72,4 +96,6 @@ module.exports = {
   getCategoryById,
   getSubCategoriesByCategoryId,
   findSubCategories,
+  getProdutsByCategoryId,
+  findProducts,
 };

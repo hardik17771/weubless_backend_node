@@ -265,16 +265,7 @@ class ApiRepository {
     }
   }
 
-  async categoryListing() {
-    try {
-      // console.log(Category.Category);
-      const categoryList = await Category.Category.find();
-      console.log("categoryList", categoryList);
-      return { list: categoryList, code: 674 };
-    } catch (error) {
-      return { code: 425 };
-    }
-  }
+  /*********************************************** CATEGORY ***********************************/
 
   async createCategory(data) {
     try {
@@ -297,6 +288,18 @@ class ApiRepository {
       return { code: 707 };
     }
   }
+
+  async categoryListing() {
+    try {
+      // console.log(Category.Category);
+      const categoryList = await Category.Category.find();
+      console.log("categoryList", categoryList);
+      return { list: categoryList, code: 674 };
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+  /*********************************************** SUB CATEGORY ***********************************/
 
   async createSubCategory(data) {
     try {
@@ -368,115 +371,115 @@ class ApiRepository {
     }
   }
 
-  async createSubSubCategory(data) {
-    try {
-      console.log("Create sub category api repo hit");
+  // async createSubSubCategory(data) {
+  //   try {
+  //     console.log("Create sub category api repo hit");
 
-      if (data.name && data.main_subcategory_id) {
-        const newSubSubCategory = new SubSubCategory.SubSubCategory(data);
-        // console.log("new category present");
+  //     if (data.name && data.main_subcategory_id) {
+  //       const newSubSubCategory = new SubSubCategory.SubSubCategory(data);
+  //       // console.log("new category present");
 
-        const subCategory = await SubCategory.getSubCategoryById(
-          data.main_subcategory_id
-        );
-        if (subCategory) {
-          subCategory.subsubCategories.push(newSubSubCategory._id);
-          await subCategory.save();
-          await newSubSubCategory.save();
-        } else {
-          return { code: 726 };
-        }
+  //       const subCategory = await SubCategory.getSubCategoryById(
+  //         data.main_subcategory_id
+  //       );
+  //       if (subCategory) {
+  //         subCategory.subsubCategories.push(newSubSubCategory._id);
+  //         await subCategory.save();
+  //         await newSubSubCategory.save();
+  //       } else {
+  //         return { code: 726 };
+  //       }
 
-        // console.log(newSubCategory);
-        return { data: newSubSubCategory, code: 712 };
-      } else if (data.name == "") {
-        console.log("name absent");
-        return { code: 710 };
-      } else {
-        return { code: 711 };
-      }
-    } catch (error) {
-      console.error(error);
-      return { code: 713 };
-    }
-  }
+  //       // console.log(newSubCategory);
+  //       return { data: newSubSubCategory, code: 712 };
+  //     } else if (data.name == "") {
+  //       console.log("name absent");
+  //       return { code: 710 };
+  //     } else {
+  //       return { code: 711 };
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     return { code: 713 };
+  //   }
+  // }
 
-  async SubCategory(data) {
-    const { main_subcategory_id } = data;
-    let subSubCategoriesList = [];
-    try {
-      const subSubCategoryIds =
-        await SubCategory.getSubSubCategoriesByMainSubCategoryId(
-          main_subcategory_id
-        );
-      const subSubCategoriesObjects = await SubCategory.findSubSubCategories(
-        subSubCategoryIds
-      );
+  // async SubCategory(data) {
+  //   const { main_subcategory_id } = data;
+  //   let subSubCategoriesList = [];
+  //   try {
+  //     const subSubCategoryIds =
+  //       await SubCategory.getSubSubCategoriesByMainSubCategoryId(
+  //         main_subcategory_id
+  //       );
+  //     const subSubCategoriesObjects = await SubCategory.findSubSubCategories(
+  //       subSubCategoryIds
+  //     );
 
-      if (subSubCategoriesObjects && subSubCategoriesObjects.length > 0) {
-        for (const subSubCategory of subSubCategoriesObjects) {
-          let productsList = [];
-          const productIds = await SubSubCategory.getProdutsBySubCategoryId(
-            subSubCategory.subcategory_id
-          );
-          const productObjects = await SubSubCategory.findProducts(productIds);
+  //     if (subSubCategoriesObjects && subSubCategoriesObjects.length > 0) {
+  //       for (const subSubCategory of subSubCategoriesObjects) {
+  //         let productsList = [];
+  //         const productIds = await SubSubCategory.getProdutsBySubCategoryId(
+  //           subSubCategory.subcategory_id
+  //         );
+  //         const productObjects = await SubSubCategory.findProducts(productIds);
 
-          if (productObjects && productObjects.length > 0) {
-            for (const product of productObjects) {
-              const productItem = {
-                product_id: product.product_id,
-                subcategory: product.name || "",
-              };
-              productsList.push(productItem);
-            }
-          }
+  //         if (productObjects && productObjects.length > 0) {
+  //           for (const product of productObjects) {
+  //             const productItem = {
+  //               product_id: product.product_id,
+  //               subcategory: product.name || "",
+  //             };
+  //             productsList.push(productItem);
+  //           }
+  //         }
 
-          const item = {
-            subcategory_id: subSubCategory.subcategory_id,
-            subcategory: subSubCategory.name || "",
-            products: productsList,
-          };
-          subSubCategoriesList.push(item);
-        }
+  //         const item = {
+  //           subcategory_id: subSubCategory.subcategory_id,
+  //           subcategory: subSubCategory.name || "",
+  //           products: productsList,
+  //         };
+  //         subSubCategoriesList.push(item);
+  //       }
 
-        return { code: 689, subSubCategoriesList: subSubCategoriesList };
-      } else {
-        return { code: 715, subSubCategoriesList: subSubCategoriesList };
-      }
-    } catch (error) {
-      return { code: 642, subSubCategoriesList: subSubCategoriesList };
-    }
-  }
+  //       return { code: 689, subSubCategoriesList: subSubCategoriesList };
+  //     } else {
+  //       return { code: 715, subSubCategoriesList: subSubCategoriesList };
+  //     }
+  //   } catch (error) {
+  //     return { code: 642, subSubCategoriesList: subSubCategoriesList };
+  //   }
+  // }
+
+  /*********************************************** PRODUCTS ***********************************/
 
   async createProduct(data) {
     // try {
     console.log("Create newProduct api repo hit");
     console.log("name is ", data.name);
     console.log("data is ", data);
-    if (data.name && data.subcategory_id && data.shop_id) {
+    if (data.name && data.main_subcategory_id && data.shop_id) {
       // console.log("name and image present");
       const newProduct = new Product.Product(data);
 
-      const subSubCategory = await SubSubCategory.getSubSubCategoryById(
-        data.subcategory_id
+      const subCategory = await SubCategory.getSubCategoryById(
+        data.main_subcategory_id
       );
       const shop = await Shop.getShopById(data.shop_id);
 
       // console.log(subSubCategory.main_subcategory_id);
 
-      if (subSubCategory && shop) {
-        // Sub Sub Categories
-        const mainSubcategoryId = subSubCategory.main_subcategory_id;
-        subSubCategory.products.push(newProduct._id);
-        await subSubCategory.save();
-
-        // Sub Category
-        const subCategory = await SubCategory.getSubCategoryById(
-          mainSubcategoryId
-        );
+      if (subCategory && shop) {
+        // Sub Categories
         subCategory.products.push(newProduct._id);
         await subCategory.save();
-        console.log(subCategory);
+
+        // Category
+        const categoryId = subCategory.category_id;
+        const category = await Category.getCategoryById(categoryId);
+        category.products.push(newProduct._id);
+        await category.save();
+        console.log(category);
 
         // Shop
         console.log("shop data is", shop);
@@ -489,8 +492,8 @@ class ApiRepository {
         await newProduct.save();
         // console.log(newProduct);
 
-        const updated_product = await Product.populateMainSubcategory(
-          mainSubcategoryId,
+        const updated_product = await Product.populateCategory(
+          categoryId,
           newProduct.product_id
         );
 
@@ -501,8 +504,8 @@ class ApiRepository {
         );
 
         return { data: new_updated_product, code: 716 };
-      } else if (!subSubCategory) {
-        return { code: 727 };
+      } else if (!subCategory) {
+        return { code: 726 };
       } else {
         return { code: 723 };
       }
@@ -510,7 +513,7 @@ class ApiRepository {
       // console.log("new newProduct present");
       // await newProduct.save();
       // console.log(newProduct);
-    } else if (!data.subcategory_id) {
+    } else if (!data.main_subcategory_id) {
       return { code: 725 };
     } else if (!data.shop_id) {
       return { code: 723 };
@@ -648,15 +651,17 @@ class ApiRepository {
     }
   }
 
-  async productsFromSubCategoryId(data) {
-    const { subcategory_id } = data;
+  /*********************************************** FETCHING PRODUCTS BY IDs ***********************************/
+
+  async productsFromMainSubCategoryId(data) {
+    const { main_subcategory_id } = data;
     let productsList = [];
     try {
-      const productIds = await SubSubCategory.getProdutsBySubCategoryId(
-        subcategory_id
+      const productIds = await SubCategory.getProdutsByMainSubCategoryId(
+        main_subcategory_id
       );
 
-      const productObjects = await SubSubCategory.findProducts(productIds);
+      const productObjects = await SubCategory.findProducts(productIds);
       if (productObjects && productObjects.length > 0) {
         productObjects.forEach((product) => {
           const item = {
@@ -673,6 +678,32 @@ class ApiRepository {
       return { code: 642, productsList: productsList };
     }
   }
+
+  async productsFromCategoryId(data) {
+    const { category_id } = data;
+    let productsList = [];
+    try {
+      const productIds = await Category.getProdutsByCategoryId(category_id);
+
+      const productObjects = await Category.findProducts(productIds);
+      if (productObjects && productObjects.length > 0) {
+        productObjects.forEach((product) => {
+          const item = {
+            product_id: product.product_id,
+            product_name: product.name || "",
+          };
+          productsList.push(item);
+        });
+        return { code: 684, productsList: productsList };
+      } else {
+        return { code: 729, productsList: productsList };
+      }
+    } catch (error) {
+      return { code: 642, productsList: productsList };
+    }
+  }
+
+  /*********************************************** SHOPS ***********************************/
 
   async createShop(data) {
     console.log(data);
@@ -763,6 +794,8 @@ class ApiRepository {
       return { code: 724 };
     }
   }
+
+  /*********************************************** LOCATION FEATURES ***********************************/
 
   async main_subcategoryproductLocation(data) {
     try {

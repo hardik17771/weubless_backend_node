@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { SubSubCategory } = require("./SubSubCategory");
+// const { SubSubCategory } = require("./SubSubCategory");
 const { Product } = require("./Product");
 const subCategorySchema = new mongoose.Schema(
   {
@@ -10,9 +10,9 @@ const subCategorySchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
-    subsubCategories: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "SubSubCategory" },
-    ],
+    // subsubCategories: [
+    //   { type: mongoose.Schema.Types.ObjectId, ref: "SubSubCategory" },
+    // ],
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
   { timestamps: true }
@@ -42,25 +42,36 @@ const getSubCategoryById = async (main_subcategory_id) => {
   }
 };
 
-const getSubSubCategoriesByMainSubCategoryId = async (main_subcategory_id) => {
+// const getSubSubCategoriesByMainSubCategoryId = async (main_subcategory_id) => {
+//   try {
+//     const subCategory = await SubCategory.findOne({
+//       main_subcategory_id,
+//     }).exec();
+//     return subCategory ? subCategory.subsubCategories : [];
+//   } catch (error) {
+//     throw new Error(`Error fetching user: ${error.message}`);
+//   }
+// };
+
+// const findSubSubCategories = async (objectIds) => {
+//   try {
+//     const subSubCategories = await SubSubCategory.find({
+//       _id: { $in: objectIds },
+//     });
+//     return subSubCategories;
+//   } catch (error) {
+//     throw new Error(`Error fetching categories: ${error.message}`);
+//   }
+// };
+
+const getProdutsByMainSubCategoryId = async (main_subcategory_id) => {
   try {
     const subCategory = await SubCategory.findOne({
       main_subcategory_id,
     }).exec();
-    return subCategory ? subCategory.subsubCategories : [];
+    return subCategory ? subCategory.products : [];
   } catch (error) {
     throw new Error(`Error fetching user: ${error.message}`);
-  }
-};
-
-const findSubSubCategories = async (objectIds) => {
-  try {
-    const subSubCategories = await SubSubCategory.find({
-      _id: { $in: objectIds },
-    });
-    return subSubCategories;
-  } catch (error) {
-    throw new Error(`Error fetching categories: ${error.message}`);
   }
 };
 
@@ -80,7 +91,8 @@ const SubCategory = mongoose.model("SubCategory", subCategorySchema);
 module.exports = {
   SubCategory,
   getSubCategoryById,
-  getSubSubCategoriesByMainSubCategoryId,
-  findSubSubCategories,
+  getProdutsByMainSubCategoryId,
+  // getSubSubCategoriesByMainSubCategoryId,
+  // findSubSubCategories,
   findProducts,
 };

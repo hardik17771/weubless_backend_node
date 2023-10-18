@@ -11,6 +11,8 @@ const categoryListingMiddleware = async (req, res, next) => {
   //   }
 };
 
+/**** CATEGORY ROUTES *****/
+
 /**
  * @swagger
  * /api/category:
@@ -123,48 +125,50 @@ router.get("/api/category", categoryListingMiddleware);
  *                   enum: [707]
  */
 router.post("/api/category", apiController.createCategory);
+
+/**** SUB CATEGORY ROUTES *****/
+
 router.post("/api/create-subcategory", apiController.createSubCategory);
-
 router.get("/api/subcategory-list", apiController.subCategoryListing);
-
 router.post("/api/main_subcategory", apiController.mainSubCategory);
-router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
-router.post("/api/subcategory", apiController.SubCategory);
+
+// router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
+// router.post("/api/subcategory", apiController.SubCategory);
+
+/**** PRODUCT ROUTES *****/
+
 router.post("/api/create-product", apiController.createProduct);
 router.get("/api/product-list", apiController.productListing);
-
 router.post("/api/product-details", apiController.productDetails);
+
+/**** FETCHING PRODUCTS FROM IDs ROUTES *****/
+
+router.post("/api/products-category-id", apiController.productsFromCategoryId);
 router.post(
-  "/api/products-subCategoryId",
-  apiController.productsFromSubCategoryId
+  "/api/products-main-subcategory-id",
+  apiController.productsFromMainSubCategoryId
 );
 
-// router.post(
-//   "/api/fetch-product-from-main-subcategory",
-//   apiController.fetchProductFromMainSubCategory
-// );
+/**** SHOP ROUTES *****/
 
 router.post("/api/create-shop", apiController.createShop);
 router.get("/api/shop-list", apiController.shopListing);
-
 router.post("/api/shop-details", apiController.shopDetails);
-// router.post("/api/subcategory", apiController.SubCategory);
+
+/**** LOCATION FEATURES ROUTES *****/
 
 router.post(
   "/api/main-subcategoryproductLocation",
   apiController.main_subcategoryproductLocation
 );
-
 router.post(
   "/api/main-subcategoryproductDistance",
   apiController.main_subcategoryproductDistance
 );
-
 router.post(
   "/api/main-subcategoryproductLatLong",
   apiController.main_subcategoryproductLatLong
 );
-
 router.post(
   "/api/main-subcategoryproductUserDistance",
   apiController.main_subcategoryproductUserDistance

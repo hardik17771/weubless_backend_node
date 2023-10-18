@@ -7,8 +7,9 @@ const productSchema = new mongoose.Schema(
     name: { type: String, required: true },
     quantity: { type: Number, default: 0 },
     added_by: { type: String, default: "" },
-    main_subcategory_id: { type: Number, ref: "SubCategory", default: 0 },
-    subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
+    category_id: { type: Number, ref: "Category", default: 0 },
+    main_subcategory_id: { type: Number, ref: "SubCategory", required: true },
+    // subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
     shop_id: { type: Number, ref: "Shop", required: true },
     latitude: {
       type: String,
@@ -23,11 +24,7 @@ const productSchema = new mongoose.Schema(
       ref: "users2",
       default: null,
     },
-    category_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      default: null,
-    },
+
     brand_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
@@ -93,21 +90,19 @@ const getProductById = async (product_id) => {
   }
 };
 
-const populateMainSubcategory = async (main_subcategory_id, product_id) => {
+const populateCategory = async (category_id, product_id) => {
   // try {
-  console.log(main_subcategory_id);
+  console.log(category_id);
   const product = await Product.findOne({ product_id }).exec();
 
-  if (main_subcategory_id) {
-    product.main_subcategory_id = main_subcategory_id;
+  if (category_id) {
+    product.category_id = category_id;
 
     await product.save();
     console.log(product);
     return product;
   } else {
-    throw new Error(
-      `SubSubCategory with subcategory_id ${subcategory_id} not found`
-    );
+    throw new Error(`Category with category ID ${category_id} not found`);
   }
   // } catch (error) {
   //   throw new Error(`Error populating main_subcategory_id: ${error.message}`);
@@ -140,6 +135,6 @@ const Product = mongoose.model("Product", productSchema);
 module.exports = {
   Product,
   getProductById,
-  populateMainSubcategory,
+  populateCategory,
   populateLatLong,
 };

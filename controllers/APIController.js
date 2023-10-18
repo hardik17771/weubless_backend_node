@@ -249,27 +249,6 @@ async function hashPassword(password) {
 
 /*********************************************** CATEGORY ***********************************/
 
-const categoryListing = async (req, res) => {
-  const apiRepository = new ApiRepository();
-  const data = await apiRepository.categoryListing();
-  const error_msg = new Msg();
-  try {
-    if (data.code == 674) {
-      const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
-    } else {
-      const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
-      res.status(201).json(response);
-    }
-  } catch (error) {
-    const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
-  }
-};
-
 const createCategory = async (req, res) => {
   const { name, banner, icon, image, featured, top } = req.body;
   const apiRepository = new ApiRepository();
@@ -300,6 +279,28 @@ const createCategory = async (req, res) => {
     res.status(400).json(response);
   }
 };
+
+const categoryListing = async (req, res) => {
+  const apiRepository = new ApiRepository();
+  const data = await apiRepository.categoryListing();
+  const error_msg = new Msg();
+  try {
+    if (data.code == 674) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+/*********************************************** SUB CATEGORY ***********************************/
 
 const createSubCategory = async (req, res) => {
   const { name, category_id } = req.body;
@@ -375,66 +376,68 @@ const mainSubCategory = async (req, res) => {
   // }
 };
 
-const createSubSubCategory = async (req, res) => {
-  const { name, main_subcategory_id } = req.body;
-  const apiRepository = new ApiRepository();
-  const error_msg = new Msg();
+// const createSubSubCategory = async (req, res) => {
+//   const { name, main_subcategory_id } = req.body;
+//   const apiRepository = new ApiRepository();
+//   const error_msg = new Msg();
 
-  console.log("Create sub sub category api controller hit");
-  try {
-    const newSubSubCategory = await apiRepository.createSubSubCategory({
-      name,
-      main_subcategory_id,
-    });
+//   console.log("Create sub sub category api controller hit");
+//   try {
+//     const newSubSubCategory = await apiRepository.createSubSubCategory({
+//       name,
+//       main_subcategory_id,
+//     });
 
-    const msg = error_msg.responseMsg(newSubSubCategory.code); //706
-    if (newSubSubCategory.code === 712) {
-      const response = {
-        status: "1",
-        message: msg,
-        data: newSubSubCategory.data,
-      };
-      res.status(201).json(response);
-    } else {
-      const response = {
-        status: "0",
-        message: msg,
-        data: newSubSubCategory.data,
-      };
-      res.status(201).json(response);
-    }
-  } catch (error) {
-    const msg = error_msg.responseMsg(707); //707
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
-  }
-};
+//     const msg = error_msg.responseMsg(newSubSubCategory.code); //706
+//     if (newSubSubCategory.code === 712) {
+//       const response = {
+//         status: "1",
+//         message: msg,
+//         data: newSubSubCategory.data,
+//       };
+//       res.status(201).json(response);
+//     } else {
+//       const response = {
+//         status: "0",
+//         message: msg,
+//         data: newSubSubCategory.data,
+//       };
+//       res.status(201).json(response);
+//     }
+//   } catch (error) {
+//     const msg = error_msg.responseMsg(707); //707
+//     const response = { status: "0", message: msg };
+//     res.status(400).json(response);
+//   }
+// };
 
-const SubCategory = async (req, res) => {
-  const data = req.body;
-  const error_msg = new Msg();
-  const apiService = new ApiService();
+// const SubCategory = async (req, res) => {
+//   const data = req.body;
+//   const error_msg = new Msg();
+//   const apiService = new ApiService();
 
-  const Check = await apiService.SubCategory(data);
-  // console.log("controller data", Check);
-  const msg = error_msg.responseMsg(Check.code);
+//   const Check = await apiService.SubCategory(data);
+//   // console.log("controller data", Check);
+//   const msg = error_msg.responseMsg(Check.code);
 
-  if (Check.code == 689) {
-    // console.log("code: ", Check.code);
-    const response = { status: "1", message: msg, data: Check.list };
-    return res.status(200).json(response);
-  } else {
-    const response = { status: "0", message: msg };
-    return res.status(200).json(response);
-  }
-  // }
-  // } catch (error) {
-  //   console.error(error);
-  //   const msg = error_msg.responseMsg(642);
-  //   const response = { status: "0", message: msg };
-  //   return res.status(500).json(response);
-  // }
-};
+//   if (Check.code == 689) {
+//     // console.log("code: ", Check.code);
+//     const response = { status: "1", message: msg, data: Check.list };
+//     return res.status(200).json(response);
+//   } else {
+//     const response = { status: "0", message: msg };
+//     return res.status(200).json(response);
+//   }
+//   // }
+//   // } catch (error) {
+//   //   console.error(error);
+//   //   const msg = error_msg.responseMsg(642);
+//   //   const response = { status: "0", message: msg };
+//   //   return res.status(500).json(response);
+//   // }
+// };
+
+/*********************************************** PRODUCTS ***********************************/
 
 const createProduct = async (req, res) => {
   const data = req.body;
@@ -507,12 +510,14 @@ const productDetails = async (req, res) => {
   }
 };
 
-const productsFromSubCategoryId = async (req, res) => {
+/*********************************************** FETCHING PRODUCTS BY IDs ***********************************/
+
+const productsFromMainSubCategoryId = async (req, res) => {
   const data = req.body;
   const error_msg = new Msg();
   const apiService = new ApiService();
 
-  const Check = await apiService.productsFromSubCategoryId(data);
+  const Check = await apiService.productsFromMainSubCategoryId(data);
   // console.log("controller data", Check);
   const msg = error_msg.responseMsg(Check.code);
 
@@ -532,6 +537,34 @@ const productsFromSubCategoryId = async (req, res) => {
   //   return res.status(500).json(response);
   // }
 };
+
+const productsFromCategoryId = async (req, res) => {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+
+  const Check = await apiService.productsFromCategoryId(data);
+  // console.log("controller data", Check);
+  const msg = error_msg.responseMsg(Check.code);
+
+  if (Check.code == 684) {
+    // console.log("code: ", Check.code);
+    const response = { status: "1", message: msg, data: Check.list };
+    return res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg };
+    return res.status(200).json(response);
+  }
+  // }
+  // } catch (error) {
+  //   console.error(error);
+  //   const msg = error_msg.responseMsg(642);
+  //   const response = { status: "0", message: msg };
+  //   return res.status(500).json(response);
+  // }
+};
+
+/*********************************************** SHOPS ***********************************/
 
 const createShop = async (req, res) => {
   const data = req.body;
@@ -603,6 +636,8 @@ const shopDetails = async (req, res) => {
   //   res.status(400).json(response);
   // }
 };
+
+/*********************************************** LOCATION FEATURES ***********************************/
 
 const main_subcategoryproductLocation = async (req, res) => {
   // try {
@@ -730,7 +765,8 @@ module.exports = {
   createShop,
   shopListing,
   shopDetails,
-  productsFromSubCategoryId,
+  productsFromMainSubCategoryId,
+  productsFromCategoryId,
   main_subcategoryproductLocation,
   main_subcategoryproductDistance,
   main_subcategoryproductLatLong,

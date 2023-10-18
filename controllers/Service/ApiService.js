@@ -114,10 +114,20 @@ class ApiService {
     }
   }
 
-  async productsFromSubCategoryId(arg) {
-    const apiRepository = new ApiRepository(); // Assuming ApiRepository is properly imported and initialized
+  async productsFromMainSubCategoryId(arg) {
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.productsFromMainSubCategoryId(arg);
+    console.log("service data", data);
+    if (data.code === 684) {
+      return { code: data.code, list: data.productsList };
+    } else {
+      return { code: data.code };
+    }
+  }
 
-    const data = await apiRepository.productsFromSubCategoryId(arg);
+  async productsFromCategoryId(arg) {
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.productsFromCategoryId(arg);
     console.log("service data", data);
     if (data.code === 684) {
       return { code: data.code, list: data.productsList };
