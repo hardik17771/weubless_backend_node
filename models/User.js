@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const { Product } = require("./Product");
 
 // const userSchema = new mongoose.Schema({
 
@@ -151,6 +152,7 @@ const userSchema2 = new mongoose.Schema({
     default: null,
     required: false,
   },
+  products_bought: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
 });
 
 userSchema2.pre("save", async function (next) {
@@ -186,5 +188,16 @@ const getUserById = async (user_id) => {
   }
 };
 
+const findProducts = async (objectIds) => {
+  try {
+    const products = await Product.find({
+      _id: { $in: objectIds },
+    });
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching categories: ${error.message}`);
+  }
+};
+
 const User2 = mongoose.model("User2", userSchema2);
-module.exports = { User2, getUser, getUserById };
+module.exports = { User2, getUser, getUserById, findProducts };

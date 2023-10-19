@@ -254,6 +254,8 @@ class Msg {
       731: "Distance is required",
       732: "Products List Fetched",
       733: "Shops List Fetched",
+      734: "No stock left for the Product",
+      735: "No Product for the given Product ID",
       900: "Success",
     };
 

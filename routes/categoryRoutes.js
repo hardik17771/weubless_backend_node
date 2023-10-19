@@ -174,4 +174,7 @@ router.post(
   apiController.main_subcategoryproductUserDistance
 );
 
+/**** BUY PRODUCTS *****/
+router.post("/api/buy-product", apiController.buyProduct);
+
 module.exports = router;

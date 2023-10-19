@@ -191,6 +191,18 @@ class ApiService {
       return { code: data.code };
     }
   }
+
+  async buyProduct(arg) {
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.buyProduct(arg);
+    if (data.code === 900) {
+      // console.log("data.productsList", data.productsList);
+      // console.log("data ", data);
+      return { code: data.code };
+    } else {
+      return { code: data.code };
+    }
+  }
 }
 
 module.exports = ApiService;

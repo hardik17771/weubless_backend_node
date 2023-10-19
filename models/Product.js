@@ -24,7 +24,7 @@ const productSchema = new mongoose.Schema(
       ref: "users2",
       default: null,
     },
-
+    num_of_sale: { type: Number, default: 0 },
     brand_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
@@ -54,7 +54,6 @@ const productSchema = new mongoose.Schema(
     tax_type: { type: String, default: "" },
     shipping_type: { type: String, default: "" },
     shipping_cost: { type: Number, default: 0 },
-    num_of_sale: { type: Number, default: 0 },
     meta_title: { type: String, default: "" },
     meta_description: { type: String, default: "" },
     meta_img: { type: String, default: "" },

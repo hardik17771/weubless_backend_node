@@ -1087,6 +1087,41 @@ class ApiRepository {
     }
   }
 
+  async buyProduct(data) {
+    try {
+      if (data.product_id && data.user_id) {
+        const product = await Product.getProductById(data.product_id);
+        const user = await User.getUserById(data.user_id);
+
+        if (product && user) {
+          if (product.quantity > 0) {
+            product.num_of_sale += 1;
+            product.quantity -= 1;
+            product.save();
+            user.products_bought.push(product._id);
+            user.save();
+          } else {
+            return { code: 734 };
+          }
+        } else if (!product) {
+          return { code: 735 };
+        } else {
+          return { code: 461 };
+        }
+
+        console.log("product", product, "user", user);
+        return { code: 900 };
+      } else if (!data.product_id) {
+        return { code: 718 };
+      } else {
+        return { code: 730 };
+      }
+      // console.log(Category.Category);
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 
