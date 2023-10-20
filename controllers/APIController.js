@@ -616,25 +616,25 @@ const shopDetails = async (req, res) => {
   const apiRepository = new ApiRepository();
   const error_msg = new Msg();
 
-  // try {
-  const shop = await apiRepository.shopDetails(data);
+  try {
+    const shop = await apiRepository.shopDetails(data);
 
-  const msg = error_msg.responseMsg(shop.code);
-  console.log(shop.code);
-  if (shop.code === 667) {
-    // console.log("status 1");
-    const response = { status: "1", message: msg, data: shop.data };
-    res.status(201).json(response);
-  } else {
-    // console.log("status 0");
-    const response = { status: "0", message: msg, data: shop.data };
-    res.status(201).json(response);
+    const msg = error_msg.responseMsg(shop.code);
+    console.log(shop.code);
+    if (shop.code === 667) {
+      // console.log("status 1");
+      const response = { status: "1", message: msg, data: shop.data };
+      res.status(201).json(response);
+    } else {
+      // console.log("status 0");
+      const response = { status: "0", message: msg, data: shop.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717);
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
 };
 
 /*********************************************** LOCATION FEATURES ***********************************/
@@ -768,6 +768,31 @@ const buyProduct = async (req, res) => {
   // } catch (error) {}
 };
 
+const trendingProducts = async (req, res) => {
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+  const Check = await apiService.trendingProducts({});
+  // try {
+  if (Check.code === 732) {
+    // console.log(Check.productsList);
+    const msg = error_msg.responseMsg(Check.code);
+    const response = { status: "1", message: msg, list: Check.productsList };
+    res.status(201).json(response);
+  } else {
+    const msg = error_msg.responseMsg(Check.code);
+    const response = { status: "0", message: msg, list: Check.productsList };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(425);
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
+  // const msg = error_msg.responseMsg(Check.code);
+  // console.log("controller msg", msg);
+  // } catch (error) {}
+};
+
 module.exports = {
   login,
   changePassword,
@@ -798,4 +823,5 @@ module.exports = {
   main_subcategoryproductLatLong,
   main_subcategoryproductUserDistance,
   buyProduct,
+  trendingProducts,
 };

@@ -1122,6 +1122,19 @@ class ApiRepository {
     }
   }
 
+  async trendingProducts() {
+    // try {
+    // console.log(Category.Category);
+    const productList = await Product.Product.find()
+      .limit(50) // Limit to the top 50 products
+      .sort({ num_of_sale: -1 });
+    console.log("shopList", productList);
+    return { productsList: productList, code: 732 };
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 
