@@ -230,7 +230,7 @@ class Msg {
       708: "Name is required",
       709: "Category Image is required",
       710: "Sub Category Name is required",
-      711: "Category ID for subcategory is required",
+      711: "Category ID is required",
       712: "Sub Category added successfully",
       713: "Sub Category cannot be added",
       714: "Category ID not found",

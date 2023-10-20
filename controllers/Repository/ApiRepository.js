@@ -1123,13 +1123,31 @@ class ApiRepository {
   }
 
   async trendingProducts() {
+    try {
+      const productList = await Product.Product.find()
+        .limit(50) // Limit to the top 50 products
+        .sort({ num_of_sale: -1 });
+      console.log("shopList", productList);
+      return { productsList: productList, code: 732 };
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
+  async trendingProductsByCategory(data) {
     // try {
-    // console.log(Category.Category);
-    const productList = await Product.Product.find()
-      .limit(50) // Limit to the top 50 products
-      .sort({ num_of_sale: -1 });
-    console.log("shopList", productList);
-    return { productsList: productList, code: 732 };
+    if (data.category_id) {
+      console.log(data.category_id);
+      const productList = await Product.Product.find({
+        category_id: data.category_id,
+      })
+        .limit(50) // Limit to the top 50 products
+        .sort({ num_of_sale: -1 });
+      console.log("shopList", productList);
+      return { productsList: productList, code: 732 };
+    } else {
+      return { code: 711 };
+    }
     // } catch (error) {
     //   return { code: 425 };
     // }

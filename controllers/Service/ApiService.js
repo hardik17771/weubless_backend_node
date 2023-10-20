@@ -204,9 +204,21 @@ class ApiService {
     }
   }
 
-  async trendingProducts(arg) {
+  async trendingProducts() {
     const apiRepository = new ApiRepository();
-    const data = await apiRepository.trendingProducts(arg);
+    const data = await apiRepository.trendingProducts();
+    if (data.code === 732) {
+      // console.log("data.productsList", data.productsList);
+      // console.log("data ", data);
+      return { code: data.code, productsList: data.productsList };
+    } else {
+      return { code: data.code };
+    }
+  }
+
+  async trendingProductsByCategory(arg) {
+    const apiRepository = new ApiRepository();
+    const data = await apiRepository.trendingProductsByCategory(arg);
     if (data.code === 732) {
       // console.log("data.productsList", data.productsList);
       // console.log("data ", data);

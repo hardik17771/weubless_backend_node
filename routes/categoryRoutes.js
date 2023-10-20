@@ -177,5 +177,9 @@ router.post(
 /**** BUY PRODUCTS *****/
 router.post("/api/buy-product", apiController.buyProduct);
 router.get("/api/trending-products", apiController.trendingProducts);
+router.post(
+  "/api/trending-products-by-category",
+  apiController.trendingProductsByCategory
+);
 
 module.exports = router;
