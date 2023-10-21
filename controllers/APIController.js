@@ -484,6 +484,31 @@ const productListing = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  // try {
+  const product = await apiRepository.updateProduct(data);
+  const msg = error_msg.responseMsg(product.code);
+  console.log(product.code);
+  if (product.code === 297) {
+    console.log("status 1");
+    const response = { status: "1", message: msg, data: product.data };
+    res.status(201).json(response);
+  } else {
+    console.log("status 0");
+    const response = { status: "0", message: msg, data: product.data };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(736);
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
+};
+
 const productDetails = async (req, res) => {
   const data = req.body;
   const apiRepository = new ApiRepository();
@@ -832,6 +857,7 @@ module.exports = {
   // SubCategory,
   createProduct,
   productListing,
+  updateProduct,
   productDetails,
   createShop,
   shopListing,

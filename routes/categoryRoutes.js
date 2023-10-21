@@ -139,6 +139,7 @@ router.post("/api/main_subcategory", apiController.mainSubCategory);
 
 router.post("/api/create-product", apiController.createProduct);
 router.get("/api/product-list", apiController.productListing);
+router.put("/api/update-product", apiController.updateProduct);
 router.post("/api/product-details", apiController.productDetails);
 
 /**** FETCHING PRODUCTS FROM IDs ROUTES *****/

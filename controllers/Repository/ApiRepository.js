@@ -537,6 +537,94 @@ class ApiRepository {
     }
   }
 
+  async updateProduct(data) {
+    // try {
+    // console.log(Category.Category);
+    if (data.product_id) {
+      const oldProduct = await Product.getProductById(data.product_id);
+      const updatedProduct = await Product.Product.findOneAndUpdate(
+        { product_id: data.product_id },
+        data,
+        { new: true } // Return the updated product
+      );
+
+      if (updatedProduct) {
+        console.log("Updated product present", updatedProduct);
+        if (data.shop_id) {
+          if (oldProduct.shop_id != data.shop_id) {
+            const oldShop = await Shop.getShopById(oldProduct.shop_id);
+            const shop = await Shop.getShopById(data.shop_id);
+            console.log(oldShop._id);
+            await Shop.Shop.findOneAndUpdate(
+              { _id: oldShop._id },
+              { $pull: { products: updatedProduct._id } }
+            );
+
+            // Add product_id to new shop
+            await Shop.Shop.findOneAndUpdate(
+              { _id: shop._id },
+              { $push: { products: updatedProduct._id } }
+            );
+          }
+        }
+
+        if (data.main_subcategory_id) {
+          console.log("SubCategory ID present");
+          if (oldProduct.main_subcategory_id != data.main_subcategory_id) {
+            console.log("Old Product not equal data main subcategory id ");
+            // Sub Category
+            const oldSubCategory = await SubCategory.getSubCategoryById(
+              oldProduct.main_subcategory_id
+            );
+            const subCategory = await SubCategory.getSubCategoryById(
+              data.main_subcategory_id
+            );
+
+            console.log("old Subcategory", oldSubCategory);
+            console.log("new Subcategory", subCategory);
+            await SubCategory.SubCategory.findOneAndUpdate(
+              { _id: oldSubCategory._id },
+              { $pull: { products: updatedProduct._id } }
+            );
+
+            // Add product_id to new shop
+            await SubCategory.SubCategory.findOneAndUpdate(
+              { _id: subCategory._id },
+              { $push: { products: updatedProduct._id } }
+            );
+
+            // Category
+            const oldCategory = await Category.getCategoryById(
+              oldSubCategory.category_id
+            );
+            const category = await Category.getCategoryById(
+              subCategory.category_id
+            );
+            await Category.Category.findOneAndUpdate(
+              { _id: oldCategory._id },
+              { $pull: { products: updatedProduct._id } }
+            );
+
+            await Category.Category.findOneAndUpdate(
+              { _id: category._id },
+              { $push: { products: updatedProduct._id } }
+            );
+          }
+        }
+
+        await updatedProduct.save(); // Save the updated product
+        return { code: 297, updatedProduct: updatedProduct };
+      } else {
+        return { code: 425 };
+      }
+    } else {
+      return { code: 718 };
+    }
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
+  }
+
   async productDetails(data) {
     try {
       if (data.product_id) {
