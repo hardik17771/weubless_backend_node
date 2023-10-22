@@ -332,6 +332,62 @@ class ApiRepository {
     }
   }
 
+  async updateSubCategory(data) {
+    // try {
+    // console.log(Category.Category);
+    if (data.main_subcategory_id) {
+      const oldSubCategory = await SubCategory.getSubCategoryById(
+        data.main_subcategory_id
+      );
+      const updatedSubCategory = await SubCategory.getSubCategoryById(
+        data.main_subcategory_id
+        // Return the document as it was before the update
+      );
+
+      console.log("Updated SubCategory", updatedSubCategory);
+      if (updatedSubCategory) {
+        Object.assign(updatedSubCategory, data);
+        console.log("Old Sub-Category present", oldSubCategory);
+        console.log("Updated sub Category present", updatedSubCategory);
+        if (data.category_id) {
+          console.log("Category ID present");
+          if (oldSubCategory.category_id != data.category_id) {
+            console.log("Old Product not equal data main subcategory id ");
+
+            // Category
+            const oldCategory = await Category.getCategoryById(
+              oldSubCategory.category_id
+            );
+            const category = await Category.getCategoryById(data.category_id);
+            console.log("Apparantely the category", category);
+            if (!category) {
+              return { code: 714 };
+            }
+            await Category.Category.findOneAndUpdate(
+              { _id: oldCategory._id },
+              { $pull: { subCategories: updatedSubCategory._id } }
+            );
+
+            await Category.Category.findOneAndUpdate(
+              { _id: category._id },
+              { $push: { subCategories: updatedSubCategory._id } }
+            );
+          }
+        }
+
+        await updatedSubCategory.save(); // Save the updated product
+        return { code: 297, updatedSubCategory: updatedSubCategory };
+      } else {
+        return { code: 425 };
+      }
+    } else {
+      return { code: 725 };
+    }
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
+  }
+
   async subCategoryListing() {
     try {
       // console.log(Category.Category);
@@ -538,91 +594,100 @@ class ApiRepository {
   }
 
   async updateProduct(data) {
-    // try {
-    // console.log(Category.Category);
-    if (data.product_id) {
-      const oldProduct = await Product.getProductById(data.product_id);
-      const updatedProduct = await Product.Product.findOneAndUpdate(
-        { product_id: data.product_id },
-        data,
-        { new: true } // Return the updated product
-      );
+    try {
+      // console.log(Category.Category);
+      if (data.product_id) {
+        const oldProduct = await Product.getProductById(data.product_id);
+        const updatedProduct = await Product.Product.findOneAndUpdate(
+          { product_id: data.product_id },
+          data,
+          { new: true, context: "query" } // Return the document as it was before the update
+        );
 
-      if (updatedProduct) {
-        console.log("Updated product present", updatedProduct);
-        if (data.shop_id) {
-          if (oldProduct.shop_id != data.shop_id) {
-            const oldShop = await Shop.getShopById(oldProduct.shop_id);
-            const shop = await Shop.getShopById(data.shop_id);
-            console.log(oldShop._id);
-            await Shop.Shop.findOneAndUpdate(
-              { _id: oldShop._id },
-              { $pull: { products: updatedProduct._id } }
-            );
+        if (updatedProduct) {
+          console.log("Updated product present", updatedProduct);
+          if (data.shop_id) {
+            if (oldProduct.shop_id != data.shop_id) {
+              const oldShop = await Shop.getShopById(oldProduct.shop_id);
+              const shop = await Shop.getShopById(data.shop_id);
 
-            // Add product_id to new shop
-            await Shop.Shop.findOneAndUpdate(
-              { _id: shop._id },
-              { $push: { products: updatedProduct._id } }
-            );
+              if (!shop) {
+                return { code: 722 };
+              }
+
+              console.log(oldShop._id);
+              await Shop.Shop.findOneAndUpdate(
+                { _id: oldShop._id },
+                { $pull: { products: updatedProduct._id } }
+              );
+
+              // Add product_id to new shop
+              await Shop.Shop.findOneAndUpdate(
+                { _id: shop._id },
+                { $push: { products: updatedProduct._id } }
+              );
+            }
           }
-        }
 
-        if (data.main_subcategory_id) {
-          console.log("SubCategory ID present");
-          if (oldProduct.main_subcategory_id != data.main_subcategory_id) {
-            console.log("Old Product not equal data main subcategory id ");
-            // Sub Category
-            const oldSubCategory = await SubCategory.getSubCategoryById(
-              oldProduct.main_subcategory_id
-            );
-            const subCategory = await SubCategory.getSubCategoryById(
-              data.main_subcategory_id
-            );
+          if (data.main_subcategory_id) {
+            console.log("SubCategory ID present");
+            if (oldProduct.main_subcategory_id != data.main_subcategory_id) {
+              console.log("Old Product not equal data main subcategory id ");
+              // Sub Category
+              const oldSubCategory = await SubCategory.getSubCategoryById(
+                oldProduct.main_subcategory_id
+              );
+              const subCategory = await SubCategory.getSubCategoryById(
+                data.main_subcategory_id
+              );
 
-            console.log("old Subcategory", oldSubCategory);
-            console.log("new Subcategory", subCategory);
-            await SubCategory.SubCategory.findOneAndUpdate(
-              { _id: oldSubCategory._id },
-              { $pull: { products: updatedProduct._id } }
-            );
+              if (!subCategory) {
+                return { code: 726 };
+              }
 
-            // Add product_id to new shop
-            await SubCategory.SubCategory.findOneAndUpdate(
-              { _id: subCategory._id },
-              { $push: { products: updatedProduct._id } }
-            );
+              console.log("old Subcategory", oldSubCategory);
+              console.log("new Subcategory", subCategory);
+              await SubCategory.SubCategory.findOneAndUpdate(
+                { _id: oldSubCategory._id },
+                { $pull: { products: updatedProduct._id } }
+              );
 
-            // Category
-            const oldCategory = await Category.getCategoryById(
-              oldSubCategory.category_id
-            );
-            const category = await Category.getCategoryById(
-              subCategory.category_id
-            );
-            await Category.Category.findOneAndUpdate(
-              { _id: oldCategory._id },
-              { $pull: { products: updatedProduct._id } }
-            );
+              // Add product_id to new shop
+              await SubCategory.SubCategory.findOneAndUpdate(
+                { _id: subCategory._id },
+                { $push: { products: updatedProduct._id } }
+              );
 
-            await Category.Category.findOneAndUpdate(
-              { _id: category._id },
-              { $push: { products: updatedProduct._id } }
-            );
+              // Category
+              const oldCategory = await Category.getCategoryById(
+                oldSubCategory.category_id
+              );
+              const category = await Category.getCategoryById(
+                subCategory.category_id
+              );
+              await Category.Category.findOneAndUpdate(
+                { _id: oldCategory._id },
+                { $pull: { products: updatedProduct._id } }
+              );
+
+              await Category.Category.findOneAndUpdate(
+                { _id: category._id },
+                { $push: { products: updatedProduct._id } }
+              );
+            }
           }
-        }
 
-        await updatedProduct.save(); // Save the updated product
-        return { code: 297, updatedProduct: updatedProduct };
+          await updatedProduct.save(); // Save the updated product
+          return { code: 297, updatedProduct: updatedProduct };
+        } else {
+          return { code: 425 };
+        }
       } else {
-        return { code: 425 };
+        return { code: 718 };
       }
-    } else {
-      return { code: 718 };
+    } catch (error) {
+      return { code: 425 };
     }
-    // } catch (error) {
-    //   return { code: 425 };
-    // }
   }
 
   async productDetails(data) {

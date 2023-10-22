@@ -257,6 +257,7 @@ class Msg {
       734: "No stock left for the Product",
       735: "No Product for the given Product ID",
       736: "Error in updating product",
+      737: "Error in updating subCategory",
       900: "Success",
     };
 

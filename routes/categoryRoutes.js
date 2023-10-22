@@ -130,6 +130,7 @@ router.post("/api/category", apiController.createCategory);
 
 router.post("/api/create-subcategory", apiController.createSubCategory);
 router.get("/api/subcategory-list", apiController.subCategoryListing);
+router.put("/api/update-subcategory", apiController.updateSubCategory);
 router.post("/api/main_subcategory", apiController.mainSubCategory);
 
 // router.post("/api/create-sub-sub-category", apiController.createSubSubCategory);
