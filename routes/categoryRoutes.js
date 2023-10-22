@@ -126,6 +126,8 @@ router.get("/api/category", categoryListingMiddleware);
  */
 router.post("/api/category", apiController.createCategory);
 
+router.put("/api/update-category", apiController.updateCategory);
+
 /**** SUB CATEGORY ROUTES *****/
 
 router.post("/api/create-subcategory", apiController.createSubCategory);
@@ -155,6 +157,7 @@ router.post(
 
 router.post("/api/create-shop", apiController.createShop);
 router.get("/api/shop-list", apiController.shopListing);
+router.put("/api/update-shop", apiController.updateShop);
 router.post("/api/shop-details", apiController.shopDetails);
 
 /**** LOCATION FEATURES ROUTES *****/
@@ -178,6 +181,8 @@ router.post(
 
 /**** BUY PRODUCTS *****/
 router.post("/api/buy-product", apiController.buyProduct);
+
+/**** TRENDING PRODUCTS *****/
 router.get("/api/trending-products", apiController.trendingProducts);
 router.post(
   "/api/trending-products-by-category",

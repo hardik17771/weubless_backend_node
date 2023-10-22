@@ -289,6 +289,32 @@ class ApiRepository {
     }
   }
 
+  async updateCategory(data) {
+    try {
+      if (data.category_id) {
+        const oldCategory = await Category.getCategoryById(data.category_id);
+        const updatedCategory = await Category.getCategoryById(
+          data.category_id
+        );
+
+        if (updatedCategory) {
+          Object.assign(updatedCategory, data);
+          console.log("Old Category present", oldCategory);
+          console.log("Updated Category present", updatedCategory);
+
+          updatedCategory.save();
+          return { code: 297, updatedCategory: updatedCategory };
+        } else {
+          return { code: 425 };
+        }
+      } else {
+        return { code: 711 };
+      }
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
   async categoryListing() {
     try {
       // console.log(Category.Category);
@@ -902,6 +928,30 @@ class ApiRepository {
       const shopList = await Shop.Shop.find();
       console.log("shopList", shopList);
       return { list: shopList, code: 733 };
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
+  async updateShop(data) {
+    try {
+      if (data.shop_id) {
+        const oldShop = await Shop.getShopById(data.shop_id);
+        const updatedShop = await Shop.getShopById(data.shop_id);
+
+        if (updatedShop) {
+          Object.assign(updatedShop, data);
+          console.log("Old Shop present", oldShop);
+          console.log("Updated Shop present", updatedShop);
+
+          updatedShop.save();
+          return { code: 297, updatedShop: updatedShop };
+        } else {
+          return { code: 425 };
+        }
+      } else {
+        return { code: 723 };
+      }
     } catch (error) {
       return { code: 425 };
     }
