@@ -344,7 +344,6 @@ class ApiRepository {
         // Return the document as it was before the update
       );
 
-      console.log("Updated SubCategory", updatedSubCategory);
       if (updatedSubCategory) {
         Object.assign(updatedSubCategory, data);
         console.log("Old Sub-Category present", oldSubCategory);
@@ -363,6 +362,7 @@ class ApiRepository {
             if (!category) {
               return { code: 714 };
             }
+
             await Category.Category.findOneAndUpdate(
               { _id: oldCategory._id },
               { $pull: { subCategories: updatedSubCategory._id } }
@@ -372,6 +372,23 @@ class ApiRepository {
               { _id: category._id },
               { $push: { subCategories: updatedSubCategory._id } }
             );
+
+            const products = await SubCategory.getProdutsByMainSubCategoryId(
+              data.main_subcategory_id
+            );
+            if (products) {
+              for (const product of products) {
+                await Category.Category.findOneAndUpdate(
+                  { _id: oldCategory._id },
+                  { $pull: { products: product._id } }
+                );
+
+                await Category.Category.findOneAndUpdate(
+                  { _id: category._id },
+                  { $push: { products: product._id } }
+                );
+              }
+            }
           }
         }
 
@@ -598,13 +615,10 @@ class ApiRepository {
       // console.log(Category.Category);
       if (data.product_id) {
         const oldProduct = await Product.getProductById(data.product_id);
-        const updatedProduct = await Product.Product.findOneAndUpdate(
-          { product_id: data.product_id },
-          data,
-          { new: true, context: "query" } // Return the document as it was before the update
-        );
+        const updatedProduct = await Product.getProductById(data.product_id);
 
         if (updatedProduct) {
+          Object.assign(updatedProduct, data);
           console.log("Updated product present", updatedProduct);
           if (data.shop_id) {
             if (oldProduct.shop_id != data.shop_id) {
