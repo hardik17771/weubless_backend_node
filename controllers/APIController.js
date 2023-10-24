@@ -933,6 +933,33 @@ const trendingProductsByCategory = async (req, res) => {
   }
 };
 
+const trendingProductsByLocation = async (req, res) => {
+  const { lat, long, distance } = req.body;
+  const error_msg = new Msg();
+  const apiService = new ApiService();
+  const Check = await apiService.trendingProductsByLocation({
+    lat,
+    long,
+    distance,
+  });
+  try {
+    if (Check.code === 732) {
+      // console.log(Check.productsList);
+      const msg = error_msg.responseMsg(Check.code);
+      const response = { status: "1", message: msg, list: Check.productsList };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(Check.code);
+      const response = { status: "0", message: msg, list: Check.productsList };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 module.exports = {
   login,
   changePassword,
