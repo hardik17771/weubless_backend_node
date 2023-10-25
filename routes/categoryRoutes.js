@@ -188,5 +188,9 @@ router.post(
   "/api/trending-products-by-category",
   apiController.trendingProductsByCategory
 );
+router.post(
+  "/api/trending-products-by-location",
+  apiController.trendingProductsByLocation
+);
 
 module.exports = router;

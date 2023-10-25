@@ -934,12 +934,12 @@ const trendingProductsByCategory = async (req, res) => {
 };
 
 const trendingProductsByLocation = async (req, res) => {
-  const { lat, long, distance } = req.body;
+  const { latitude, longitude, distance } = req.body;
   const error_msg = new Msg();
   const apiService = new ApiService();
   const Check = await apiService.trendingProductsByLocation({
-    lat,
-    long,
+    latitude,
+    longitude,
     distance,
   });
   try {
@@ -996,4 +996,5 @@ module.exports = {
   buyProduct,
   trendingProducts,
   trendingProductsByCategory,
+  trendingProductsByLocation,
 };

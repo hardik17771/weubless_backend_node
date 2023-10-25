@@ -1370,6 +1370,47 @@ class ApiRepository {
     // }
   }
 
+  async trendingProductsByLocation(data) {
+    // try {
+    if (data.latitude && data.longitude && data.distance) {
+      const productList = await Product.Product.find().sort({
+        num_of_sale: -1,
+      });
+      console.log("Products List", productList);
+      const filteredProducts = [];
+      for (const product of productList) {
+        const distanceUserProduct = await calculateDistance(
+          data.latitude,
+          data.longitude,
+          product.latitude,
+          product.longitude
+        );
+
+        console.log(
+          "user.latitude,user.longitude,product.latitude,product.longitude",
+          data.latitude,
+          data.longitude,
+          product.latitude,
+          product.longitude
+        );
+
+        if (distanceUserProduct <= data.distance) {
+          filteredProducts.push(product);
+        }
+      }
+
+      console.log("filtered Products", filteredProducts);
+      return { productsList: filteredProducts, code: 732 };
+    } else if (!(data.latitude && data.longitude)) {
+      return { code: 719 };
+    } else {
+      return { code: 731 };
+    }
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 
