@@ -1417,46 +1417,49 @@ class ApiRepository {
 
   async createCart(data) {
     // try {
-    // console.log("Create newProduct api repo hit");
-    // console.log("name is ", data.name);
-    // console.log("data is ", data);
     if (data.product_id && data.user_id) {
-      // console.log("name and image present");
       const newCart = new Cart.Cart(data);
 
-      // const subCategory = await SubCategory.getSubCategoryById(
-      //   data.main_subcategory_id
-      // );
-      // const shop = await Shop.getShopById(data.shop_id);
       const product = await Product.getProductById(data.product_id);
-      // console.log(subSubCategory.main_subcategory_id);
-
-      if (product) {
+      const user = await User.getUserById(data.user_id);
+      if (product && user) {
         // Product
         product.cart_id = newCart.cart_id;
         await product.save();
 
         // Category ID
         const categoryId = product.category_id;
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      } else if (!subCategory) {
-        return { code: 726 };
+
+        await newCart.save();
+
+        const updatedCart = await Cart.populateCategoryId(
+          categoryId,
+          newCart.cart_id
+        );
+
+        const newUpdateCart = await Cart.populateUserId(
+          data.user_id,
+          updatedCart.cart_id
+        );
+
+        await newUpdateCart.save();
+        return { data: newUpdateCart, code: 669 };
+      } else if (!user) {
+        return { code: 404 };
       } else {
-        return { code: 723 };
+        return { code: 735 };
       }
       // await newProduct.save();
       // console.log("new newProduct present");
       // await newProduct.save();
       // console.log(newProduct);
-    } else if (!data.main_subcategory_id) {
-      return { code: 725 };
-    } else if (!data.shop_id) {
-      return { code: 723 };
+    } else if (!data.product_id) {
+      return { code: 718 };
     } else {
-      return { code: 708 };
+      return { code: 730 };
     }
     // } catch (error) {
-    //   return { code: 717 };
+    //   return { code: 670 };
     // }
   }
 

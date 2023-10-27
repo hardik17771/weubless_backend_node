@@ -193,4 +193,7 @@ router.post(
   apiController.trendingProductsByLocation
 );
 
+/**** CART *****/
+router.post("/api/create-cart", apiController.createCart);
+
 module.exports = router;
