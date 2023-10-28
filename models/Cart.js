@@ -13,7 +13,6 @@ const cartSchema = new mongoose.Schema({
   coupon_applied: Boolean,
   quantity: Number,
   owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  product_id: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
   variation: String,
 });
 

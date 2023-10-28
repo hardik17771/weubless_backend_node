@@ -1417,14 +1417,17 @@ class ApiRepository {
 
   async createCart(data) {
     // try {
-    if (data.product_id && data.user_id) {
+    if (data.product_id && data.user_id && data.quantity) {
       const newCart = new Cart.Cart(data);
 
       const product = await Product.getProductById(data.product_id);
       const user = await User.getUserById(data.user_id);
       if (product && user) {
         // Product
+        const unit_price = product.unit_price;
         product.cart_id = newCart.cart_id;
+        product.quantity -= quantity;
+        const amount = unit_price * quantity;
         await product.save();
 
         // Category ID
@@ -1443,7 +1446,7 @@ class ApiRepository {
         );
 
         await newUpdateCart.save();
-        return { data: newUpdateCart, code: 669 };
+        return { data: newUpdateCart, amount: amount, code: 669 };
       } else if (!user) {
         return { code: 404 };
       } else {
