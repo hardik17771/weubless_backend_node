@@ -202,7 +202,7 @@ class Msg {
       680: "Product Searched",
       681: "Problem occurred in update password.",
       682: "About Us Fatched Detail",
-      683: "Cart Deleted",
+      683: "Cart Deleted and checked out",
       684: "Product related Data",
       685: "Address Added",
       686: "Address Display",
@@ -258,6 +258,8 @@ class Msg {
       735: "No Product for the given Product ID",
       736: "Error in updating product",
       737: "Error in updating subCategory",
+      738: "Error in checking out ",
+      739: "Cart Id is required",
       900: "Success",
     };
 

@@ -1466,6 +1466,27 @@ class ApiRepository {
     // }
   }
 
+  async checkout(data) {
+    // try {
+    if (data.cart_id) {
+      const cart = await Cart.getCartById(data.cart_id);
+
+      if (cart) {
+        // Cart
+        Cart.deleteOne({ cart_id: cart.cart_id });
+        cart.save();
+        return { code: 683 };
+      } else {
+        return { code: 738 };
+      }
+    } else {
+      return { code: 739 };
+    }
+    // } catch (error) {
+    //   return { code: 670 };
+    // }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 

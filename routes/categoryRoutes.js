@@ -195,5 +195,6 @@ router.post(
 
 /**** CART *****/
 router.post("/api/create-cart", apiController.createCart);
+router.post("/api/checkout", apiController.checkout);
 
 module.exports = router;
