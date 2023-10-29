@@ -1487,6 +1487,44 @@ class ApiRepository {
     // }
   }
 
+  async cartDetails(data) {
+    try {
+      if (data.cart_id) {
+        // console.log("name and image present");
+        const cart = await Cart.getCartById(data.cart_id);
+
+        if (cart) {
+          const data = cart;
+
+          // let productsList = [];
+
+          // const productObjects = await Shop.findProducts(products);
+          // if (productObjects && productObjects.length > 0) {
+          //   productObjects.forEach((product) => {
+          //     const item = {
+          //       product_id: product.product_id,
+          //       product_name: product.name || "",
+          //     };
+          //     productsList.push(item);
+          //   });
+          // }
+
+          return {
+            data: data,
+            code: 671,
+          };
+        } else {
+          return { code: 1100 };
+        }
+      } else {
+        return { code: 739 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 1100 };
+    }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 

@@ -190,7 +190,7 @@ class Msg {
       668: "Advertisement Fatched Detail",
       669: "Product added to cart",
       670: "Problem occurred while adding to your cart",
-      671: "Cart Fatched Detail",
+      671: "Cart Fetched Detail",
       672: "Past Order Detail",
       673: "Current Order Detail",
       674: "Category Listing Fetched Successfully",
@@ -261,6 +261,7 @@ class Msg {
       738: "Error in checking out ",
       739: "Cart Id is required",
       900: "Success",
+      1100: "Failure",
     };
 
     return msg[msgId] || "";

@@ -1015,6 +1015,32 @@ const checkout = async (req, res) => {
   // }
 };
 
+const cartDetails = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  try {
+    const cart = await apiRepository.cartDetails(data);
+
+    const msg = error_msg.responseMsg(cart.code);
+    console.log(cart.code);
+    if (cart.code === 671) {
+      // console.log("status 1");
+      const response = { status: "1", message: msg, data: cart.data };
+      res.status(201).json(response);
+    } else {
+      // console.log("status 0");
+      const response = { status: "0", message: msg, data: cart.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(1100);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 module.exports = {
   login,
   changePassword,
@@ -1054,4 +1080,5 @@ module.exports = {
   trendingProductsByLocation,
   createCart,
   checkout,
+  cartDetails,
 };
