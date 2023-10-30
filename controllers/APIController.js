@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 
 const nodemailer = require("nodemailer");
 const ContactUs = require("../models/ContactUs"); // Assuming you have a model defined
+const Advertisement = require("../models/Advertisement"); // Assuming you have a model defined
 
 const transporter = nodemailer.createTransport({
   host: "your_smtp_server.com",
@@ -149,7 +150,12 @@ const registerUser = async (req, res) => {
       user_type: data.user_type,
       latitude: data.latitude,
       longitude: data.longitude,
+      liveAddress: data.liveAddress,
+      livePincode: data.livePincode,
+      liveCity: data.liveCity,
+      deviceToken: data.deviceToken,
     });
+
     await newUser.save();
     res.status(200).json({
       status: 1,
@@ -1054,7 +1060,7 @@ const cartDetails = async (req, res) => {
   }
 };
 
-const contactUs = (data) => {
+const contactUs = async (data) => {
   const user = new ContactUs({
     name: data.name,
     email: data.email,
@@ -1079,14 +1085,41 @@ const contactUs = (data) => {
     console.log("Email sent:", info.response);
   });
 
-  user.save((err, savedUser) => {
+  await user.save((err, savedUser) => {
     if (err) {
       return console.error(err);
     }
     console.log("User saved successfully:", savedUser);
   });
-
   return user;
+};
+
+const advertisementShow = async (data) => {
+  try {
+    let getDetails;
+
+    if (data) {
+      getDetails = await Advertisement.find({ category_id: data });
+    } else {
+      // Handle case when data is not set (if needed)
+      getDetails = [];
+    }
+
+    const array2 = getDetails.map((list) => {
+      return {
+        advertisement_id: list.id,
+        category_id: list.category_id || "",
+        name: list.name || "",
+        date_range: list.date_range || "",
+        amount: list.amount || "",
+      };
+    });
+
+    return array2;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 module.exports = {
@@ -1130,4 +1163,5 @@ module.exports = {
   checkout,
   cartDetails,
   contactUs,
+  advertisementShow,
 };

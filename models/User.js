@@ -137,16 +137,27 @@ const userSchema2 = new mongoose.Schema({
     default: null,
     required: false,
   },
-  city: {
+  liveCity: {
     type: String,
     default: null,
     required: false,
   },
-  postal_code: {
+  livePincode: {
     type: String,
     default: null,
     required: false,
   },
+  liveAddress: {
+    type: String,
+    default: null,
+    required: false,
+  },
+  deviceToken: {
+    type: String,
+    default: null,
+    required: false,
+  },
+
   image: {
     type: String,
     default: null,
