@@ -198,4 +198,7 @@ router.post("/api/create-cart", apiController.createCart);
 router.post("/api/checkout", apiController.checkout);
 router.post("/api/cart-details", apiController.cartDetails);
 
+/**** CONTACT US *****/
+router.post("/api/contact-us", apiController.contactUs);
+
 module.exports = router;

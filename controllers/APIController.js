@@ -5,6 +5,19 @@ const ApiRepository = require("./Repository/ApiRepository");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
+const nodemailer = require("nodemailer");
+const ContactUs = require("../models/ContactUs"); // Assuming you have a model defined
+
+const transporter = nodemailer.createTransport({
+  host: "your_smtp_server.com",
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: "your_email@example.com",
+    pass: "your_password",
+  },
+});
+
 /*********************************************** AUTH  ***********************************/
 
 // Login
@@ -1041,6 +1054,41 @@ const cartDetails = async (req, res) => {
   }
 };
 
+const contactUs = (data) => {
+  const user = new ContactUs({
+    name: data.name,
+    email: data.email,
+    message: data.message,
+  });
+
+  const mailOptions = {
+    from: data.email,
+    to: "muskan.apgroup@gmail.com",
+    subject: "Inquiry Recorded",
+    html: `
+      <p>Name: ${data.name}</p>
+      <p>Email: ${data.email}</p>
+      <p>Message: ${data.message}</p>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      return console.error(error);
+    }
+    console.log("Email sent:", info.response);
+  });
+
+  user.save((err, savedUser) => {
+    if (err) {
+      return console.error(err);
+    }
+    console.log("User saved successfully:", savedUser);
+  });
+
+  return user;
+};
+
 module.exports = {
   login,
   changePassword,
@@ -1081,4 +1129,5 @@ module.exports = {
   createCart,
   checkout,
   cartDetails,
+  contactUs,
 };
