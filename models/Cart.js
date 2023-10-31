@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
+const { Product } = require("./Product");
 
 const cartSchema = new mongoose.Schema({
   cart_id: { type: Number, unique: true },
   user_id: Number,
   category_id: Number,
+  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   address_id: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
   price: Number,
   tax: Number,
@@ -77,5 +79,34 @@ const populateUserId = async (user_id, cart_id) => {
   // }
 };
 
+const getProdutsByCartId = async (cart_id) => {
+  try {
+    const cart = await Cart.findOne({
+      cart_id,
+    }).exec();
+    return cart ? cart.products : [];
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
+const findProducts = async (objectIds) => {
+  try {
+    const products = await Product.find({
+      _id: { $in: objectIds },
+    });
+    return products;
+  } catch (error) {
+    throw new Error(`Error fetching categories: ${error.message}`);
+  }
+};
+
 const Cart = mongoose.model("Cart", cartSchema);
-module.exports = { Cart, getCartById, populateCategoryId, populateUserId };
+module.exports = {
+  Cart,
+  getCartById,
+  populateCategoryId,
+  populateUserId,
+  getProdutsByCartId,
+  findProducts,
+};

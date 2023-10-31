@@ -988,19 +988,20 @@ const createCart = async (req, res) => {
 
   // console.log("Create product api controller hit");
   // try {
-  const newCart = await apiRepository.createCart(data);
+  const Check = await apiRepository.createCart(data);
 
   const msg = error_msg.responseMsg(newProduct.code); //706
   if (newProduct.code === 716) {
     const response = {
       status: "1",
       message: msg,
-      data: newCart.data,
-      amount: newCart.amount,
+      data: Check.data,
+      amount: Check.amount,
+      list: Check.productsList,
     };
     res.status(201).json(response);
   } else {
-    const response = { status: "0", message: msg, data: newProduct.data };
+    const response = { status: "0", message: msg, data: Check.data };
     res.status(201).json(response);
   }
   // } catch (error) {

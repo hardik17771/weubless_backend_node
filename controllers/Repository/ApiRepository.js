@@ -1418,11 +1418,15 @@ class ApiRepository {
   async createCart(data) {
     // try {
     if (data.product_id && data.user_id && data.quantity) {
-      const newCart = new Cart.Cart(data);
+      let productsList = [];
 
+      const newCart = new Cart.Cart(data);
       const product = await Product.getProductById(data.product_id);
       const user = await User.getUserById(data.user_id);
+
       if (product && user) {
+        // Cart
+        newCart.products.push(product._id);
         // Product
         const unit_price = product.unit_price;
         product.cart_id = newCart.cart_id;
@@ -1435,6 +1439,19 @@ class ApiRepository {
 
         await newCart.save();
 
+        const productIds = await Cart.getProdutsByCartId(newCart.cart_id);
+
+        const productObjects = await Cart.findProducts(productIds);
+        if (productObjects && productObjects.length > 0) {
+          productObjects.forEach((product) => {
+            // const item = {
+            //   product_id: product.product_id,
+            //   product_name: product.name || "",
+            // };
+            productsList.push(product);
+          });
+        }
+
         const updatedCart = await Cart.populateCategoryId(
           categoryId,
           newCart.cart_id
@@ -1446,7 +1463,12 @@ class ApiRepository {
         );
 
         await newUpdateCart.save();
-        return { data: newUpdateCart, amount: amount, code: 669 };
+        return {
+          data: newUpdateCart,
+          amount: amount,
+          productsList: productsList,
+          code: 669,
+        };
       } else if (!user) {
         return { code: 404 };
       } else {
