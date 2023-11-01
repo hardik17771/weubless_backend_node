@@ -1430,8 +1430,8 @@ class ApiRepository {
         // Product
         const unit_price = product.unit_price;
         product.cart_id = newCart.cart_id;
-        product.quantity -= quantity;
-        const amount = unit_price * quantity;
+        product.quantity -= data.quantity;
+        const amount = unit_price * data.quantity;
         await product.save();
 
         // Category ID
@@ -1495,7 +1495,7 @@ class ApiRepository {
 
       if (cart) {
         // Cart
-        Cart.deleteOne({ cart_id: cart.cart_id });
+        Cart.Cart.deleteOne({ cart_id: cart.cart_id });
         cart.save();
         return { code: 683 };
       } else {
