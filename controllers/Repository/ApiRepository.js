@@ -1425,14 +1425,19 @@ class ApiRepository {
       const user = await User.getUserById(data.user_id);
 
       if (product && user) {
-        // Cart
-        newCart.products.push(product._id);
         // Product
+        if (data.quantity > product.quantity) {
+          return { code: 740 };
+        }
         const unit_price = product.unit_price;
         product.cart_id = newCart.cart_id;
+
         product.quantity -= data.quantity;
+
         const amount = unit_price * data.quantity;
         await product.save();
+        // Cart
+        newCart.products.push(product._id);
 
         // Category ID
         const categoryId = product.category_id;

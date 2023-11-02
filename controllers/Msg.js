@@ -260,6 +260,7 @@ class Msg {
       737: "Error in updating subCategory",
       738: "Error in checking out ",
       739: "Cart Id is required",
+      740: "Sufficient Quantity is not present",
       900: "Success",
       1100: "Failure",
     };

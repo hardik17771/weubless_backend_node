@@ -991,7 +991,7 @@ const createCart = async (req, res) => {
   const Check = await apiRepository.createCart(data);
 
   const msg = error_msg.responseMsg(Check.code); //706
-  if (Check.code === 716) {
+  if (Check.code === 669) {
     const response = {
       status: "1",
       message: msg,
