@@ -261,6 +261,7 @@ class Msg {
       738: "Error in checking out ",
       739: "Cart Id is required",
       740: "Sufficient Quantity is not present",
+      741: "Product category and cart category doesn't match",
       900: "Success",
       1100: "Failure",
     };

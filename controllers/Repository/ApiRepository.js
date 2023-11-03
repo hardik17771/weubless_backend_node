@@ -1415,9 +1415,9 @@ class ApiRepository {
 
   /*********************************************** CART ***********************************/
 
-  async createCart(data) {
+  async addToCart(data) {
     // try {
-    if (data.product_id && data.user_id && data.quantity) {
+    if (data.product_id && data.user_id && data.quantity && data.category_id) {
       let productsList = [];
 
       const newCart = new Cart.Cart(data);
@@ -1428,6 +1428,9 @@ class ApiRepository {
         // Product
         if (data.quantity > product.quantity) {
           return { code: 740 };
+        }
+        if (product.category_id != data.category_id) {
+          return { code: 741 };
         }
         const unit_price = product.unit_price;
         product.cart_id = newCart.cart_id;
@@ -1485,6 +1488,8 @@ class ApiRepository {
       // console.log(newProduct);
     } else if (!data.product_id) {
       return { code: 718 };
+    } else if (!data.category_id) {
+      return { code: 711 };
     } else {
       return { code: 730 };
     }

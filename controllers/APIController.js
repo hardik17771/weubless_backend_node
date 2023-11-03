@@ -981,14 +981,14 @@ const trendingProductsByLocation = async (req, res) => {
 
 /*********************************************** CART ***********************************/
 
-const createCart = async (req, res) => {
+const addToCart = async (req, res) => {
   const data = req.body;
   const apiRepository = new ApiRepository();
   const error_msg = new Msg();
 
   // console.log("Create product api controller hit");
   // try {
-  const Check = await apiRepository.createCart(data);
+  const Check = await apiRepository.addToCart(data);
 
   const msg = error_msg.responseMsg(Check.code); //706
   if (Check.code === 669) {
@@ -1160,7 +1160,7 @@ module.exports = {
   trendingProducts,
   trendingProductsByCategory,
   trendingProductsByLocation,
-  createCart,
+  addToCart,
   checkout,
   cartDetails,
   contactUs,
