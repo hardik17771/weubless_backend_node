@@ -258,10 +258,11 @@ class Msg {
       735: "No Product for the given Product ID",
       736: "Error in updating product",
       737: "Error in updating subCategory",
-      738: "Error in checking out ",
+      738: "Cart does not exist",
       739: "Cart Id is required",
       740: "Sufficient Quantity is not present",
       741: "Product category and cart category doesn't match",
+      742: "All the carts Listed",
       900: "Success",
       1100: "Failure",
     };

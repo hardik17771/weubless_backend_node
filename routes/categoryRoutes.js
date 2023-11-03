@@ -195,8 +195,9 @@ router.post(
 
 /**** CART *****/
 router.post("/api/add-to-cart", apiController.addToCart);
-router.post("/api/checkout", apiController.checkout);
+router.get("/api/cart-list", apiController.cartListing);
 router.post("/api/cart-details", apiController.cartDetails);
+router.post("/api/checkout", apiController.checkout);
 
 /**** CONTACT US *****/
 router.post("/api/contact-us", apiController.contactUs);

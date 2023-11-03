@@ -1011,28 +1011,25 @@ const addToCart = async (req, res) => {
   // }
 };
 
-const checkout = async (req, res) => {
-  const data = req.body;
+const cartListing = async (req, res) => {
   const apiRepository = new ApiRepository();
+  const data = await apiRepository.cartListing();
   const error_msg = new Msg();
-
-  // console.log("Create product api controller hit");
-  // try {
-  const Check = await apiRepository.checkout(data);
-
-  const msg = error_msg.responseMsg(Check.code); //706
-  if (Check.code === 716) {
-    const response = { status: "1", message: msg, data: Check.data };
-    res.status(201).json(response);
-  } else {
-    const response = { status: "0", message: msg, data: Check.data };
-    res.status(201).json(response);
+  try {
+    if (data.code == 742) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717); //707
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
 };
 
 const cartDetails = async (req, res) => {
@@ -1059,6 +1056,30 @@ const cartDetails = async (req, res) => {
     const response = { status: "0", message: msg };
     res.status(400).json(response);
   }
+};
+
+const checkout = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  // console.log("Create product api controller hit");
+  // try {
+  const Check = await apiRepository.checkout(data);
+
+  const msg = error_msg.responseMsg(Check.code); //706
+  if (Check.code === 683) {
+    const response = { status: "1", message: msg, data: Check.data };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg, data: Check.data };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(717); //707
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
 };
 
 const contactUs = async (data) => {
@@ -1161,8 +1182,9 @@ module.exports = {
   trendingProductsByCategory,
   trendingProductsByLocation,
   addToCart,
-  checkout,
+  cartListing,
   cartDetails,
+  checkout,
   contactUs,
   advertisementShow,
 };

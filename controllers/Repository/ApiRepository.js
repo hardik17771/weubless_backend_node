@@ -1498,25 +1498,15 @@ class ApiRepository {
     // }
   }
 
-  async checkout(data) {
-    // try {
-    if (data.cart_id) {
-      const cart = await Cart.getCartById(data.cart_id);
-
-      if (cart) {
-        // Cart
-        Cart.Cart.deleteOne({ cart_id: cart.cart_id });
-        cart.save();
-        return { code: 683 };
-      } else {
-        return { code: 738 };
-      }
-    } else {
-      return { code: 739 };
+  async cartListing() {
+    try {
+      // console.log(Category.Category);
+      const cartList = await Cart.Cart.find();
+      // console.log("shopList", shopList);
+      return { list: cartList, code: 742 };
+    } catch (error) {
+      return { code: 425 };
     }
-    // } catch (error) {
-    //   return { code: 670 };
-    // }
   }
 
   async cartDetails(data) {
@@ -1546,7 +1536,7 @@ class ApiRepository {
             code: 671,
           };
         } else {
-          return { code: 1100 };
+          return { code: 738 };
         }
       } else {
         return { code: 739 };
@@ -1555,6 +1545,26 @@ class ApiRepository {
       console.error(error);
       return { code: 1100 };
     }
+  }
+
+  async checkout(data) {
+    // try {
+    if (data.cart_id) {
+      const cart = await Cart.getCartById(data.cart_id);
+      console.log(cart);
+      if (cart) {
+        // Cart
+        await Cart.Cart.deleteOne({ cart_id: cart.cart_id });
+        return { code: 683 };
+      } else {
+        return { code: 738 };
+      }
+    } else {
+      return { code: 739 };
+    }
+    // } catch (error) {
+    //   return { code: 670 };
+    // }
   }
 
   /******************************************** END OF FUNCTION ********************************************/
