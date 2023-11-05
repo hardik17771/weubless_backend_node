@@ -10,12 +10,12 @@ const ContactUs = require("../models/ContactUs"); // Assuming you have a model d
 const Advertisement = require("../models/Advertisement"); // Assuming you have a model defined
 
 const transporter = nodemailer.createTransport({
-  host: "your_smtp_server.com",
+  service: "gmail",
   port: 587,
   secure: false, // true for 465, false for other ports
   auth: {
-    user: "your_email@example.com",
-    pass: "your_password",
+    user: "acehunter500@gmail.com",
+    pass: "mpajszqgvctxhonn",
   },
 });
 
@@ -1082,8 +1082,9 @@ const checkout = async (req, res) => {
   // }
 };
 
-const contactUs = async (data) => {
-  const user = new ContactUs({
+const contactUs = async (req, res) => {
+  data = req.body;
+  const contact = new ContactUs.ContactUs({
     name: data.name,
     email: data.email,
     message: data.message,
@@ -1091,7 +1092,7 @@ const contactUs = async (data) => {
 
   const mailOptions = {
     from: data.email,
-    to: "muskan.apgroup@gmail.com",
+    to: "21BMA003@nith.ac.com",
     subject: "Inquiry Recorded",
     html: `
       <p>Name: ${data.name}</p>
@@ -1102,18 +1103,27 @@ const contactUs = async (data) => {
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return console.error(error);
+      const response = { status: "0", message: "Error in sending mail" };
+      res.status(400).json(response);
     }
+    console.log(info);
     console.log("Email sent:", info.response);
+    const response = {
+      status: "1",
+      message: "Email sent successfully",
+      data: info.response,
+    };
+    res.status(201).json(response);
   });
 
-  await user.save((err, savedUser) => {
-    if (err) {
-      return console.error(err);
-    }
-    console.log("User saved successfully:", savedUser);
-  });
-  return user;
+  try {
+    await contact.save(); // Using await to wait for the save operation to complete
+    console.log("User saved successfully:", contact);
+    return contact;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error saving contact");
+  }
 };
 
 const advertisementShow = async (data) => {

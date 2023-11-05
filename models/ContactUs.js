@@ -9,4 +9,4 @@ const contactUsSchema = new mongoose.Schema({
 
 const ContactUs = mongoose.model("ContactUs", contactUsSchema);
 
-module.exports = ContactUs;
+module.exports = { ContactUs };
