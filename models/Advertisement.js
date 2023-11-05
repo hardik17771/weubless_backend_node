@@ -31,7 +31,20 @@ const getAdvertisementById = async (ad_id) => {
   }
 };
 
+const getAdvertisementsByCategoryId = async (category_id) => {
+  try {
+    const advertisements = await Advertisement.find({ category_id }).exec();
+    return advertisements;
+  } catch (error) {
+    throw new Error(`Error fetching advertisements: ${error.message}`);
+  }
+};
+
 // Create the Advertisement model
 const Advertisement = mongoose.model("Advertisement", advertisementSchema);
 
-module.exports = { Advertisement, getAdvertisementById };
+module.exports = {
+  Advertisement,
+  getAdvertisementById,
+  getAdvertisementsByCategoryId,
+};

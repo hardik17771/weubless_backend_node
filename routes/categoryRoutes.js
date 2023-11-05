@@ -201,7 +201,14 @@ router.post("/api/checkout", apiController.checkout);
 
 /**** CONTACT US *****/
 router.post("/api/contact-us", apiController.contactUs);
+
+/**** ADVERTISEMENT *****/
 router.post("/api/create-advertisement", apiController.createAdvertisement);
+router.get("/api/advertisement-list", apiController.advertisementListing);
+router.post(
+  "/api/advertisement-list-by-category",
+  apiController.advertisementListingByCategory
+);
 router.post("/api/advertisement-show", apiController.advertisementShow);
 
 module.exports = router;

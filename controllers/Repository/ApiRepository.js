@@ -1608,6 +1608,24 @@ class ApiRepository {
     }
   }
 
+  async advertisementListingByCategory(data) {
+    // try {
+    // const { category_id } = data;
+    if (data.category_id) {
+      const advertisementList =
+        await Advertisement.getAdvertisementsByCategoryId(data.category_id);
+
+      console.log("advertisementList", advertisementList);
+      return { list: advertisementList, code: 678 };
+    } else {
+      return { code: 711 };
+    }
+    // console.log(Category.Category);
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
+  }
+
   /******************************************** END OF FUNCTION ********************************************/
 }
 

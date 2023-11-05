@@ -1169,7 +1169,29 @@ const advertisementListing = async (req, res) => {
       res.status(201).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
+      const response = { status: "0", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
+const advertisementListingByCategory = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const Check = await apiRepository.advertisementListingByCategory(data);
+  const error_msg = new Msg();
+  try {
+    if (Check.code == 678) {
+      const msg = error_msg.responseMsg(Check.code);
+      const response = { status: "1", message: msg, list: Check.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(Check.code);
+      const response = { status: "0", message: msg };
       res.status(201).json(response);
     }
   } catch (error) {
@@ -1251,5 +1273,6 @@ module.exports = {
   contactUs,
   createAdvertisement,
   advertisementListing,
+  advertisementListingByCategory,
   advertisementShow,
 };
