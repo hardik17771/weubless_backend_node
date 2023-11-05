@@ -201,6 +201,7 @@ router.post("/api/checkout", apiController.checkout);
 
 /**** CONTACT US *****/
 router.post("/api/contact-us", apiController.contactUs);
+router.post("/api/create-advertisement", apiController.createAdvertisement);
 router.post("/api/advertisement-show", apiController.advertisementShow);
 
 module.exports = router;

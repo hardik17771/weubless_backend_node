@@ -1126,6 +1126,59 @@ const contactUs = async (req, res) => {
   }
 };
 
+const createAdvertisement = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create product api controller hit");
+  try {
+    const newAdvertisement = await apiRepository.createAdvertisement(data);
+
+    const msg = error_msg.responseMsg(newAdvertisement.code);
+    if (newAdvertisement.code === 743) {
+      const response = {
+        status: "1",
+        message: msg,
+        data: newAdvertisement.data,
+      };
+      res.status(201).json(response);
+    } else {
+      const response = {
+        status: "0",
+        message: msg,
+        data: newAdvertisement.data,
+      };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(1100);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
+const advertisementListing = async (req, res) => {
+  const apiRepository = new ApiRepository();
+  const data = await apiRepository.advertisementListing();
+  const error_msg = new Msg();
+  try {
+    if (data.code == 678) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 const advertisementShow = async (data) => {
   try {
     let getDetails;
@@ -1196,5 +1249,7 @@ module.exports = {
   cartDetails,
   checkout,
   contactUs,
+  createAdvertisement,
+  advertisementListing,
   advertisementShow,
 };

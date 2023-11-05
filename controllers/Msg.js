@@ -197,7 +197,7 @@ class Msg {
       675: "State Listing",
       676: "City Listing",
       677: "Form Submitted",
-      678: "Advertisement Fatched",
+      678: "Advertisement List Fetched",
       679: "Trending Product",
       680: "Product Searched",
       681: "Problem occurred in update password.",
@@ -263,6 +263,7 @@ class Msg {
       740: "Sufficient Quantity is not present",
       741: "Product category and cart category doesn't match",
       742: "All the carts Listed",
+      743: "Advertisement created successfully",
       900: "Success",
       1100: "Failure",
     };

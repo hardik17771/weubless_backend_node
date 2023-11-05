@@ -13,6 +13,7 @@ const SubSubCategory = require("../../models/SubSubCategory");
 const Product = require("../../models/Product");
 const Shop = require("../../models/Shop");
 const Cart = require("../../models/Cart");
+const Advertisement = require("../../models/Advertisement");
 
 class ApiRepository {
   constructor() {
@@ -1565,6 +1566,46 @@ class ApiRepository {
     // } catch (error) {
     //   return { code: 670 };
     // }
+  }
+
+  /*********************************************** ADVERTISEMENT ***********************************/
+
+  async createAdvertisement(data) {
+    console.log(data);
+    try {
+      // console.log("Create newShop api repo hit");
+      // console.log("name is ", data.name);
+      // console.log("data is ", data);
+      if (data.name && data.category_id) {
+        console.log("name and image present");
+        const newAdvertisement = new Advertisement.Advertisement(data);
+        const category = await Category.getCategoryById(data.category_id);
+        if (!category) {
+          return { code: 714 };
+        }
+        // console.log("new newShop present");
+        await newAdvertisement.save();
+        console.log(newAdvertisement);
+        return { data: newAdvertisement, code: 743 };
+      } else if (!data.name) {
+        return { code: 708 };
+      } else {
+        return { code: 711 };
+      }
+    } catch (error) {
+      return { code: 1100 };
+    }
+  }
+
+  async advertisementListing() {
+    try {
+      // console.log(Category.Category);
+      const advertisementList = await Advertisement.Advertisement.find();
+      console.log("advertisementList", advertisementList);
+      return { list: advertisementList, code: 678 };
+    } catch (error) {
+      return { code: 425 };
+    }
   }
 
   /******************************************** END OF FUNCTION ********************************************/
