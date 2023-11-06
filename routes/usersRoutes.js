@@ -357,7 +357,6 @@ router.post("/api/fetch_user", apiController.fetchUser);
  *       - bearerAuth: []
  *     requestBody:
  *       description: User profile information to update
- *       required: true
  *       content:
  *         application/json:
  *           schema:

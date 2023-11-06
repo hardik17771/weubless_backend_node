@@ -60,14 +60,15 @@ router.get("/api/category", categoryListingMiddleware);
  *       - in: body
  *         name: category
  *         description: Category information
- *         required: true
  *         schema:
  *           type: object
  *           properties:
  *             name:
  *               type: string
+ *               required: true  # This makes 'name' field required
  *             image:
  *               type: string
+ *               required: true  # This makes 'image' field required
  *             banner:
  *               type: string
  *             icon:

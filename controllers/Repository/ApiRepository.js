@@ -146,15 +146,15 @@ class ApiRepository {
 
           user.save();
 
-          const response = await axios.post(
-            "http://localhost:8080/api/update_profile",
-            {},
-            {
-              headers: {
-                Authorization: accessToken,
-              },
-            }
-          );
+          // const response = await axios.post(
+          //   "http://localhost:8080/api/update_profile",
+          //   {},
+          //   {
+          //     headers: {
+          //       Authorization: accessToken,
+          //     },
+          //   }
+          // );
 
           console.log("response.data", response.data);
           return { data: response.data, code: 200 };
