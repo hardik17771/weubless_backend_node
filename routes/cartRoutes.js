@@ -277,3 +277,5 @@ router.post("/api/cart-details", apiController.cartDetails);
  *                   enum: [670]
  */
 router.post("/api/checkout", apiController.checkout);
+
+module.exports = router;

@@ -1,3 +1,7 @@
+const express = require("express");
+const router = express.Router();
+const apiController = require("../controllers/APIController");
+
 /**** CONTACT US *****/
 
 /**
@@ -224,3 +228,5 @@ router.post(
   "/api/advertisement-list-by-category",
   apiController.advertisementListingByCategory
 );
+
+module.exports = router;

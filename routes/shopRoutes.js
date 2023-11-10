@@ -259,3 +259,5 @@ router.put("/api/update-shop", apiController.updateShop);
  *                   enum: [724]
  */
 router.post("/api/shop-details", apiController.shopDetails);
+
+module.exports = router;

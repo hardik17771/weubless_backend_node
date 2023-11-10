@@ -1050,3 +1050,5 @@ router.post(
   "/api/trending-products-by-location",
   apiController.trendingProductsByLocation
 );
+
+module.exports = router;
