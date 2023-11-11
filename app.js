@@ -11,6 +11,8 @@ dotenv.config();
 
 // Connect to the database
 connectDB();
+// Set EJS as the view engine
+app.set("view engine", "ejs");
 
 app.use(bodyParser.json());
 app.use("", routes);

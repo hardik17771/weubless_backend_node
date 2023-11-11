@@ -5,6 +5,7 @@ const productRoutes = require("./productRoutes");
 const cartRoutes = require("./cartRoutes");
 const shopRoutes = require("./shopRoutes");
 const miscRoutes = require("./miscRoutes");
+const adminRoutes = require("./admin");
 
 // const test = require("./testfunc");
 
@@ -16,6 +17,7 @@ router.use("", productRoutes);
 router.use("", cartRoutes);
 router.use("", shopRoutes);
 router.use("", miscRoutes);
+router.use("/admin", adminRoutes);
 // router.get("/testRoute", test.createCategory);
 
 module.exports = router;
