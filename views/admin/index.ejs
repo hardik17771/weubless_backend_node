@@ -29,6 +29,17 @@
       </section>
     </main>
 
+    <!-- Form for updating user profile -->
+    <form action="/admin/update-profile" method="post">
+      <!-- Add input fields for the user profile data -->
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" value="<%= user.name %>" />
+
+      <!-- Add more input fields for other profile data -->
+
+      <button type="submit">Update Profile</button>
+    </form>
+
     <footer>
       <!-- Footer content, if any -->
     </footer>
