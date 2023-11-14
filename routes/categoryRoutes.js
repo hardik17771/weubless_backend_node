@@ -30,12 +30,27 @@ const categoryListingMiddleware = async (req, res, next) => {
  *               items:
  *                 type: object
  *                 properties:
+ *                   category_id:
+ *                     type: number
  *                   _id:
  *                     type: string
+ *                     description : Mongo ID
  *                   name:
  *                     type: string
- *                   description:
+ *                   banner:
  *                     type: string
+ *                   icon:
+ *                     type: string
+ *                   image:
+ *                     type: string
+ *                   featured:
+ *                     type: string
+ *                   top:
+ *                     type: string
+ *                   subCategories:
+ *                     type: array
+ *                   products:
+ *                     type: array
  *       500:
  *         description: Internal Server Error
  *         content:

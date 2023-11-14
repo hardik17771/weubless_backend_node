@@ -129,7 +129,7 @@ class ApiRepository {
     try {
       const accessToken = this.access_token;
       if (data) {
-        const user = await User.getUser(data.email);
+        const user = await User.getUserById(data.user_id);
 
         if (user) {
           user.name = data.name || "";

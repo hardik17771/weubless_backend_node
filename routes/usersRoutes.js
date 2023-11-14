@@ -71,9 +71,9 @@ const verifyAccessToken = require("../middleware/VerifyAccessToken");
  *               user_type:
  *                 type: string
  *               latitude:
- *                 type: number
+ *                 type: string
  *               longitude:
- *                 type: number
+ *                 type: string
  *     responses:
  *       200:
  *         description: User registered successfully
@@ -279,7 +279,7 @@ router.post("/api/changePassword", apiController.changePassword);
  *             type: object
  *             properties:
  *               user_id:
- *                 type: string
+ *                 type: number
  *     responses:
  *       200:
  *         description: User details fetched successfully
@@ -289,7 +289,7 @@ router.post("/api/changePassword", apiController.changePassword);
  *               type: object
  *               properties:
  *                 user_id:
- *                   type: string
+ *                   type: number
  *                 id:
  *                   type: string
  *                 name:
@@ -361,7 +361,11 @@ router.post("/api/fetch_user", apiController.fetchUser);
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - user_id
  *             properties:
+ *               user_id :
+ *                 type: number
  *               name:
  *                 type: string
  *               phone:
