@@ -7,11 +7,14 @@ const routes = require("./routes");
 const connectDB = require("./config/db");
 // const ForestAdmin = require("forest-express-mongoose"); // Import Forest Admin
 
-const mongoose = require("mongoose");
-const { createAgent } = require("@forestadmin/agent");
-const {
-  createMongooseDataSource,
-} = require("@forestadmin/datasource-mongoose");
+// const AdminBro = require("admin-bro"); // Import AdminBro
+// const AdminBroExpress = require("@admin-bro/express"); // Import AdminBro Express middleware
+
+// const mongoose = require("mongoose");
+// const { createAgent } = require("@forestadmin/agent");
+// const {
+//   createMongooseDataSource,
+// } = require("@forestadmin/datasource-mongoose");
 
 const app = express();
 dotenv.config();
@@ -52,6 +55,15 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
 // // Mount the Forest Admin agent on the Express app
 // agent.mountOnExpress(app);
+
+// // Initialize AdminBro
+// const adminBro = new AdminBro({
+//   databases: [mongoose],
+//   rootPath: "/admin",
+// });
+
+// // Use AdminBro middleware along with your existing middleware
+// app.use(adminBro.options.rootPath, AdminBroExpress.buildRouter(adminBro));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
