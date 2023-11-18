@@ -6,6 +6,7 @@ const swaggerSpecs = require("./swaggerConfig");
 const routes = require("./routes");
 const connectDB = require("./config/db");
 const expressLayouts = require("express-ejs-layouts");
+const path = require("path");
 
 const app = express();
 dotenv.config();
@@ -20,7 +21,7 @@ app.use(bodyParser.json());
 app.use("", routes);
 app.use(express.urlencoded({ extended: true }));
 
-// app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 
