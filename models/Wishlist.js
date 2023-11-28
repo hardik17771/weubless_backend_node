@@ -11,7 +11,16 @@ const wishlistSchema = new mongoose.Schema(
       ref: "Product",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
 );
 
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);

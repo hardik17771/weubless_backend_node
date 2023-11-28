@@ -1,22 +1,33 @@
 const mongoose = require("mongoose");
 const { Product } = require("./Product");
 
-const cartSchema = new mongoose.Schema({
-  cart_id: { type: Number, unique: true },
-  user_id: Number,
-  category_id: Number,
-  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-  address_id: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
-  price: Number,
-  tax: Number,
-  shipping_cost: Number,
-  discount: Number,
-  coupon_code: String,
-  coupon_applied: Boolean,
-  quantity: Number,
-  owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  variation: String,
-});
+const cartSchema = new mongoose.Schema(
+  {
+    cart_id: { type: Number, unique: true },
+    user_id: Number,
+    category_id: Number,
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    address_id: { type: mongoose.Schema.Types.ObjectId, ref: "Address" },
+    price: Number,
+    tax: Number,
+    shipping_cost: Number,
+    discount: Number,
+    coupon_code: String,
+    coupon_applied: Boolean,
+    quantity: Number,
+    owner_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    variation: String,
+  },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
+);
 
 // Define a pre-save middleware to handle auto-incrementing category_id
 cartSchema.pre("save", async function (next) {

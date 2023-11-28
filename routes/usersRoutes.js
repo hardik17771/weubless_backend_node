@@ -272,14 +272,51 @@ router.post("/api/changePassword", apiController.changePassword);
  *       - User
  *     requestBody:
  *       description: User ID
- *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - user_id
  *             properties:
  *               user_id:
  *                 type: number
+ *               userUid :
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *               latitude:
+ *                 type: string
+ *               longitude:
+ *                 type: string
+ *               liveAddress:
+ *                 type: string
+ *               livePincode:
+ *                 type: string
+ *               liveCity:
+ *                 type: string
+ *               input_latitude:
+ *                 type: string
+ *               input_longitude:
+ *                 type: string
+ *               input_liveAddress:
+ *                 type: string
+ *               input_livePincode:
+ *                 type: string
+ *               input_liveCity:
+ *                 type: string
+ *               input_deviceToken:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
  *     responses:
  *       200:
  *         description: User details fetched successfully
@@ -287,39 +324,45 @@ router.post("/api/changePassword", apiController.changePassword);
  *           application/json:
  *             schema:
  *               type: object
- *               properties:
- *                 user_id:
- *                   type: number
- *                 id:
- *                   type: string
- *                 name:
- *                   type: string
- *                 latitude:
- *                   type: number
- *                 longitude:
- *                   type: number
- *                 country_code:
- *                   type: string
- *                 phone:
- *                   type: string
- *                 email:
- *                   type: string
- *                 user_type:
- *                   type: string
- *                 dob:
- *                   type: string
- *                 country:
- *                   type: string
- *                 state:
- *                   type: string
- *                 city:
- *                   type: string
- *                 postal_code:
- *                   type: string
- *                 image:
- *                   type: string
- *                 access_token:
- *                   type: string
+ *             properties:
+ *               user_id :
+ *                 type: number
+ *               userUid :
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               phone:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               dob:
+ *                 type: string
+ *               latitude:
+ *                 type: string
+ *               longitude:
+ *                 type: string
+ *               liveAddress:
+ *                 type: string
+ *               livePincode:
+ *                 type: string
+ *               liveCity:
+ *                 type: string
+ *               input_latitude:
+ *                 type: string
+ *               input_longitude:
+ *                 type: string
+ *               input_liveAddress:
+ *                 type: string
+ *               input_livePincode:
+ *                 type: string
+ *               input_liveCity:
+ *                 type: string
+ *               input_deviceToken:
+ *                 type: string
+ *               profileImage:
+ *                 type: string
  *                 code:
  *                   type: integer
  *                   enum: [200]
@@ -366,6 +409,8 @@ router.post("/api/fetch_user", apiController.fetchUser);
  *             properties:
  *               user_id :
  *                 type: number
+ *               userUid :
+ *                 type: string
  *               name:
  *                 type: string
  *               phone:
@@ -376,17 +421,29 @@ router.post("/api/fetch_user", apiController.fetchUser);
  *                 type: string
  *               dob:
  *                 type: string
- *               address:
+ *               latitude:
  *                 type: string
- *               country:
+ *               longitude:
  *                 type: string
- *               state:
+ *               liveAddress:
  *                 type: string
- *               city:
+ *               livePincode:
  *                 type: string
- *               postal_code:
+ *               liveCity:
  *                 type: string
- *               image:
+ *               input_latitude:
+ *                 type: string
+ *               input_longitude:
+ *                 type: string
+ *               input_liveAddress:
+ *                 type: string
+ *               input_livePincode:
+ *                 type: string
+ *               input_liveCity:
+ *                 type: string
+ *               input_deviceToken:
+ *                 type: string
+ *               profileImage:
  *                 type: string
  *     responses:
  *       200:
@@ -424,7 +481,7 @@ router.post("/api/fetch_user", apiController.fetchUser);
  */
 router.post(
   "/api/update_profile",
-  verifyAccessToken,
+  // verifyAccessToken,
   apiController.updateProfile
 );
 

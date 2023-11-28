@@ -31,7 +31,7 @@ class ApiService {
     const apiRepository = new ApiRepository();
     const data = await apiRepository.updateProfile(arg);
     console.log("API fetch User SERVICE DATA", data);
-    if (data.code === 200) {
+    if (data.code === 208) {
       console.log("data", data);
       return { error_code: data.code, data };
     } else {

@@ -88,28 +88,78 @@ class ApiRepository {
 
   async fetchUser(data) {
     try {
-      const accessToken = this.access_token;
+      // const accessToken = this.access_token;
 
       if (data.user_id) {
         const user = await User.getUserById(data.user_id);
         if (user) {
           return {
-            user_id: user.user_id,
-            id: user.id,
+            // user_id: user.user_id,
+            // id: user.id,
+            // name: user.name,
+            // latitude: user.latitude,
+            // longitude: user.longitude,
+            // country_code: user.country_code,
+            // phone: user.phone,
+            // email: user.email,
+            // user_type: user.user_type,
+            // dob: user.dob,
+            // country: user.country,
+            // state: user.state,
+            // city: user.city,
+            // postal_code: user.postal_code,
+            // image: user.image,
+            userUid: user.userUid,
+            username: user.username,
             name: user.name,
-            latitude: user.latitude,
-            longitude: user.longitude,
             country_code: user.country_code,
             phone: user.phone,
             email: user.email,
+            password: await hashPassword(user.password),
             user_type: user.user_type,
-            dob: user.dob,
-            country: user.country,
-            state: user.state,
-            city: user.city,
-            postal_code: user.postal_code,
-            image: user.image,
-            access_token: accessToken,
+            latitude: user.latitude,
+            longitude: user.longitude,
+            liveAddress: user.liveAddress,
+            livePincode: user.livePincode,
+            liveCity: user.liveCity,
+            input_latitude: user.input_latitude,
+            input_longitude: user.input_longitude,
+            input_liveAddress: user.input_liveAddress,
+            input_livePincode: user.input_livePincode,
+            input_liveCity: user.input_liveCity,
+            input_deviceToken: user.deviceToken,
+            profileImage: user.profileImage,
+            // access_token: accessToken,
+            code: 200,
+          };
+        } else {
+          return { code: 422 };
+        }
+      } else if (data.userUid) {
+        const user = await User.getUserByUserUid(data.userUid);
+        if (user) {
+          return {
+            userUid: user.userUid,
+            username: user.username,
+            name: user.name,
+            country_code: user.country_code,
+            phone: user.phone,
+            email: user.email,
+            password: await hashPassword(user.password),
+            user_type: user.user_type,
+            latitude: user.latitude,
+            longitude: user.longitude,
+            liveAddress: user.liveAddress,
+            livePincode: user.livePincode,
+            liveCity: user.liveCity,
+            input_latitude: user.input_latitude,
+            input_longitude: user.input_longitude,
+            input_liveAddress: user.input_liveAddress,
+            input_livePincode: user.input_livePincode,
+            input_liveCity: user.input_liveCity,
+            input_deviceToken: user.deviceToken,
+            profileImage: user.profileImage,
+            // access_token: accessToken,
             code: 200,
           };
         } else {
@@ -127,22 +177,35 @@ class ApiRepository {
   async updateProfile(data) {
     console.log("data", data);
     try {
-      const accessToken = this.access_token;
+      // const accessToken = this.access_token;
       if (data) {
-        const user = await User.getUserById(data.user_id);
+        const user =
+          (await User.getUserById(data.user_id)) ||
+          (await User.getUserByUserUid(data.userUid));
 
         if (user) {
-          user.name = data.name || "";
-          user.phone = data.phone || "";
-          user.username = data.username || "";
-          user.email = data.email || "";
-          user.dob = data.dob || "";
-          user.address = data.address || "";
-          user.country = data.country || "";
-          user.state = data.state || "";
-          user.city = data.city || "";
-          user.postal_code = data.postal_code || "";
-          user.image = data.image || "";
+          user.userUid = data.userUid || user.userUid;
+          user.username = data.username || user.username;
+          user.name = data.name || user.name;
+          user.country_code = data.country_code || user.country_code;
+          user.phone = data.phone || user.phone;
+          user.email = data.email || user.email;
+          user.user_type = data.user_type || user.user_type;
+          user.dob = data.dob || user.dob;
+          user.latitude = data.latitude || user.latitude;
+          user.longitude = data.longitude || user.longitude;
+          user.liveAddress = data.liveAddress || user.liveAddress;
+          user.livePincode = data.livePincode || user.livePincode;
+          user.liveCity = data.liveCity || user.liveCity;
+          user.input_latitude = data.input_latitude || user.input_latitude;
+          user.input_longitude = data.input_longitude || user.input_longitude;
+          user.input_liveAddress =
+            data.input_liveAddress || user.input_liveAddress;
+          user.input_livePincode =
+            data.input_livePincode || user.input_livePincode;
+          user.input_liveCity = data.input_liveCity || user.input_liveCity;
+
+          user.profileImage = data.profileImage || user.profileImage;
 
           user.save();
 
@@ -156,8 +219,8 @@ class ApiRepository {
           //   }
           // );
 
-          console.log("response.data", response.data);
-          return { data: response.data, code: 200 };
+          // console.log("response.data", response.data);
+          return { data: user, code: 208 };
 
           // return {
           //   id: user.id,
@@ -258,8 +321,7 @@ class ApiRepository {
   delete_account(data, userId) {
     const user = User.findById(userId);
 
-    if (user && user.is_deleted === 0) {
-      user.is_deleted = 1;
+    if (user) {
       user.save();
       return { code: 200 };
     } else {

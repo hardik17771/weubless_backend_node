@@ -10,6 +10,15 @@ const customerSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
   }
 );
 

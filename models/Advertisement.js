@@ -1,13 +1,24 @@
 const mongoose = require("mongoose");
 
 // Define the schema for Advertisement
-const advertisementSchema = new mongoose.Schema({
-  ad_id: String,
-  category_id: String,
-  name: String,
-  date_range: String,
-  amount: String,
-});
+const advertisementSchema = new mongoose.Schema(
+  {
+    ad_id: String,
+    category_id: String,
+    name: String,
+    date_range: String,
+    amount: String,
+  },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
+);
 
 advertisementSchema.pre("save", async function (next) {
   try {

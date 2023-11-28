@@ -64,7 +64,7 @@ const updateProfile = async (req, res) => {
   const Check = await apiService.updateProfile(data);
   const msg = errorMsg.responseMsg(Check.error_code);
   console.log(Check);
-  if (Check.error_code === 200) {
+  if (Check.error_code === 208) {
     console.log("Check.data", Check.data);
     res.status(200).json({ status: "1", message: msg, data: Check.data });
   } else {
@@ -141,6 +141,7 @@ const registerUser = async (req, res) => {
 
   try {
     const newUser = new User.User2({
+      userUid: data.userUid,
       username: data.username,
       name: data.name,
       country_code: data.country_code,
@@ -153,7 +154,13 @@ const registerUser = async (req, res) => {
       liveAddress: data.liveAddress,
       livePincode: data.livePincode,
       liveCity: data.liveCity,
-      deviceToken: data.deviceToken,
+      input_latitude: data.input_latitude,
+      input_longitude: data.input_longitude,
+      input_liveAddress: data.input_liveAddress,
+      input_livePincode: data.input_livePincode,
+      input_liveCity: data.input_liveCity,
+      input_deviceToken: data.deviceToken,
+      profileImage: data.profileImage,
     });
 
     await newUser.save();

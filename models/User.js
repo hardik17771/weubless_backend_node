@@ -58,113 +58,159 @@ const { Product } = require("./Product");
 
 // const User = mongoose.model("User", userSchema);
 
-const userSchema2 = new mongoose.Schema({
-  user_id: { type: Number, unique: true },
+const userSchema2 = new mongoose.Schema(
+  {
+    user_id: { type: Number, unique: true },
 
-  username: {
-    type: String,
-    required: [true, "Username is required"],
-    unique: [true, "Username should be unique"],
-  },
-  name: {
-    type: String,
-    required: [true, "Name is required"],
-    maxlength: [255, "Name is too long"],
-  },
-  country_code: {
-    type: String,
-    required: [true, "Country code is required"],
-    maxlength: [3, "Invalid country code"],
-  },
-  phone: {
-    type: String,
-    required: [true, "Phone is required"],
-    maxlength: [255, "Phone is too long"],
-    unique: [true, "Phone should be unique"],
-  },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    maxlength: [255, "Email is too long"],
-    unique: [true, "Email should be unique"],
-    validate: {
-      validator: function (v) {
-        return validator.isEmail(v);
-      },
-      message: "Invalid email format",
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      unique: [true, "Username should be unique"],
     },
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-  },
-  user_type: {
-    type: Number,
-    required: [true, "User type is required"],
-  },
-  latitude: {
-    type: String,
-    required: [true, "Latitude is required"],
-  },
-  longitude: {
-    type: String,
-    required: [true, "Longitude is required"],
-  },
-  is_deleted: Number,
-  dob: {
-    type: Date,
-    required: false,
-    validate: {
-      validator: function (v) {
-        return moment(v, "MM/DD/YYYY", true).isValid(); // Validate format as 'MM/DD/YYYY'
-      },
-      message: (props) =>
-        `${props.value} is not a valid date. Please use the format MM/DD/YYYY.`,
+    name: {
+      type: String,
+      required: [true, "Name is required"],
+      maxlength: [255, "Name is too long"],
     },
-  },
-  access_token: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  country: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  state: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  liveCity: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  livePincode: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  liveAddress: {
-    type: String,
-    default: null,
-    required: false,
-  },
-  deviceToken: {
-    type: String,
-    default: null,
-    required: false,
-  },
 
-  image: {
-    type: String,
-    default: null,
-    required: false,
+    userUid: {
+      type: String,
+    },
+
+    country_code: {
+      type: String,
+      required: [true, "Country code is required"],
+      maxlength: [3, "Invalid country code"],
+    },
+    phone: {
+      type: String,
+      required: [true, "Phone is required"],
+      maxlength: [255, "Phone is too long"],
+      unique: [true, "Phone should be unique"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      maxlength: [255, "Email is too long"],
+      unique: [true, "Email should be unique"],
+      validate: {
+        validator: function (v) {
+          return validator.isEmail(v);
+        },
+        message: "Invalid email format",
+      },
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+    user_type: {
+      type: Number,
+      required: [true, "User type is required"],
+    },
+    latitude: {
+      type: String,
+      required: [true, "Latitude is required"],
+    },
+    longitude: {
+      type: String,
+      required: [true, "Longitude is required"],
+    },
+    is_deleted: Number,
+    dob: {
+      type: Date,
+      required: false,
+      validate: {
+        validator: function (v) {
+          return moment(v, "MM/DD/YYYY", true).isValid(); // Validate format as 'MM/DD/YYYY'
+        },
+        message: (props) =>
+          `${props.value} is not a valid date. Please use the format MM/DD/YYYY.`,
+      },
+    },
+    access_token: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    country: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    state: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    liveCity: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    livePincode: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    liveAddress: {
+      type: String,
+      default: null,
+      required: false,
+    },
+
+    input_latitude: {
+      type: String,
+      // required: [true, "Latitude is required"],
+    },
+    input_longitude: {
+      type: String,
+      // required: [true, "Longitude is required"],
+    },
+
+    input_liveCity: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    input_livePincode: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    input_liveAddress: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    deviceToken: {
+      type: String,
+      default: null,
+      required: false,
+    },
+
+    profileImage: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    products_bought: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
-  products_bought: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-});
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
+);
+
+// userSchema.pre("findOne", function (next) {
+//   this.select("-_id -__v");
+//   next();
+// });
 
 userSchema2.pre("save", async function (next) {
   try {
@@ -199,6 +245,16 @@ const getUserById = async (user_id) => {
   }
 };
 
+const getUserByUserUid = async (userUid) => {
+  try {
+    const user = await User2.findOne({ userUid: userUid }).exec();
+    console.log(user);
+    return user;
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
 const findProducts = async (objectIds) => {
   try {
     const products = await Product.find({
@@ -211,4 +267,10 @@ const findProducts = async (objectIds) => {
 };
 
 const User2 = mongoose.model("User2", userSchema2);
-module.exports = { User2, getUser, getUserById, findProducts };
+module.exports = {
+  User2,
+  getUser,
+  getUserById,
+  getUserByUserUid,
+  findProducts,
+};

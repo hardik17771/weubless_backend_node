@@ -61,7 +61,16 @@ const productSchema = new mongoose.Schema(
     slug: { type: String, default: "" },
     rating: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
 );
 
 productSchema.pre("save", async function (next) {

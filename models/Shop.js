@@ -25,7 +25,16 @@ const shopSchema = new mongoose.Schema(
     instagram: String,
     slug: String,
   },
-  { timestamps: true }
+  { timestamps: true },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
 );
 
 shopSchema.pre("save", async function (next) {

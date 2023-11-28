@@ -22,5 +22,8 @@ const homeController = require("../controllers/Admin/homeController");
 // });
 
 router.get("/", homeController.indexView);
+router.get("/tables", homeController.tablesView);
+router.get("/billing", homeController.billingView);
+router.get("/profile", homeController.profileView);
 
 module.exports = router;

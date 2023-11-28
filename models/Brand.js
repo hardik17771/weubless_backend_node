@@ -6,7 +6,16 @@ const brandSchema = new mongoose.Schema(
     logo: String,
     top: Number,
   },
-  { timestamps: true }
+  { timestamps: true },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
 );
 
 brandSchema.statics.alphabetical = function () {

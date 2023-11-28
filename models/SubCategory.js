@@ -15,7 +15,16 @@ const subCategorySchema = new mongoose.Schema(
     // ],
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
-  { timestamps: true }
+  { timestamps: true },
+  {
+    toJSON: {
+      transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+  }
 );
 
 subCategorySchema.pre("save", async function (next) {
