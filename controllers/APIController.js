@@ -19,6 +19,32 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/*********************************************** ADDRESS  ***********************************/
+
+const createAddress = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  // console.log("Create product api controller hit");
+  // try {
+  const Check = await apiRepository.createAddress(data);
+
+  const msg = error_msg.responseMsg(Check.code); //706
+  if (Check.code === 716) {
+    const response = { status: "1", message: msg, data: Check.data };
+    res.status(201).json(response);
+  } else {
+    const response = { status: "0", message: msg, data: Check.data };
+    res.status(201).json(response);
+  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(717); //707
+  //   const response = { status: "0", message: msg };
+  //   res.status(400).json(response);
+  // }
+};
+
 /*********************************************** AUTH  ***********************************/
 
 // Login
@@ -1263,6 +1289,7 @@ const advertisementShow = async (data) => {
 };
 
 module.exports = {
+  createAddress,
   login,
   changePassword,
   logout,

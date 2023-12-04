@@ -7,6 +7,7 @@ const User = require("../../models/User");
 const token = require("../../models/Token");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const Address = require("../../models/Address");
 const Category = require("../../models/Category");
 const SubCategory = require("../../models/SubCategory");
 const SubSubCategory = require("../../models/SubSubCategory");
@@ -23,6 +24,38 @@ class ApiRepository {
       .createHash("sha1")
       .update(`WUECART${this.token_id}!@#$%^&*!!`)
       .digest("hex");
+  }
+
+  async createAddress(data) {
+    // try {
+
+    if (data.latitude && data.longitude && data.userUid && data.user_id) {
+      const user =
+        (await User.getUserById(data.user_id)) ||
+        (await User.getUserByUserUid(data.userUid));
+      if (!user) {
+        return { code: 461 };
+      } else {
+        const address = new Address.Address(data);
+        await address.save();
+        console.log("data", data);
+        console.log("address", address);
+
+        user.addresses.push(address);
+        await user.save();
+        console.log(user);
+        return { code: 744, data: address };
+      }
+    } else if (!data.latitude) {
+      return { code: 719 };
+    } else if (!data.longitude) {
+      return { code: 719 };
+    } else {
+      return { code: 730 };
+    }
+    // } catch (error) {
+    //   return { code: 1100 };
+    // }
   }
 
   async login(data) {
@@ -94,42 +127,44 @@ class ApiRepository {
         const user = await User.getUserById(data.user_id);
         if (user) {
           return {
-            // user_id: user.user_id,
-            // id: user.id,
+            // // user_id: user.user_id,
+            // // id: user.id,
+            // // name: user.name,
+            // // latitude: user.latitude,
+            // // longitude: user.longitude,
+            // // country_code: user.country_code,
+            // // phone: user.phone,
+            // // email: user.email,
+            // // user_type: user.user_type,
+            // // dob: user.dob,
+            // // country: user.country,
+            // // state: user.state,
+            // // city: user.city,
+            // // postal_code: user.postal_code,
+            // // image: user.image,
+            // userUid: user.userUid,
+            // username: user.username,
             // name: user.name,
-            // latitude: user.latitude,
-            // longitude: user.longitude,
             // country_code: user.country_code,
             // phone: user.phone,
             // email: user.email,
+            // password: await hashPassword(user.password),
             // user_type: user.user_type,
-            // dob: user.dob,
-            // country: user.country,
-            // state: user.state,
-            // city: user.city,
-            // postal_code: user.postal_code,
-            // image: user.image,
-            userUid: user.userUid,
-            username: user.username,
-            name: user.name,
-            country_code: user.country_code,
-            phone: user.phone,
-            email: user.email,
-            password: await hashPassword(user.password),
-            user_type: user.user_type,
-            latitude: user.latitude,
-            longitude: user.longitude,
-            liveAddress: user.liveAddress,
-            livePincode: user.livePincode,
-            liveCity: user.liveCity,
-            input_latitude: user.input_latitude,
-            input_longitude: user.input_longitude,
-            input_liveAddress: user.input_liveAddress,
-            input_livePincode: user.input_livePincode,
-            input_liveCity: user.input_liveCity,
-            input_deviceToken: user.deviceToken,
-            profileImage: user.profileImage,
-            // access_token: accessToken,
+            // primary_address_index = user.primary_address_index,
+            // // latitude: user.latitude,
+            // // longitude: user.longitude,
+            // // liveAddress: user.liveAddress,
+            // // livePincode: user.livePincode,
+            // // liveCity: user.liveCity,
+            // // input_latitude: user.input_latitude,
+            // // input_longitude: user.input_longitude,
+            // // input_liveAddress: user.input_liveAddress,
+            // // input_livePincode: user.input_livePincode,
+            // // input_liveCity: user.input_liveCity,
+            // deviceToken: user.deviceToken,
+            // profileImage: user.profileImage,
+            // // access_token: accessToken,
+            user: user,
             code: 200,
           };
         } else {
@@ -139,27 +174,28 @@ class ApiRepository {
         const user = await User.getUserByUserUid(data.userUid);
         if (user) {
           return {
-            userUid: user.userUid,
-            username: user.username,
-            name: user.name,
-            country_code: user.country_code,
-            phone: user.phone,
-            email: user.email,
-            password: await hashPassword(user.password),
-            user_type: user.user_type,
-            latitude: user.latitude,
-            longitude: user.longitude,
-            liveAddress: user.liveAddress,
-            livePincode: user.livePincode,
-            liveCity: user.liveCity,
-            input_latitude: user.input_latitude,
-            input_longitude: user.input_longitude,
-            input_liveAddress: user.input_liveAddress,
-            input_livePincode: user.input_livePincode,
-            input_liveCity: user.input_liveCity,
-            input_deviceToken: user.deviceToken,
-            profileImage: user.profileImage,
+            // userUid: user.userUid,
+            // username: user.username,
+            // name: user.name,
+            // country_code: user.country_code,
+            // phone: user.phone,
+            // email: user.email,
+            // password: await hashPassword(user.password),
+            // user_type: user.user_type,
+            // // latitude: user.latitude,
+            // // longitude: user.longitude,
+            // // liveAddress: user.liveAddress,
+            // // livePincode: user.livePincode,
+            // // liveCity: user.liveCity,
+            // // input_latitude: user.input_latitude,
+            // // input_longitude: user.input_longitude,
+            // // input_liveAddress: user.input_liveAddress,
+            // // input_livePincode: user.input_livePincode,
+            // // input_liveCity: user.input_liveCity,
+            // deviceToken: user.deviceToken,
+            // profileImage: user.profileImage,
             // access_token: accessToken,
+            user: user,
             code: 200,
           };
         } else {
@@ -192,20 +228,19 @@ class ApiRepository {
           user.email = data.email || user.email;
           user.user_type = data.user_type || user.user_type;
           user.dob = data.dob || user.dob;
-          user.latitude = data.latitude || user.latitude;
-          user.longitude = data.longitude || user.longitude;
-          user.liveAddress = data.liveAddress || user.liveAddress;
-          user.livePincode = data.livePincode || user.livePincode;
-          user.liveCity = data.liveCity || user.liveCity;
-          user.input_latitude = data.input_latitude || user.input_latitude;
-          user.input_longitude = data.input_longitude || user.input_longitude;
-          user.input_liveAddress =
-            data.input_liveAddress || user.input_liveAddress;
-          user.input_livePincode =
-            data.input_livePincode || user.input_livePincode;
-          user.input_liveCity = data.input_liveCity || user.input_liveCity;
-
           user.profileImage = data.profileImage || user.profileImage;
+          // user.latitude = data.latitude || user.latitude;
+          // user.longitude = data.longitude || user.longitude;
+          // user.liveAddress = data.liveAddress || user.liveAddress;
+          // user.livePincode = data.livePincode || user.livePincode;
+          // user.liveCity = data.liveCity || user.liveCity;
+          // user.input_latitude = data.input_latitude || user.input_latitude;
+          // user.input_longitude = data.input_longitude || user.input_longitude;
+          // user.input_liveAddress =
+          //   data.input_liveAddress || user.input_liveAddress;
+          // user.input_livePincode =
+          //   data.input_livePincode || user.input_livePincode;
+          // user.input_liveCity = data.input_liveCity || user.input_liveCity;
 
           user.save();
 
@@ -1063,18 +1098,18 @@ class ApiRepository {
   }
 
   async getShopsByCategory(data) {
-    // try {
-    if (data.category_id) {
-      const shops = await Shop.getShopsByCategory(data.category_id);
-      console.log(shops);
-      return { code: 900, data: shops };
-    } else {
-      return { code: 711 };
+    try {
+      if (data.category_id) {
+        const shops = await Shop.getShopsByCategory(data.category_id);
+        console.log(shops);
+        return { code: 900, data: shops };
+      } else {
+        return { code: 711 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 724 };
     }
-    // } catch (error) {
-    //   console.error(error);
-    //   return { code: 724 };
-    // }
   }
 
   /*********************************************** LOCATION FEATURES ***********************************/

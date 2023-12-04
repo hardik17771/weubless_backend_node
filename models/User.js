@@ -1,62 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const { Product } = require("./Product");
-
-// const userSchema = new mongoose.Schema({
-
-//   username: {
-//     type: String,
-//     required: [true, "Username is required"],
-//     unique: [true, "Username should be unique"],
-//   },
-//   name: {
-//     type: String,
-//     required: [true, "Name is required"],
-//     maxlength: [10, "Name is too long"],
-//   },
-//   country_code: {
-//     type: String,
-//     required: [true, "Country code is required"],
-//     maxlength: [3, "Invalid country code and Max length be 3 only"],
-//   },
-//   phone: {
-//     type: String,
-//     required: [true, "Phone is required"],
-//     maxlength: [5, "Phone is too long"],
-//     unique: [true, "Phone should be unique"],
-//   },
-//   email: {
-//     type: String,
-//     required: [true, "Email is required"],
-//     maxlength: [255, "Email is too long"],
-//     unique: [true, "Email should be unique"],
-//     validate: {
-//       validator: function (v) {
-//         return validator.isEmail(v);
-//       },
-//       message: "Invalid email format",
-//     },
-//   },
-//   password: {
-//     type: String,
-//     required: [true, "Password is required"],
-//   },
-//   user_type: {
-//     type: Number,
-//     required: [true, "User type is required"],
-//   },
-//   latitude: {
-//     type: String,
-//     required: [true, "Latitude is required"],
-//   },
-//   longitude: {
-//     type: String,
-//     required: [true, "Longitude is required"],
-//   },
-//   is_deleted: Number,
-// });
-
-// const User = mongoose.model("User", userSchema);
+const { Address } = require("./Address");
 
 const userSchema2 = new mongoose.Schema(
   {
@@ -108,14 +53,6 @@ const userSchema2 = new mongoose.Schema(
       type: Number,
       required: [true, "User type is required"],
     },
-    latitude: {
-      type: String,
-      required: [true, "Latitude is required"],
-    },
-    longitude: {
-      type: String,
-      required: [true, "Longitude is required"],
-    },
     is_deleted: Number,
     dob: {
       type: Date,
@@ -133,56 +70,7 @@ const userSchema2 = new mongoose.Schema(
       default: null,
       required: false,
     },
-    country: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    state: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    liveCity: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    livePincode: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    liveAddress: {
-      type: String,
-      default: null,
-      required: false,
-    },
 
-    input_latitude: {
-      type: String,
-      // required: [true, "Latitude is required"],
-    },
-    input_longitude: {
-      type: String,
-      // required: [true, "Longitude is required"],
-    },
-
-    input_liveCity: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    input_livePincode: {
-      type: String,
-      default: null,
-      required: false,
-    },
-    input_liveAddress: {
-      type: String,
-      default: null,
-      required: false,
-    },
     deviceToken: {
       type: String,
       default: null,
@@ -195,6 +83,81 @@ const userSchema2 = new mongoose.Schema(
       required: false,
     },
     products_bought: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+
+    primary_address_index: {
+      type: Number,
+      default: 0,
+    },
+
+    addresses: [
+      {
+        latitude: { type: String, required: [true, "Latitude is required"] },
+        longitude: { type: String, required: [true, "Longitude is required"] },
+        country: { type: String, default: null, required: false },
+        state: { type: String, default: null, required: false },
+        city: { type: String, default: null, required: false },
+        pincode: { type: String, default: null, required: false },
+        address: { type: String, default: null, required: false },
+      },
+    ],
+    // latitude: {
+    //   type: String,
+    //   required: [true, "Latitude is required"],
+    // },
+    // longitude: {
+    //   type: String,
+    //   required: [true, "Longitude is required"],
+    // },
+    // country: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+    // state: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+    // liveCity: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+    // livePincode: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+    // liveAddress: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+
+    // input_latitude: {
+    //   type: String,
+    //   // required: [true, "Latitude is required"],
+    // },
+    // input_longitude: {
+    //   type: String,
+    //   // required: [true, "Longitude is required"],
+    // },
+
+    // input_liveCity: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+    // input_livePincode: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
+    // input_liveAddress: {
+    //   type: String,
+    //   default: null,
+    //   required: false,
+    // },
   },
   {
     toJSON: {

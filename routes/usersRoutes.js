@@ -41,6 +41,8 @@ const verifyAccessToken = require("../middleware/VerifyAccessToken");
 // Middleware for the routes under /api
 // router.use("/api", authenticate); // Assuming authenticate is your authentication middleware
 
+router.post("/api/add-address", apiController.createAddress);
+
 /**
  * @swagger
  * /api/register:

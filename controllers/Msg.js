@@ -264,6 +264,7 @@ class Msg {
       741: "Product category and cart category doesn't match",
       742: "All the carts Listed",
       743: "Advertisement created successfully",
+      744: "New Address is created",
       900: "Success",
       1100: "Failure",
     };
