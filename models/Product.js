@@ -89,6 +89,15 @@ productSchema.pre("save", async function (next) {
   }
 });
 
+const getProductByMongoId = async (product_mongo_id) => {
+  try {
+    const product = await Product.findOne({ _id: product_mongo_id }).exec();
+    return product;
+  } catch (error) {
+    throw new Error(`Error fetching user: ${error.message}`);
+  }
+};
+
 const getProductById = async (product_id) => {
   try {
     const product = await Product.findOne({ product_id }).exec();
@@ -142,6 +151,7 @@ const Product = mongoose.model("Product", productSchema);
 
 module.exports = {
   Product,
+  getProductByMongoId,
   getProductById,
   populateCategory,
   populateLatLong,

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Product } = require("./Product");
+const { Product, getProductByMongoId } = require("./Product");
 
 const shopSchema = new mongoose.Schema(
   {
@@ -81,6 +81,74 @@ const findProducts = async (objectIds) => {
   }
 };
 
+const getShopsByCategory = async (category_id) => {
+  try {
+    const shops = await Shop.find({}).exec();
+    let shop_list = [];
+    for (const shop of shops) {
+      let flag = 0;
+      console.log("shop is", shop);
+
+      for (const product_mongo_id of shop.products) {
+        // const product_mongo_id = element;
+        // console.log("product id", product_mongo_id);
+        const product = await getProductByMongoId(product_mongo_id);
+        // console.log("product is: ", product);
+        // console.log("product CATEGORYID is: ", product.category_id);
+
+        if (product.category_id === category_id) {
+          flag = 1;
+          break;
+        }
+      }
+
+      if (flag === 1) {
+        const {
+          name,
+          createdAt,
+          updatedAt,
+          shop_id,
+          latitude,
+          longitude,
+          products,
+          // user_id,
+        } = shop;
+
+        let productsList = [];
+        // console.log(products);
+        const productObjects = await findProducts(products);
+        if (productObjects && productObjects.length > 0) {
+          productObjects.forEach((product) => {
+            productsList.push(product);
+          });
+        }
+
+        let shop_data = {
+          name,
+          createdAt,
+          updatedAt,
+          shop_id,
+          latitude,
+          longitude,
+          productsList,
+        };
+        // console.log(shop);
+        // shop_list.push(shop);
+        shop_list.push(shop_data);
+      }
+    }
+    return shop_list;
+  } catch (error) {
+    throw new Error(`Error fetching shops by category: ${error.message}`);
+  }
+};
+
 const Shop = mongoose.model("Shop", shopSchema);
 
-module.exports = { Shop, getShopById, getProdutsByShopId, findProducts };
+module.exports = {
+  Shop,
+  getShopById,
+  getProdutsByShopId,
+  findProducts,
+  getShopsByCategory,
+};

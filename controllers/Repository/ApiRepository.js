@@ -520,11 +520,7 @@ class ApiRepository {
     // console.log("Main SUbcategories by the category Id", subCategoriesObjects);
     if (subCategoriesObjects && subCategoriesObjects.length > 0) {
       subCategoriesObjects.forEach((subCategory) => {
-        const item = {
-          main_subcategory_id: subCategory.main_subcategory_id,
-          main_subcategory: subCategory.name || "",
-        };
-        subCategoriesList.push(item);
+        subCategoriesList.push(subCategory);
       });
       return { code: 689, subCategoriesList: subCategoriesList };
     } else {
@@ -923,11 +919,7 @@ class ApiRepository {
       const productObjects = await SubCategory.findProducts(productIds);
       if (productObjects && productObjects.length > 0) {
         productObjects.forEach((product) => {
-          const item = {
-            product_id: product.product_id,
-            product_name: product.name || "",
-          };
-          productsList.push(item);
+          productsList.push(product);
         });
         return { code: 684, productsList: productsList };
       } else {
@@ -947,11 +939,7 @@ class ApiRepository {
       const productObjects = await Category.findProducts(productIds);
       if (productObjects && productObjects.length > 0) {
         productObjects.forEach((product) => {
-          const item = {
-            product_id: product.product_id,
-            product_name: product.name || "",
-          };
-          productsList.push(item);
+          productsList.push(product);
         });
         return { code: 684, productsList: productsList };
       } else {
@@ -1041,15 +1029,11 @@ class ApiRepository {
           } = shop;
 
           let productsList = [];
-
+          // console.log(products);
           const productObjects = await Shop.findProducts(products);
           if (productObjects && productObjects.length > 0) {
             productObjects.forEach((product) => {
-              const item = {
-                product_id: product.product_id,
-                product_name: product.name || "",
-              };
-              productsList.push(item);
+              productsList.push(product);
             });
           }
 
@@ -1076,6 +1060,21 @@ class ApiRepository {
       console.error(error);
       return { code: 724 };
     }
+  }
+
+  async getShopsByCategory(data) {
+    // try {
+    if (data.category_id) {
+      const shops = await Shop.getShopsByCategory(data.category_id);
+      console.log(shops);
+      return { code: 723, data: shops };
+    } else {
+      return { code: 723 };
+    }
+    // } catch (error) {
+    //   console.error(error);
+    //   return { code: 724 };
+    // }
   }
 
   /*********************************************** LOCATION FEATURES ***********************************/

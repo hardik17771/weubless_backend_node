@@ -260,4 +260,6 @@ router.put("/api/update-shop", apiController.updateShop);
  */
 router.post("/api/shop-details", apiController.shopDetails);
 
+router.post("/api/shop-by-categoryid", apiController.getShopsByCategory);
+
 module.exports = router;
