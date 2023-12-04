@@ -788,25 +788,25 @@ const getShopsByCategory = async (req, res) => {
   const apiRepository = new ApiRepository();
   const error_msg = new Msg();
 
-  // try {
-  const shop = await apiRepository.getShopsByCategory(data);
+  try {
+    const shop = await apiRepository.getShopsByCategory(data);
 
-  const msg = error_msg.responseMsg(shop.code);
-  // console.log(shop.code);
-  if (shop.code === 667) {
-    // console.log("status 1");
-    const response = { status: "1", message: msg, data: shop.data };
-    res.status(201).json(response);
-  } else {
-    // console.log("status 0");
-    const response = { status: "0", message: msg, data: shop.data };
-    res.status(201).json(response);
+    const msg = error_msg.responseMsg(shop.code);
+    // console.log(shop.code);
+    if (shop.code === 900) {
+      // console.log("status 1");
+      const response = { status: "1", message: msg, data: shop.data };
+      res.status(201).json(response);
+    } else {
+      // console.log("status 0");
+      const response = { status: "0", message: msg, data: shop.data };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717);
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
 };
 
 /*********************************************** LOCATION FEATURES ***********************************/

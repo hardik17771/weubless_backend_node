@@ -1067,9 +1067,9 @@ class ApiRepository {
     if (data.category_id) {
       const shops = await Shop.getShopsByCategory(data.category_id);
       console.log(shops);
-      return { code: 723, data: shops };
+      return { code: 900, data: shops };
     } else {
-      return { code: 723 };
+      return { code: 711 };
     }
     // } catch (error) {
     //   console.error(error);

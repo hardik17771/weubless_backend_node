@@ -260,6 +260,83 @@ router.put("/api/update-shop", apiController.updateShop);
  */
 router.post("/api/shop-details", apiController.shopDetails);
 
+/**
+ * @swagger
+ * /api/shop-by-categoryid:
+ *   post:
+ *     summary: Get shops by category ID
+ *     tags:
+ *       - Shop
+ *     requestBody:
+ *       description: Data to get shops by category ID
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category_id:
+ *                 type: number
+ *                 description: The ID of the category to filter shops
+ *             required:
+ *               - category_id
+ *     responses:
+ *       900:
+ *         description: Shops retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [900]
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       latitude:
+ *                         type: string
+ *                       longitude:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       shop_id:
+ *                         type: integer
+ *                       products:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *       711:
+ *         description: Missing category ID in the request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [711]
+ *       724:
+ *         description: Error retrieving shops by category
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [724]
+ */
 router.post("/api/shop-by-categoryid", apiController.getShopsByCategory);
 
 module.exports = router;
