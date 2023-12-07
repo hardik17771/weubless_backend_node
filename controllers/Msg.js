@@ -265,6 +265,7 @@ class Msg {
       742: "All the carts Listed",
       743: "Advertisement created successfully",
       744: "New Address is created",
+      745: "New FAQ is created",
       900: "Success",
       1100: "Failure",
     };
