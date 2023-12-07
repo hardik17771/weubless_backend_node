@@ -31,7 +31,7 @@ const createAddress = async (req, res) => {
   const Check = await apiRepository.createAddress(data);
 
   const msg = error_msg.responseMsg(Check.code); //706
-  if (Check.code === 716) {
+  if (Check.code === 744) {
     const response = { status: "1", message: msg, data: Check.data };
     res.status(201).json(response);
   } else {
@@ -1288,6 +1288,59 @@ const advertisementShow = async (data) => {
   }
 };
 
+const createFaq = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create product api controller hit");
+  try {
+    const newAdvertisement = await apiRepository.createFaq(data);
+
+    const msg = error_msg.responseMsg(newAdvertisement.code);
+    if (newAdvertisement.code === 745) {
+      const response = {
+        status: "1",
+        message: msg,
+        data: newAdvertisement.data,
+      };
+      res.status(201).json(response);
+    } else {
+      const response = {
+        status: "0",
+        message: msg,
+        data: newAdvertisement.data,
+      };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(1100);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
+const faqListing = async (req, res) => {
+  const apiRepository = new ApiRepository();
+  const data = await apiRepository.faqListing();
+  const error_msg = new Msg();
+  try {
+    if (data.code == 900) {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "1", message: msg, list: data.list };
+      res.status(201).json(response);
+    } else {
+      const msg = error_msg.responseMsg(data.code);
+      const response = { status: "0", message: msg };
+      res.status(201).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(425);
+    const response = { status: "0", message: msg };
+    res.status(400).json(response);
+  }
+};
+
 module.exports = {
   createAddress,
   login,
@@ -1336,4 +1389,6 @@ module.exports = {
   advertisementListing,
   advertisementListingByCategory,
   advertisementShow,
+  createFaq,
+  faqListing,
 };
