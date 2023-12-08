@@ -77,7 +77,7 @@ const fetchUser = async (req, res) => {
     console.log("Check.data", Check.data);
     res.status(200).json({ status: "1", message: msg, data: Check.data });
   } else {
-    res.status(401).json({ status: "0", message: msg });
+    res.status(401).json({ status: "0", message: msg  });
   }
 };
 
@@ -94,7 +94,7 @@ const updateProfile = async (req, res) => {
     console.log("Check.data", Check.data);
     res.status(200).json({ status: "1", message: msg, data: Check.data });
   } else {
-    res.status(401).json({ status: "0", message: msg });
+    res.status(400).json({ status: "0", message: msg ,  issue :Check.issue});
   }
 };
 
