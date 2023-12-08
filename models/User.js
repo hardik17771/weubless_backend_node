@@ -89,6 +89,39 @@ const userSchema2 = new mongoose.Schema(
       default: 0,
     },
 
+    latitude: {
+      type: String,
+      required: [true, "Latitude is required"],
+    },
+    longitude: {
+      type: String,
+      required: [true, "Longitude is required"],
+    },
+    country: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    state: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    city: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    pincode: {
+      type: String,
+      default: null,
+      required: false,
+    },
+    address: {
+      type: String,
+      default: null,
+      required: false,
+    },
     addresses: [
       {
         latitude: { type: String, required: [true, "Latitude is required"] },

@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const ContactUs = require("../models/ContactUs"); // Assuming you have a model defined
 const Advertisement = require("../models/Advertisement"); // Assuming you have a model defined
-
+const Address = require("../models/Address")
 const transporter = nodemailer.createTransport({
   service: "gmail",
   port: 587,
@@ -30,7 +30,7 @@ const createAddress = async (req, res) => {
   // try {
   const Check = await apiRepository.createAddress(data);
 
-  const msg = error_msg.responseMsg(Check.code); //706
+  const msg = error_msg.responseMsg(Check.code); 
   if (Check.code === 744) {
     const response = { status: "1", message: msg, data: Check.data };
     res.status(201).json(response);
@@ -175,20 +175,45 @@ const registerUser = async (req, res) => {
       email: data.email,
       password: await hashPassword(data.password),
       user_type: data.user_type,
+      deviceToken: data.deviceToken,
+      profileImage: data.profileImage,
       latitude: data.latitude,
       longitude: data.longitude,
-      liveAddress: data.liveAddress,
-      livePincode: data.livePincode,
-      liveCity: data.liveCity,
-      input_latitude: data.input_latitude,
-      input_longitude: data.input_longitude,
-      input_liveAddress: data.input_liveAddress,
-      input_livePincode: data.input_livePincode,
-      input_liveCity: data.input_liveCity,
-      input_deviceToken: data.deviceToken,
-      profileImage: data.profileImage,
+      address: data.address,
+      pincode: data.pincode,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+      // input_latitude: data.input_latitude,
+      // input_longitude: data.input_longitude,
+      // input_liveAddress: data.input_liveAddress,
+      // input_livePincode: data.input_livePincode,
+      // input_liveCity: data.input_liveCity,
+      addresses: [
+        {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          address: data.address,
+          pincode: data.pincode,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+        },
+      ],
     });
 
+    const newAddress = new Address.Address({
+      latitude: data.latitude,
+      longitude: data.longitude,
+      address: data.address,
+      pincode: data.pincode,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+    })
+
+    console.log(newAddress)
+    await newAddress.save();
     await newUser.save();
     res.status(200).json({
       status: 1,

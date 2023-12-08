@@ -28,36 +28,60 @@ class ApiRepository {
 
   async createAddress(data) {
     // try {
-
-    if (data.latitude && data.longitude && data.userUid && data.user_id) {
-      const user =
-        (await User.getUserById(data.user_id)) ||
-        (await User.getUserByUserUid(data.userUid));
-      if (!user) {
-        return { code: 461 };
+      if (data.latitude && data.longitude  && data.user_id) {
+        const user =
+          (await User.getUserById(data.user_id)) ||
+          (await User.getUserByUserUid(data.userUid));
+  
+        if (!user) {
+          return { code: 461 };
+        } else {
+          // Ensure that latitude and longitude are present in the data object
+          if (data.latitude && data.longitude) {
+            const address = new Address.Address({
+              latitude: data.latitude,
+              longitude: data.longitude,
+              address: data.address,
+              pincode: data.pincode,
+              city: data.city,
+              state: data.state,
+              country: data.country,
+            });
+  
+            await address.save();
+  
+            console.log("data", data);
+            console.log("address", address);
+            
+            user.addresses = [...user.addresses, {
+              latitude: data.latitude,
+              longitude: data.longitude,
+              address: data.address,
+              pincode: data.pincode,
+              city: data.city,
+              state: data.state,
+              country: data.country,
+            }];
+            await user.save();
+  
+            console.log(user);
+            return { code: 744, data: address };
+          } else {
+            return { code: 730 };
+          }
+        }
+      } else if (!data.latitude) {
+        return { code: 719 };
+      } else if (!data.longitude) {
+        return { code: 719 };
       } else {
-        const address = new Address.Address(data);
-        await address.save();
-        console.log("data", data);
-        console.log("address", address);
-
-        user.addresses.push(address);
-        await user.save();
-        console.log(user);
-        return { code: 744, data: address };
+        return { code: 730 };
       }
-    } else if (!data.latitude) {
-      return { code: 719 };
-    } else if (!data.longitude) {
-      return { code: 719 };
-    } else {
-      return { code: 730 };
-    }
     // } catch (error) {
     //   return { code: 1100 };
     // }
   }
-
+  
   async login(data) {
     try {
       const accessToken = this.access_token;
