@@ -1,0 +1,55 @@
+<!-- Add padding to the main content -->
+<style>
+  .detail-page {
+    padding: 20px; /* Adjust the value as needed */
+  }
+
+  .detail-form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .detail-form .field {
+    margin-bottom: 10px;
+  }
+
+  .detail-form label {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .detail-form input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+  }
+
+  .detail-form input:focus {
+    outline: none;
+    border-color: #007bff; /* Change this color as needed */
+  }
+</style>
+
+<ul class="list-group detail-page">
+  <li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
+    <form action="/admin/detail/<%= product.product_id %>/edit" method="POST">
+      <div class="d-flex flex-column">
+        <h6 class="mb-3 text-sm">Product Details</h6>
+
+        <% Object.entries(product.toObject()).forEach(([key, value]) => { %>
+          <div class="mb-2 text-xs">
+            <label for="<%= key %>"><%= key %>:</label>
+            <input type="text" id="<%= key %>" name="<%= key %>" value="<%= value %>">
+          </div>
+        <% }); %>
+      </div>
+
+      <div class="ms-auto text-end">
+        <button type="submit" class="btn btn-link text-dark px-3 mb-0">
+          <i class="fas fa-save text-dark me-2" aria-hidden="true"></i>Save
+        </button>
+      </div>
+    </form>
+  </li>
+</ul>

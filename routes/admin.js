@@ -25,5 +25,6 @@ router.get("/", homeController.indexView);
 router.get("/tables", homeController.tablesView);
 router.get("/billing", homeController.billingView);
 router.get("/profile", homeController.profileView);
+router.get("/detail/:product_id", homeController.detailView);
 
 module.exports = router;

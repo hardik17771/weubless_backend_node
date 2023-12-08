@@ -1,0 +1,25 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "workbench.iconTheme": "vscode-icons",
+  "glassit.alpha": 220,
+  "window.titleBarStyle": "custom",
+  "vscode_vibrancy.opacity": 1,
+  "vscode_vibrancy.type": "ultra-dark",
+  "files.associations": {
+    "*.html": "html"
+  },
+  "sonarlint.rules": {
+    "javascript:S3776": {
+      "level": "off"
+    },
+    "javascript:S125": {
+      "level": "off"
+    }
+  },
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "sonarlint.focusOnNewCode": true,
+  "[ejs]": {
+    "editor.formatOnSave": false
+  }
+}
