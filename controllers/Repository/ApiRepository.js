@@ -1152,7 +1152,8 @@ class ApiRepository {
     try {
       if (data.category_id) {
         const shops = await Shop.getShopsByCategory(data.category_id);
-        console.log(shops);
+  
+
         return { code: 900, data: shops };
       } else {
         return { code: 711 };
@@ -1162,7 +1163,7 @@ class ApiRepository {
       return { code: 724 };
     }
   }
-
+  
   /*********************************************** LOCATION FEATURES ***********************************/
 
   async main_subcategoryproductLocation(data) {

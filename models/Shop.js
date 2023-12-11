@@ -15,15 +15,15 @@ const shopSchema = new mongoose.Schema(
       required: [true, "Longitude is required"],
     },
     products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-    logo: String,
-    sliders: String,
-    address: String,
-    facebook: String,
-    google: String,
-    twitter: String,
-    youtube: String,
-    instagram: String,
-    slug: String,
+    logo: { type: String, default: null },
+    sliders: { type: String, default: null },
+    address: { type: String, default: null },
+    facebook: { type: String, default: null },
+    google: { type: String, default: null },
+    twitter: { type: String, default: null },
+    youtube: { type: String, default: null },
+    instagram: { type: String, default: null },
+    slug: { type: String, default: null },
   },
   { timestamps: true },
   {
@@ -90,11 +90,7 @@ const getShopsByCategory = async (category_id) => {
       console.log("shop is", shop);
 
       for (const product_mongo_id of shop.products) {
-        // const product_mongo_id = element;
-        // console.log("product id", product_mongo_id);
         const product = await getProductByMongoId(product_mongo_id);
-        // console.log("product is: ", product);
-        // console.log("product CATEGORYID is: ", product.category_id);
 
         if (product.category_id === category_id) {
           flag = 1;
@@ -103,38 +99,40 @@ const getShopsByCategory = async (category_id) => {
       }
 
       if (flag === 1) {
-        const {
-          name,
-          createdAt,
-          updatedAt,
-          shop_id,
-          latitude,
-          longitude,
-          products,
-          // user_id,
-        } = shop;
+        // const {
+        //   name,
+        //   createdAt,
+        //   updatedAt,
+        //   shop_id,
+        //   latitude,
+        //   longitude,
+        //   products,
 
-        let productsList = [];
-        // console.log(products);
-        const productObjects = await findProducts(products);
-        if (productObjects && productObjects.length > 0) {
-          productObjects.forEach((product) => {
-            productsList.push(product);
-          });
-        }
+        //   // user_id,
+        // } = shop;
 
-        let shop_data = {
-          name,
-          createdAt,
-          updatedAt,
-          shop_id,
-          latitude,
-          longitude,
-          productsList,
-        };
-        // console.log(shop);
-        // shop_list.push(shop);
-        shop_list.push(shop_data);
+        // let productsList = [];
+        // // console.log(products);
+        // const productObjects = await findProducts(products);
+        // if (productObjects && productObjects.length > 0) {
+        //   productObjects.forEach((product) => {
+        //     productsList.push(product);
+        //   });
+        // }
+
+        // let shop_data = {
+        //   name,
+        //   createdAt,
+        //   updatedAt,
+        //   shop_id,
+        //   latitude,
+        //   longitude,
+        //   productsList,
+
+          // };
+          // console.log(shop);
+          // shop_list.push(shop);
+        shop_list.push(shop);
       }
     }
     return shop_list;
