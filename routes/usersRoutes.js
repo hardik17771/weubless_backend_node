@@ -41,6 +41,8 @@ const verifyAccessToken = require("../middleware/VerifyAccessToken");
 // Middleware for the routes under /api
 // router.use("/api", authenticate); // Assuming authenticate is your authentication middleware
 
+
+
 /**
  * @swagger
  * /api/add-address:
@@ -126,24 +128,8 @@ router.post("/api/add-address", apiController.createAddress);
  *           schema:
  *             type: object
  *             properties:
- *               username:
- *                 type: string
- *               name:
- *                 type: string
- *               country_code:
- *                 type: string
- *               phone:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               user_type:
- *                 type: string
- *               latitude:
- *                 type: string
- *               longitude:
- *                 type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: User registered successfully

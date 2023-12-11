@@ -18,27 +18,27 @@ const addressSchema = new mongoose.Schema(
     country: {
       type: String,
       default: null,
-      required: false,
+      required: true,
     },
     state: {
       type: String,
       default: null,
-      required: false,
+      required: true,
     },
     city: {
       type: String,
       default: null,
-      required: false,
+      required: true,
     },
     pincode: {
       type: String,
       default: null,
-      required: false,
+      required: true,
     },
     address: {
       type: String,
       default: null,
-      required: false,
+      required: true,
     },
   },
   {

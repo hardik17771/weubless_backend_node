@@ -162,18 +162,16 @@ const register = async (req) => {
 
 const registerUser = async (req, res) => {
   const data = req.body;
-  console.log("API Controller data");
-  console.log(data);
+  // console.log("API Controller data");
+  // console.log(data);
 
   try {
     const newUser = new User.User2({
       userUid: data.userUid,
       username: data.username,
       name: data.name,
-      country_code: data.country_code,
       phone: data.phone,
       email: data.email,
-      password: await hashPassword(data.password),
       user_type: data.user_type,
       deviceToken: data.deviceToken,
       profileImage: data.profileImage,
@@ -184,6 +182,7 @@ const registerUser = async (req, res) => {
       city: data.city,
       state: data.state,
       country: data.country,
+      dob : data.dob,
       // input_latitude: data.input_latitude,
       // input_longitude: data.input_longitude,
       // input_liveAddress: data.input_liveAddress,
@@ -211,8 +210,10 @@ const registerUser = async (req, res) => {
       state: data.state,
       country: data.country,
     })
+    console.log('dob that is entered value before validation:', data.dob);
+    console.log('dob for user value before validation:', newUser.dob);
 
-    console.log(newAddress)
+    // console.log(newAddress)
     await newAddress.save();
     await newUser.save();
     res.status(200).json({

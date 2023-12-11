@@ -246,7 +246,6 @@ class ApiRepository {
 
         if (user) {
 
-                  // Check if the new username is already in use by another user
         if (data.username && data.username !== user.username) {
           const usernameExists = await User.User2.findOne({ username: data.username });
           if (usernameExists) {
@@ -254,7 +253,6 @@ class ApiRepository {
           }
         }
 
-        // Check if the new email is already in use by another user
         if (data.email && data.email !== user.email) {
           const emailExists = await User.User2.findOne({ email: data.email });
           if (emailExists) {
@@ -262,7 +260,6 @@ class ApiRepository {
           }
         }
 
-        // Check if the new phone number is already in use by another user
         if (data.phone && data.phone !== user.phone) {
           const phoneExists = await User.User2.findOne({ phone: data.phone });
           if (phoneExists) {
@@ -273,7 +270,6 @@ class ApiRepository {
           user.userUid = data.userUid || user.userUid;
           user.username = data.username || user.username;
           user.name = data.name || user.name;
-          user.country_code = data.country_code || user.country_code;
           user.phone = data.phone || user.phone;
           user.email = data.email || user.email;
           user.user_type = data.user_type || user.user_type;
