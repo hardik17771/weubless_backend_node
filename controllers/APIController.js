@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const ContactUs = require("../models/ContactUs"); // Assuming you have a model defined
 const Advertisement = require("../models/Advertisement"); // Assuming you have a model defined
-
+const Address = require("../models/Address")
 const transporter = nodemailer.createTransport({
   service: "gmail",
   port: 587,
@@ -30,7 +30,7 @@ const createAddress = async (req, res) => {
   // try {
   const Check = await apiRepository.createAddress(data);
 
-  const msg = error_msg.responseMsg(Check.code); //706
+  const msg = error_msg.responseMsg(Check.code); 
   if (Check.code === 744) {
     const response = { status: "1", message: msg, data: Check.data };
     res.status(201).json(response);
@@ -77,7 +77,7 @@ const fetchUser = async (req, res) => {
     console.log("Check.data", Check.data);
     res.status(200).json({ status: "1", message: msg, data: Check.data });
   } else {
-    res.status(401).json({ status: "0", message: msg });
+    res.status(401).json({ status: "0", message: msg  });
   }
 };
 
@@ -94,7 +94,7 @@ const updateProfile = async (req, res) => {
     console.log("Check.data", Check.data);
     res.status(200).json({ status: "1", message: msg, data: Check.data });
   } else {
-    res.status(401).json({ status: "0", message: msg });
+    res.status(400).json({ status: "0", message: msg ,  issue :Check.issue});
   }
 };
 
@@ -162,33 +162,53 @@ const register = async (req) => {
 
 const registerUser = async (req, res) => {
   const data = req.body;
-  console.log("API Controller data");
-  console.log(data);
+  // console.log("API Controller data");
+  // console.log(data);
+
+  const newAddress = new Address.Address({
+    latitude: data.latitude,
+    longitude: data.longitude,
+    address: data.address,
+    pincode: data.pincode,
+    city: data.city,
+    state: data.state,
+    country: data.country,
+  })
+  await newAddress.save();
 
   try {
     const newUser = new User.User2({
       userUid: data.userUid,
       username: data.username,
       name: data.name,
-      country_code: data.country_code,
       phone: data.phone,
       email: data.email,
-      password: await hashPassword(data.password),
       user_type: data.user_type,
+      deviceToken: data.deviceToken,
+      profileImage: data.profileImage,
       latitude: data.latitude,
       longitude: data.longitude,
-      liveAddress: data.liveAddress,
-      livePincode: data.livePincode,
-      liveCity: data.liveCity,
-      input_latitude: data.input_latitude,
-      input_longitude: data.input_longitude,
-      input_liveAddress: data.input_liveAddress,
-      input_livePincode: data.input_livePincode,
-      input_liveCity: data.input_liveCity,
-      input_deviceToken: data.deviceToken,
-      profileImage: data.profileImage,
+      address: data.address,
+      pincode: data.pincode,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+      dob : data.dob,
+      // input_latitude: data.input_latitude,
+      // input_longitude: data.input_longitude,
+      // input_liveAddress: data.input_liveAddress,
+      // input_livePincode: data.input_livePincode,
+      // input_liveCity: data.input_liveCity,
+      addresses: [
+        newAddress
+      ],
     });
 
+
+    // console.log('dob that is entered value before validation:', data.dob);
+    // console.log('dob for user value before validation:', newUser.dob);
+
+    // console.log(newAddress)
     await newUser.save();
     res.status(200).json({
       status: 1,

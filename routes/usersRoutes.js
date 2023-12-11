@@ -41,6 +41,76 @@ const verifyAccessToken = require("../middleware/VerifyAccessToken");
 // Middleware for the routes under /api
 // router.use("/api", authenticate); // Assuming authenticate is your authentication middleware
 
+
+
+/**
+ * @swagger
+ * /api/add-address:
+ *   post:
+ *     summary: Create a new address
+ *     tags:
+ *       - Address
+ *     requestBody:
+ *       description: Address data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: number
+ *               userUid:
+ *                 type: string
+ *               latitude:
+ *                 type: string
+ *               longitude:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               pincode:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *             required:
+ *               - user_id
+ *               - latitude
+ *               - longitude
+ *               # Add other required fields here
+ *     responses:
+ *       200:
+ *         description: Address created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       719:
+ *         description: Latitude is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                 message:
+ *                   type: string
+ *       730:
+ *         description: Longitude is required or other validation errors
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                 message:
+ *                   type: string
+ */
 router.post("/api/add-address", apiController.createAddress);
 
 /**
@@ -58,24 +128,8 @@ router.post("/api/add-address", apiController.createAddress);
  *           schema:
  *             type: object
  *             properties:
- *               username:
- *                 type: string
- *               name:
- *                 type: string
- *               country_code:
- *                 type: string
- *               phone:
- *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               user_type:
- *                 type: string
- *               latitude:
- *                 type: string
- *               longitude:
- *                 type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *     responses:
  *       200:
  *         description: User registered successfully

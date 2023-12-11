@@ -28,36 +28,60 @@ class ApiRepository {
 
   async createAddress(data) {
     // try {
-
-    if (data.latitude && data.longitude && data.userUid && data.user_id) {
-      const user =
-        (await User.getUserById(data.user_id)) ||
-        (await User.getUserByUserUid(data.userUid));
-      if (!user) {
-        return { code: 461 };
+      if (data.latitude && data.longitude  && data.user_id) {
+        const user =
+          (await User.getUserById(data.user_id)) ||
+          (await User.getUserByUserUid(data.userUid));
+  
+        if (!user) {
+          return { code: 461 };
+        } else {
+          // Ensure that latitude and longitude are present in the data object
+          if (data.latitude && data.longitude) {
+            const address = new Address.Address({
+              latitude: data.latitude,
+              longitude: data.longitude,
+              address: data.address,
+              pincode: data.pincode,
+              city: data.city,
+              state: data.state,
+              country: data.country,
+            });
+  
+            await address.save();
+  
+            console.log("data", data);
+            console.log("address", address);
+            
+            user.addresses = [...user.addresses, {
+              latitude: data.latitude,
+              longitude: data.longitude,
+              address: data.address,
+              pincode: data.pincode,
+              city: data.city,
+              state: data.state,
+              country: data.country,
+            }];
+            await user.save();
+  
+            console.log(user);
+            return { code: 744, data: address };
+          } else {
+            return { code: 730 };
+          }
+        }
+      } else if (!data.latitude) {
+        return { code: 719 };
+      } else if (!data.longitude) {
+        return { code: 719 };
       } else {
-        const address = new Address.Address(data);
-        await address.save();
-        console.log("data", data);
-        console.log("address", address);
-
-        user.addresses.push(address);
-        await user.save();
-        console.log(user);
-        return { code: 744, data: address };
+        return { code: 730 };
       }
-    } else if (!data.latitude) {
-      return { code: 719 };
-    } else if (!data.longitude) {
-      return { code: 719 };
-    } else {
-      return { code: 730 };
-    }
     // } catch (error) {
     //   return { code: 1100 };
     // }
   }
-
+  
   async login(data) {
     try {
       const accessToken = this.access_token;
@@ -219,21 +243,45 @@ class ApiRepository {
           (await User.getUserById(data.user_id)) ||
           (await User.getUserByUserUid(data.userUid));
 
+
         if (user) {
+
+        if (data.username && data.username !== user.username) {
+          const usernameExists = await User.User2.findOne({ username: data.username });
+          if (usernameExists) {
+            return { code: 468, issue: "Username already in use" };
+          }
+        }
+
+        if (data.email && data.email !== user.email) {
+          const emailExists = await User.User2.findOne({ email: data.email });
+          if (emailExists) {
+            return { code: 468, issue: "Email already in use" };
+          }
+        }
+
+        if (data.phone && data.phone !== user.phone) {
+          const phoneExists = await User.User2.findOne({ phone: data.phone });
+          if (phoneExists) {
+            return { code: 468, issue: "Phone number already in use" };
+          }
+        }
+
           user.userUid = data.userUid || user.userUid;
           user.username = data.username || user.username;
           user.name = data.name || user.name;
-          user.country_code = data.country_code || user.country_code;
           user.phone = data.phone || user.phone;
           user.email = data.email || user.email;
           user.user_type = data.user_type || user.user_type;
           user.dob = data.dob || user.dob;
           user.profileImage = data.profileImage || user.profileImage;
-          // user.latitude = data.latitude || user.latitude;
-          // user.longitude = data.longitude || user.longitude;
-          // user.liveAddress = data.liveAddress || user.liveAddress;
-          // user.livePincode = data.livePincode || user.livePincode;
-          // user.liveCity = data.liveCity || user.liveCity;
+          user.latitude = data.latitude || user.latitude;
+          user.longitude = data.longitude || user.longitude;
+          user.address = data.address || user.address;
+          user.pincode = data.pincode || user.pincode;
+          user.city = data.city || user.city;
+          user.state = data.state || user.state;
+          user.country = data.country || user.country;
           // user.input_latitude = data.input_latitude || user.input_latitude;
           // user.input_longitude = data.input_longitude || user.input_longitude;
           // user.input_liveAddress =
@@ -242,37 +290,23 @@ class ApiRepository {
           //   data.input_livePincode || user.input_livePincode;
           // user.input_liveCity = data.input_liveCity || user.input_liveCity;
 
+          const primaryAddressIndex = data.primary_address_index || 0; // Change 0 to the desired index
+
+          if (user.addresses && user.addresses.length > primaryAddressIndex) {
+            user.addresses[primaryAddressIndex] = {
+              latitude: data.latitude || user.addresses[primaryAddressIndex].latitude,
+              longitude: data.longitude || user.addresses[primaryAddressIndex].longitude,
+              address: data.address || user.addresses[primaryAddressIndex].address,
+              pincode: data.pincode || user.addresses[primaryAddressIndex].pincode,
+              city: data.city || user.addresses[primaryAddressIndex].city,
+              state: data.state || user.addresses[primaryAddressIndex].state,
+              country: data.country || user.addresses[primaryAddressIndex].country,
+            };
+          }
+          
           user.save();
-
-          // const response = await axios.post(
-          //   "http://localhost:8080/api/update_profile",
-          //   {},
-          //   {
-          //     headers: {
-          //       Authorization: accessToken,
-          //     },
-          //   }
-          // );
-
-          // console.log("response.data", response.data);
           return { data: user, code: 208 };
 
-          // return {
-          //   id: user.id,
-          //   name: user.name,
-          //   country_code: user.country_code,
-          //   phone: user.phone,
-          //   email: user.email,
-          //   user_type: user.user_type,
-          //   dob: user.dob,
-          //   country: user.country,
-          //   state: user.state,
-          //   city: user.city,
-          //   postal_code: user.postal_code,
-          //   image: user.image,
-          //   access_token: accessToken,
-          //   code: 200,
-          // };
         } else {
           return { code: 422 };
         }
@@ -280,8 +314,25 @@ class ApiRepository {
         return { code: 422 };
       }
     } catch (error) {
-      console.error(error);
-      return { code: 468 };
+      let errorMessage = "Registration failed";
+      if (error.code === 11000) {
+        if (error.keyPattern.username === 1) {
+          errorMessage = "Username already in use";
+        } else if (error.keyPattern.phone === 1) {
+          errorMessage = "Phone number already in use";
+        } else if (error.keyPattern.email === 1) {
+          errorMessage = "Email already in use";
+        }
+      } else if (error.name === "ValidationError") {
+        // Validation error
+        const field = Object.keys(error.errors)[0];
+        errorMessage = error.errors[field].message;
+      }
+  
+      // res.status(401).json({ status: 0, message: errorMessage });
+      
+      // console.error(error);
+      return { code: 468 , msg : errorMessage};
     }
   }
 
@@ -1101,7 +1152,8 @@ class ApiRepository {
     try {
       if (data.category_id) {
         const shops = await Shop.getShopsByCategory(data.category_id);
-        console.log(shops);
+  
+
         return { code: 900, data: shops };
       } else {
         return { code: 711 };
@@ -1111,7 +1163,7 @@ class ApiRepository {
       return { code: 724 };
     }
   }
-
+  
   /*********************************************** LOCATION FEATURES ***********************************/
 
   async main_subcategoryproductLocation(data) {

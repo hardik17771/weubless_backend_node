@@ -20,13 +20,10 @@ const userSchema2 = new mongoose.Schema(
 
     userUid: {
       type: String,
+      required : true
     },
 
-    country_code: {
-      type: String,
-      required: [true, "Country code is required"],
-      maxlength: [3, "Invalid country code"],
-    },
+
     phone: {
       type: String,
       required: [true, "Phone is required"],
@@ -45,36 +42,22 @@ const userSchema2 = new mongoose.Schema(
         message: "Invalid email format",
       },
     },
-    password: {
-      type: String,
-      required: [true, "Password is required"],
-    },
+
     user_type: {
       type: Number,
       required: [true, "User type is required"],
     },
     is_deleted: Number,
     dob: {
-      type: Date,
-      required: false,
-      validate: {
-        validator: function (v) {
-          return moment(v, "MM/DD/YYYY", true).isValid(); // Validate format as 'MM/DD/YYYY'
-        },
-        message: (props) =>
-          `${props.value} is not a valid date. Please use the format MM/DD/YYYY.`,
-      },
-    },
-    access_token: {
       type: String,
-      default: null,
-      required: false,
+      required: true,
     },
+
 
     deviceToken: {
       type: String,
       default: null,
-      required: false,
+      required: true,
     },
 
     profileImage: {
@@ -87,8 +70,42 @@ const userSchema2 = new mongoose.Schema(
     primary_address_index: {
       type: Number,
       default: 0,
+      required : true
     },
 
+    latitude: {
+      type: String,
+      required: [true, "Latitude is required"],
+    },
+    longitude: {
+      type: String,
+      required: [true, "Longitude is required"],
+    },
+    country: {
+      type: String,
+      default: null,
+      required: true,
+    },
+    state: {
+      type: String,
+      default: null,
+      required: true,
+    },
+    city: {
+      type: String,
+      default: null,
+      required: true,
+    },
+    pincode: {
+      type: String,
+      default: null,
+      required: true,
+    },
+    address: {
+      type: String,
+      default: null,
+      required: true,
+    },
     addresses: [
       {
         latitude: { type: String, required: [true, "Latitude is required"] },

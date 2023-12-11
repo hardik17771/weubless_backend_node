@@ -35,7 +35,7 @@ class ApiService {
       console.log("data", data);
       return { error_code: data.code, data };
     } else {
-      return { error_code: data.code };
+      return { error_code: data.code , issue:data.issue };
     }
   }
 
