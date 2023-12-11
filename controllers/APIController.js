@@ -165,6 +165,17 @@ const registerUser = async (req, res) => {
   // console.log("API Controller data");
   // console.log(data);
 
+  const newAddress = new Address.Address({
+    latitude: data.latitude,
+    longitude: data.longitude,
+    address: data.address,
+    pincode: data.pincode,
+    city: data.city,
+    state: data.state,
+    country: data.country,
+  })
+  await newAddress.save();
+
   try {
     const newUser = new User.User2({
       userUid: data.userUid,
@@ -189,32 +200,15 @@ const registerUser = async (req, res) => {
       // input_livePincode: data.input_livePincode,
       // input_liveCity: data.input_liveCity,
       addresses: [
-        {
-          latitude: data.latitude,
-          longitude: data.longitude,
-          address: data.address,
-          pincode: data.pincode,
-          city: data.city,
-          state: data.state,
-          country: data.country,
-        },
+        newAddress
       ],
     });
 
-    const newAddress = new Address.Address({
-      latitude: data.latitude,
-      longitude: data.longitude,
-      address: data.address,
-      pincode: data.pincode,
-      city: data.city,
-      state: data.state,
-      country: data.country,
-    })
-    console.log('dob that is entered value before validation:', data.dob);
-    console.log('dob for user value before validation:', newUser.dob);
+
+    // console.log('dob that is entered value before validation:', data.dob);
+    // console.log('dob for user value before validation:', newUser.dob);
 
     // console.log(newAddress)
-    await newAddress.save();
     await newUser.save();
     res.status(200).json({
       status: 1,
