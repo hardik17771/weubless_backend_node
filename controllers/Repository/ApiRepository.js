@@ -1566,12 +1566,14 @@ class ApiRepository {
 
   async addToCart(data) {
     // try {
-    if (data.product_id && data.user_id && data.quantity && data.category_id) {
+    if (data.product_id && data.user_id && data.quantity && data.category_id && data.userUid) {
       let productsList = [];
 
       const newCart = new Cart.Cart(data);
       const product = await Product.getProductById(data.product_id);
-      const user = await User.getUserById(data.user_id);
+      const user =
+      (await User.getUserById(data.user_id)) ||
+      (await User.getUserByUserUid(data.userUid));
 
       if (product && user) {
         // Product
