@@ -23,8 +23,6 @@
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     text-align: center;
-    opacity: 0; /* Start with opacity 0 */
-    transition: opacity 1s ease-in-out; /* Add transition */
   }
 
   .custom-modal p {
@@ -48,11 +46,8 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0; /* Start with opacity 0 */
-    transition: opacity 3s ease-in-out; /* Add transition */
   }
 
-    /* Add class to show elements */
     .show-modal {
     display: block;
     opacity: 1;
@@ -63,14 +58,18 @@
   <li class="list-group-item border-0 w-full  p-4 mb-2 bg-gray-100 border-radius-lg">
     <form action="/admin/detail/<%= product.product_id %>" method="POST">
       <div class="d-flex flex-column">
-        <h6 class="mb-3 text-sm">Product Details</h6>
+        <h6 class="mb-3 text-lg">Product Details</h6>
         
         <% Object.entries(product.toObject()).forEach(([key, value]) => { %>
-          <div class="mb-2 text-xs">
-            <label for="<%= key %>"><%= key %>:</label>
-            <input type="text" class="w-full p-1" id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(100% - 10rem);">
+          <div class="mb-2 text-s">
+            <label for="<%= key %>"><%= key %> (<%= fieldTypes[key] %>):</label>
+            <% if (uneditableFields.includes(key)) { %>
+              <span class="w-full mx-3 "><%= value %></span>
+            <% } else { %>
+              <input type="text" class="w-full mx-3 " id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(30%);">
+            <% } %>
           </div>
-          <% }); %>
+        <% }); %>        
         </div>
       <div class="ms-auto text-end">
         <button type="submit" class="btn btn-link text-dark px-3 mb-0" id = "update-save-button">

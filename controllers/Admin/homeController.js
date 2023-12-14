@@ -90,17 +90,27 @@ const profileView = (req, res, next) => {
 const detailView = async (req, res, next) => {
   const product_id = req.params.product_id;
   const product = await Product.getProductById(product_id);
-
-  // Fetch the product details based on productId
+  
   if (!product) {
-    // Handle case where the product is not found
     res.status(404).send('Product not found');
     return;
   }
 
-  // Render the detail page
-  res.render("admin/detail", { product });
+  const uneditableFields = ["_id", "createdAt", "updatedAt", "__v"];
+
+  // Get the schema paths and their types
+  const fieldTypes = Object.keys(Product.Product.schema.paths).reduce((acc, key) => {
+    acc[key] = Product.Product.schema.paths[key].instance;
+    return acc;
+  }, {});
+
+  res.render("admin/detail", {
+    product,
+    uneditableFields,
+    fieldTypes,
+  });
 };
+
 
 const updateProduct = async (req, res, next) => {
   const product_id = req.params.product_id;
@@ -125,9 +135,6 @@ const updateProduct = async (req, res, next) => {
         return value; // Return the original value if conversion fails
       }
     };
-
-
-
     updatedData.user_id = convertToObjectId(updatedData.user_id);
     updatedData.brand_id = convertToObjectId(updatedData.brand_id);
 
