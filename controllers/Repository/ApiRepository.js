@@ -784,7 +784,7 @@ class ApiRepository {
   }
 
   async updateProduct(data) {
-    try {
+    // try {
       // console.log(Category.Category);
       if (data.product_id) {
         const oldProduct = await Product.getProductById(data.product_id);
@@ -792,7 +792,7 @@ class ApiRepository {
 
         if (updatedProduct) {
           Object.assign(updatedProduct, data);
-          console.log("Updated product present", updatedProduct);
+          // console.log("Updated product present", updatedProduct);
           if (data.shop_id) {
             if (oldProduct.shop_id != data.shop_id) {
               const oldShop = await Shop.getShopById(oldProduct.shop_id);
@@ -817,9 +817,9 @@ class ApiRepository {
           }
 
           if (data.main_subcategory_id) {
-            console.log("SubCategory ID present");
+            // console.log("SubCategory ID present");
             if (oldProduct.main_subcategory_id != data.main_subcategory_id) {
-              console.log("Old Product not equal data main subcategory id ");
+              // console.log("Old Product not equal data main subcategory id ");
               // Sub Category
               const oldSubCategory = await SubCategory.getSubCategoryById(
                 oldProduct.main_subcategory_id
@@ -832,8 +832,8 @@ class ApiRepository {
                 return { code: 726 };
               }
 
-              console.log("old Subcategory", oldSubCategory);
-              console.log("new Subcategory", subCategory);
+              // console.log("old Subcategory", oldSubCategory);
+              // console.log("new Subcategory", subCategory);
               await SubCategory.SubCategory.findOneAndUpdate(
                 { _id: oldSubCategory._id },
                 { $pull: { products: updatedProduct._id } }
@@ -872,9 +872,9 @@ class ApiRepository {
       } else {
         return { code: 718 };
       }
-    } catch (error) {
-      return { code: 425 };
-    }
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
   }
 
   async productDetails(data) {

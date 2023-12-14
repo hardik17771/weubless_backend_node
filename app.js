@@ -13,11 +13,14 @@ dotenv.config();
 
 // Connect to the database
 connectDB();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 // Set EJS as the view engine
 app.use(expressLayouts);
 app.set("view engine", "ejs");
 
-app.use(bodyParser.json());
 app.use("", routes);
 app.use(express.urlencoded({ extended: true }));
 
