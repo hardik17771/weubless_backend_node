@@ -1,5 +1,6 @@
 const Product= require("../../models/Product");
 const SubCategory= require("../../models/SubCategory");
+const Category= require("../../models/Category");
 const Shop = require("../../models/Shop");
 const ApiRepository = require("../Repository/ApiRepository")
 const mongoose = require("mongoose");
@@ -13,21 +14,35 @@ const indexView = (req, res, next) => {
 
 const tablesView = async (req, res, next) => {
   const products = await Product.Product.find().exec();
+  const subcategories = await SubCategory.SubCategory.find().exec();
 
   // Fetch subcategory information for each product
-  const productsWithSubcategory = await Promise.all(
+  const alteredProducts = await Promise.all(
     products.map(async (product) => {
       const subcategory = await SubCategory.getSubCategoryById(product.main_subcategory_id);
+      const category = await Category.getCategoryById(product.category_id);
       const shop = await Shop.getShopById(product.shop_id);
       return {
         ...product.toObject(),
         subcategoryName: subcategory ? subcategory.name : "Unknown Subcategory",
+        categoryName: category ? category.name : "Category",
         shopName: shop ? shop.name : "Unknown Shop",
       };
     })
   );
 
-  res.render("admin/tables", { productsWithSubcategory });
+  const alteredSubCategories = await Promise.all(
+    subcategories.map(async (subcategory) => {
+      const category = await Category.getCategoryById(subcategory.category_id);
+      // const shop = await Shop.getShopById(product.shop_id);
+      return {
+        ...subcategory.toObject(),
+        categoryName: category ? category.name : "Category",
+      };
+    })
+  );
+
+  res.render("admin/tables", { alteredProducts,alteredSubCategories });
 };
 
 const billingView = (req, res, next) => {
@@ -37,54 +52,6 @@ const billingView = (req, res, next) => {
 const profileView = (req, res, next) => {
   res.render("admin/profile");
 };
-
-
-// const detailView = async (req, res, next) => {
-//   const product_id = req.params.product_id;
-//   const product = await Product.getProductById(product_id)
-
-//   // Fetch the product details based on productId
-//   console.log(product)
-//   if (!product) {
-//     // Handle case where the product is not found
-//     res.status(404).send('Product not found');
-//     return;
-//   }
-
-//   // Fetch additional information (subcategory, shop) if needed
-
-//   res.render("admin/detail", {product});
-// };
-
-
-// const detailView = async (req, res, next) => {
-//   const product_id = req.params.product_id;
-//   const product = await Product.getProductById(product_id);
-
-//   // Fetch the product details based on productId
-//   if (!product) {
-//     // Handle case where the product is not found
-//     res.status(404).send('Product not found');
-//     return;
-//   }
-
-//   if (req.method === 'POST') {
-//     // Handle the form submission and update the product in the database
-//     const updatedData = req.body; // Assuming you're using a middleware like body-parser
-//     const updateResult = await updateProduct(updatedData);
-
-//     // Handle the result, perhaps redirect to the detail page with a success query parameter
-//     if (updateResult.code === 297) {
-//       res.redirect(`/admin/detail/${product_id}?success=true`);
-//     } else {
-//       // Handle errors
-//       res.status(500).send('Error updating product');
-//     }
-//   } else {
-//     // Render the detail page as usual
-//     res.render("admin/detail", { product });
-//   }
-// };
 
 
 const detailView = async (req, res, next) => {
