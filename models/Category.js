@@ -98,6 +98,25 @@ const findProducts = async (objectIds) => {
   }
 };
 
+// const getTotalCountsByCategoryId = async (category_id) => {
+//   try {
+//     const category = await Category.findOne({
+//       category_id,
+//     }).exec();
+
+//     if (!category) {
+//       return { productCount: 0, subCategoryCount: 0 };
+//     }
+
+//     const productCount = category.products.length;
+//     const subCategoryCount = category.subCategories.length;
+
+//     return { productCount, subCategoryCount };
+//   } catch (error) {
+//     throw new Error(`Error fetching counts: ${error.message}`);
+//   }
+// };
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = {
@@ -107,4 +126,5 @@ module.exports = {
   findSubCategories,
   getProdutsByCategoryId,
   findProducts,
+  // getTotalCountsByCategoryId, // Add the new function to exports
 };

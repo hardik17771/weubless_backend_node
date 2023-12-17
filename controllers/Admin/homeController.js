@@ -49,17 +49,20 @@ const tablesView = async (req, res, next) => {
   try {
     const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
     const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category"];
+    const categoryHeaders = ["Category Id", "Category","Product Count"];
 
     const productData = await getModelData(Product.Product, "main_subcategory_id", "category_id", "shop_id");
     const subCategoryData = await getModelData(SubCategory.SubCategory, "category_id");
+    const categoryData = await getModelData(Category.Category, "category_id");
 
     const productAlteredData = await processModelData(productData, "product_id", productHeaders);
     const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
+    const categoryAlteredData = await processModelData(categoryData, "category_id", categoryHeaders);
     // console.log("productHeaders",productHeaders)
     // console.log("productAlteredData",productAlteredData)
     // console.log("subCategoryData",subCategoryHeaders)
     // console.log("subCategoryAlteredData",subCategoryAlteredData)
-    res.render("admin/tables", { productHeaders,subCategoryHeaders,productAlteredData, subCategoryAlteredData });
+    res.render("admin/tables", { productHeaders,subCategoryHeaders,productAlteredData, subCategoryAlteredData , categoryHeaders ,categoryAlteredData});
   } catch (error) {
     console.error("Error fetching and processing data:", error);
     next(error);
@@ -82,10 +85,13 @@ const processModelData = async (data, idField, headers) => {
         let field_key = getFieldName(key)
         console.log("field_key", field_key)
         if(Array.isArray(field_key)){
-          // console.log("TRUEUEUEUE")
-          // console.log("item[field_key[1]]",item[field_key[1]])
-          headers_field_list[`${key}`] = field_key ? item[field_key[1]] : `Unknown ${field_key}`;
-          headers_field_list["modelId"] = field_key ? item[field_key[1]] : `Unknown ${field_key}`;
+          if(field_key[0]=== "idField"){
+            headers_field_list[`${key}`] = field_key ? item[field_key[1]] : `Unknown ${field_key}`;
+            headers_field_list["modelId"] = field_key ? item[field_key[1]] : `Unknown ${field_key}`;
+          }
+          else{
+            headers_field_list[`${key}`] = field_key ? item[field_key[1]].length : `Unknown ${field_key}`;
+          }
         }
         else{
           const foreignItem = await getModelById(field_key, item[field_key]);
@@ -125,6 +131,13 @@ const getFieldName = (header) => {
       return ["idField" , "product_id"];
     case "Sub Category ID":
       return ["idField","main_subcategory_id"];
+    case "Category Id":
+      // console.log("Category ID CASE ALSO EXECUTEDDDDDD")
+      return ["idField","category_id"];
+    case "Product Count":
+      return ["countField","products"];
+    case "SubCategory Count":
+      return ["countField","subCategories"];
     case "Product":
       return "name";
     case "Shop":

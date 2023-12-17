@@ -1,28 +1,10 @@
-<% const getFieldName = (header) => {
-  switch (header) {
-    case "Product ID":
-      return "product_id";
-    case "Product":
-      return "name";
-    case "Shop":
-      return "shop_id";
-    case "SubCategory":
-      return "main_subcategory_id";
-    case "Category":
-      return "category_id";
-    case "Updated At":
-      return "updatedAt"
 
-    default:
-      return header.toLowerCase(); // Use the header as the field name (lowercased) by default
-  }
-};
- %>
 
 <div class="container-fluid py-4">
   <% const tablesData = [
     { headers: productHeaders, data: productAlteredData, title: "Products" },
-    { headers: subCategoryHeaders, data: subCategoryAlteredData, title: "SubCategories" }
+    { headers: subCategoryHeaders, data: subCategoryAlteredData, title: "SubCategories" },
+    { headers: categoryHeaders, data: categoryAlteredData, title: "Categories" }
   ]; %>
 
   <% tablesData.forEach(table => { %>
