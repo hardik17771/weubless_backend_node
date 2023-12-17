@@ -12,44 +12,12 @@ const indexView = (req, res, next) => {
   res.render("admin/home");
 };
 
-// const tablesView = async (req, res, next) => {
-//   const products = await Product.Product.find().exec();
-//   const subcategories = await SubCategory.SubCategory.find().exec();
-
-//   // Fetch subcategory information for each product
-//   const alteredProducts = await Promise.all(
-//     products.map(async (product) => {
-//       const subcategory = await SubCategory.getSubCategoryById(product.main_subcategory_id);
-//       const category = await Category.getCategoryById(product.category_id);
-//       const shop = await Shop.getShopById(product.shop_id);
-//       return {
-//         ...product.toObject(),
-//         subcategoryName: subcategory ? subcategory.name : "Unknown Subcategory",
-//         categoryName: category ? category.name : "Category",
-//         shopName: shop ? shop.name : "Unknown Shop",
-//       };
-//     })
-//   );
-
-//   const alteredSubCategories = await Promise.all(
-//     subcategories.map(async (subcategory) => {
-//       const category = await Category.getCategoryById(subcategory.category_id);
-//       // const shop = await Shop.getShopById(product.shop_id);
-//       return {
-//         ...subcategory.toObject(),
-//         categoryName: category ? category.name : "Category",
-//       };
-//     })
-//   );
-
-//   res.render("admin/tables", { alteredProducts,alteredSubCategories });
-// };
 
 const tablesView = async (req, res, next) => {
   try {
     const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
     const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category"];
-    const categoryHeaders = ["Category Id", "Category","Product Count"];
+    const categoryHeaders = ["Category Id", "Category","SubCategory Count","Product Count"];
 
     const productData = await getModelData(Product.Product, "main_subcategory_id", "category_id", "shop_id");
     const subCategoryData = await getModelData(SubCategory.SubCategory, "category_id");
