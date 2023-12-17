@@ -8,38 +8,28 @@ const Msg = require("../Msg")
 
 const apiRepository = new ApiRepository();
 const msg = new Msg();
-const indexView = (req, res, next) => {
-  res.render("admin/home");
-};
-
-
-const tablesView = async (req, res, next) => {
-  try {
-    const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
-    const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category"];
-    const categoryHeaders = ["Category Id", "Category","SubCategory Count","Product Count"];
-
-    const productData = await getModelData(Product.Product, "main_subcategory_id", "category_id", "shop_id");
-    const subCategoryData = await getModelData(SubCategory.SubCategory, "category_id");
-    const categoryData = await getModelData(Category.Category, "category_id");
-
-    const productAlteredData = await processModelData(productData, "product_id", productHeaders);
-    const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
-    const categoryAlteredData = await processModelData(categoryData, "category_id", categoryHeaders);
-    // console.log("productHeaders",productHeaders)
-    // console.log("productAlteredData",productAlteredData)
-    // console.log("subCategoryData",subCategoryHeaders)
-    // console.log("subCategoryAlteredData",subCategoryAlteredData)
-    res.render("admin/tables", { productHeaders,subCategoryHeaders,productAlteredData, subCategoryAlteredData , categoryHeaders ,categoryAlteredData});
-  } catch (error) {
-    console.error("Error fetching and processing data:", error);
-    next(error);
-  }
-};
 
 // Helper function to get model data
-const getModelData = async (model, ...foreignKeys) => {
+const getModelData = async (model) => {
   return await model.find().exec();
+};
+
+// Helper function to get model data with names and custom ids
+const getModelDataWithNames = async (model, idField) => {
+  try {
+    const data = await model.find().exec();
+
+    // Extract custom id and name from each entry
+    const formattedData = data.map(entry => ({
+      id: entry[idField], // Use the custom id field name
+      name: entry.name,    // Replace with the actual field name you want to use
+    }));
+
+    return formattedData;
+  } catch (error) {
+    console.error('Error fetching model data:', error);
+    throw error;
+  }
 };
 
 // Helper function to process model data
@@ -78,7 +68,6 @@ const processModelData = async (data, idField, headers) => {
 
 // Helper function to get model by ID
 const getModelById = async (modelName, id) => {
-  // Implement logic to get the model by ID
   switch (modelName) {
     case "main_subcategory_id":
       return await SubCategory.getSubCategoryById(id);
@@ -86,7 +75,6 @@ const getModelById = async (modelName, id) => {
       return await Category.getCategoryById(id);
     case "shop_id":
       return await Shop.getShopById(id);
-    // Add more cases for other models if needed
     default:
       return null;
   }
@@ -100,7 +88,6 @@ const getFieldName = (header) => {
     case "Sub Category ID":
       return ["idField","main_subcategory_id"];
     case "Category Id":
-      // console.log("Category ID CASE ALSO EXECUTEDDDDDD")
       return ["idField","category_id"];
     case "Product Count":
       return ["countField","products"];
@@ -116,11 +103,41 @@ const getFieldName = (header) => {
       return "category_id";
     case "Updated At":
       return "updatedAt"
-    // case "Sub Category ID":
-    //   return "main_subcategory_id"
+
 
     default:
-      return header.toLowerCase(); // Use the header as the field name (lowercased) by default
+      return header.toLowerCase(); 
+  }
+};
+
+
+
+const indexView = (req, res, next) => {
+  res.render("admin/home");
+};
+
+
+const tablesView = async (req, res, next) => {
+  try {
+    const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
+    const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category"];
+    const categoryHeaders = ["Category Id", "Category","SubCategory Count","Product Count"];
+
+    const productData = await getModelData(Product.Product);
+    const subCategoryData = await getModelData(SubCategory.SubCategory);
+    const categoryData = await getModelData(Category.Category);
+
+    const productAlteredData = await processModelData(productData, "product_id", productHeaders);
+    const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
+    const categoryAlteredData = await processModelData(categoryData, "category_id", categoryHeaders);
+    // console.log("productHeaders",productHeaders)
+    // console.log("productAlteredData",productAlteredData)
+    // console.log("subCategoryData",subCategoryHeaders)
+    // console.log("subCategoryAlteredData",subCategoryAlteredData)
+    res.render("admin/tables", { productHeaders,subCategoryHeaders,productAlteredData, subCategoryAlteredData , categoryHeaders ,categoryAlteredData});
+  } catch (error) {
+    console.error("Error fetching and processing data:", error);
+    next(error);
   }
 };
 
@@ -144,8 +161,15 @@ const detailView = async (req, res, next) => {
   }
 
   const uneditableFields = ["_id", "createdAt", "updatedAt", "__v" , "product_id"];
+  
+  const subCategoryData = await getModelDataWithNames(SubCategory.SubCategory, 'main_subcategory_id');
+  const categoryData = await getModelDataWithNames(Category.Category, 'category_id');
+  
+  // Usage example
+  // console.log('Subcategories:', subCategoryData);
+  // console.log('Categories:', categoryData);
 
-  // Get the schema paths and their types
+
   const fieldTypes = Object.keys(Product.Product.schema.paths).reduce((acc, key) => {
     acc[key] = Product.Product.schema.paths[key].instance;
     return acc;
@@ -155,6 +179,8 @@ const detailView = async (req, res, next) => {
     product,
     uneditableFields,
     fieldTypes,
+    categoryData,
+    subCategoryData
   });
 };
 
@@ -170,7 +196,11 @@ const updateProduct = async (req, res, next) => {
 
   if (req.method === 'POST') {
     const updatedData = req.body;
-
+    // console.log(updatedData)
+    const new_category_id = parseInt(updatedData.selected_category,10)
+    updatedData.category_id = new_category_id
+    const new_main_subcategory_id = parseInt(updatedData.selected_subcategory,10)
+    updatedData.main_subcategory_id = new_main_subcategory_id
     const convertToObjectId = (value) => {
       try {
         if (value === "") {

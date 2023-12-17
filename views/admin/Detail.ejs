@@ -64,12 +64,37 @@
           <div class="mb-2 text-s">
             <label for="<%= key %>"><%= key %> (<%= fieldTypes[key] %>):</label>
             <% if (uneditableFields.includes(key)) { %>
-              <span class="w-full mx-3 "><%= value %></span>
+              <input type="text" class="w-full mx-3 " id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(30%); background-color: #f2f2f2; color: #888;" readonly>
+              <!-- <span class="w-full mx-3 "><%= value %></span> -->
             <% } else { %>
               <input type="text" class="w-full mx-3 " id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(30%);">
             <% } %>
           </div>
-        <% }); %>        
+        <% }); %>  
+        
+        <div class="mb-2 text-s">
+          <label for="selected_category">Category: </label>
+          <select class="w-full mx-3" id="selected_category" name="selected_category">
+            <% categoryData.forEach(category => { %>
+              <option value=<%= category.id %> <% if (product.category_id.toString() === category.id.toString()) { %>selected<% } %>>
+                <%= category.name %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+        
+        <div class="mb-2 text-s">
+          <label for="selected_subcategory">Sub Category: </label>
+          <select class="w-full mx-3" id="selected_subcategory" name="selected_subcategory">
+            <% subCategoryData.forEach(subcategory => { %>
+              <option value=<%= subcategory.id %> <% if (product.main_subcategory_id.toString() === subcategory.id.toString()) { %>selected<% } %>>
+                <%= subcategory.name %>
+              </option>
+            <% }); %>
+          </select>
+        </div>
+
+
         </div>
       <div class="ms-auto text-end">
         <button type="submit" class="btn btn-link text-dark px-3 mb-0" id = "update-save-button">
