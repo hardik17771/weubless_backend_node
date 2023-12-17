@@ -12,38 +12,137 @@ const indexView = (req, res, next) => {
   res.render("admin/home");
 };
 
+// const tablesView = async (req, res, next) => {
+//   const products = await Product.Product.find().exec();
+//   const subcategories = await SubCategory.SubCategory.find().exec();
+
+//   // Fetch subcategory information for each product
+//   const alteredProducts = await Promise.all(
+//     products.map(async (product) => {
+//       const subcategory = await SubCategory.getSubCategoryById(product.main_subcategory_id);
+//       const category = await Category.getCategoryById(product.category_id);
+//       const shop = await Shop.getShopById(product.shop_id);
+//       return {
+//         ...product.toObject(),
+//         subcategoryName: subcategory ? subcategory.name : "Unknown Subcategory",
+//         categoryName: category ? category.name : "Category",
+//         shopName: shop ? shop.name : "Unknown Shop",
+//       };
+//     })
+//   );
+
+//   const alteredSubCategories = await Promise.all(
+//     subcategories.map(async (subcategory) => {
+//       const category = await Category.getCategoryById(subcategory.category_id);
+//       // const shop = await Shop.getShopById(product.shop_id);
+//       return {
+//         ...subcategory.toObject(),
+//         categoryName: category ? category.name : "Category",
+//       };
+//     })
+//   );
+
+//   res.render("admin/tables", { alteredProducts,alteredSubCategories });
+// };
+
 const tablesView = async (req, res, next) => {
-  const products = await Product.Product.find().exec();
-  const subcategories = await SubCategory.SubCategory.find().exec();
+  try {
+    const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
+    const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category"];
 
-  // Fetch subcategory information for each product
-  const alteredProducts = await Promise.all(
-    products.map(async (product) => {
-      const subcategory = await SubCategory.getSubCategoryById(product.main_subcategory_id);
-      const category = await Category.getCategoryById(product.category_id);
-      const shop = await Shop.getShopById(product.shop_id);
-      return {
-        ...product.toObject(),
-        subcategoryName: subcategory ? subcategory.name : "Unknown Subcategory",
-        categoryName: category ? category.name : "Category",
-        shopName: shop ? shop.name : "Unknown Shop",
-      };
-    })
-  );
+    const productData = await getModelData(Product.Product, "main_subcategory_id", "category_id", "shop_id");
+    const subCategoryData = await getModelData(SubCategory.SubCategory, "category_id");
 
-  const alteredSubCategories = await Promise.all(
-    subcategories.map(async (subcategory) => {
-      const category = await Category.getCategoryById(subcategory.category_id);
-      // const shop = await Shop.getShopById(product.shop_id);
-      return {
-        ...subcategory.toObject(),
-        categoryName: category ? category.name : "Category",
-      };
-    })
-  );
-
-  res.render("admin/tables", { alteredProducts,alteredSubCategories });
+    const productAlteredData = await processModelData(productData, "product_id", productHeaders);
+    const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
+    // console.log("productHeaders",productHeaders)
+    // console.log("productAlteredData",productAlteredData)
+    // console.log("subCategoryData",subCategoryHeaders)
+    // console.log("subCategoryAlteredData",subCategoryAlteredData)
+    res.render("admin/tables", { productHeaders,subCategoryHeaders,productAlteredData, subCategoryAlteredData });
+  } catch (error) {
+    console.error("Error fetching and processing data:", error);
+    next(error);
+  }
 };
+
+// Helper function to get model data
+const getModelData = async (model, ...foreignKeys) => {
+  return await model.find().exec();
+};
+
+// Helper function to process model data
+const processModelData = async (data, idField, headers) => {
+  return await Promise.all(
+    data.map(async (item) => {
+      const processedItem = { ...item.toObject() };
+
+      let headers_field_list = {}
+      for (const key of headers) { 
+        let field_key = getFieldName(key)
+        console.log("field_key", field_key)
+        if(Array.isArray(field_key)){
+          // console.log("TRUEUEUEUE")
+          // console.log("item[field_key[1]]",item[field_key[1]])
+          headers_field_list[`${key}`] = field_key ? item[field_key[1]] : `Unknown ${field_key}`;
+          headers_field_list["modelId"] = field_key ? item[field_key[1]] : `Unknown ${field_key}`;
+        }
+        else{
+          const foreignItem = await getModelById(field_key, item[field_key]);
+          headers_field_list[`${key}`] = foreignItem ? foreignItem.name : `Unknown ${field_key}`;
+        }
+      }
+
+      // Use Object.assign to add properties to processedItem
+      Object.assign(processedItem, headers_field_list);
+
+      console.log("processItem", processedItem);
+      return processedItem;
+    })
+  );
+};
+
+// Helper function to get model by ID
+const getModelById = async (modelName, id) => {
+  // Implement logic to get the model by ID
+  switch (modelName) {
+    case "main_subcategory_id":
+      return await SubCategory.getSubCategoryById(id);
+    case "category_id":
+      return await Category.getCategoryById(id);
+    case "shop_id":
+      return await Shop.getShopById(id);
+    // Add more cases for other models if needed
+    default:
+      return null;
+  }
+};
+
+// Helper function to get the actual field name based on the template header
+const getFieldName = (header) => {
+  switch (header) {
+    case "Product ID":
+      return ["idField" , "product_id"];
+    case "Sub Category ID":
+      return ["idField","main_subcategory_id"];
+    case "Product":
+      return "name";
+    case "Shop":
+      return "shop_id";
+    case "SubCategory":
+      return "main_subcategory_id";
+    case "Category":
+      return "category_id";
+    case "Updated At":
+      return "updatedAt"
+    // case "Sub Category ID":
+    //   return "main_subcategory_id"
+
+    default:
+      return header.toLowerCase(); // Use the header as the field name (lowercased) by default
+  }
+};
+
 
 const billingView = (req, res, next) => {
   res.render("admin/billing");
@@ -63,7 +162,7 @@ const detailView = async (req, res, next) => {
     return;
   }
 
-  const uneditableFields = ["_id", "createdAt", "updatedAt", "__v"];
+  const uneditableFields = ["_id", "createdAt", "updatedAt", "__v" , "product_id"];
 
   // Get the schema paths and their types
   const fieldTypes = Object.keys(Product.Product.schema.paths).reduce((acc, key) => {

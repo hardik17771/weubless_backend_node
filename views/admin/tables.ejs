@@ -1,180 +1,95 @@
+<% const getFieldName = (header) => {
+  switch (header) {
+    case "Product ID":
+      return "product_id";
+    case "Product":
+      return "name";
+    case "Shop":
+      return "shop_id";
+    case "SubCategory":
+      return "main_subcategory_id";
+    case "Category":
+      return "category_id";
+    case "Updated At":
+      return "updatedAt"
+
+    default:
+      return header.toLowerCase(); // Use the header as the field name (lowercased) by default
+  }
+};
+ %>
+
 <div class="container-fluid py-4">
-  <!-------------------------------------- START OF SINGLE TABLE ---------------------------------------->
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>Products table</h6>
-        </div>
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
+  <% const tablesData = [
+    { headers: productHeaders, data: productAlteredData, title: "Products" },
+    { headers: subCategoryHeaders, data: subCategoryAlteredData, title: "SubCategories" }
+  ]; %>
 
-              <thead>
-                <tr>
-                  <% const headers = ["Product ID", "Product", "Shop", "MainSubCategory", "Category"]; %> 
-                  <% headers.forEach((header,index) => { %>
-                  <th
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 sortable-header"
-                    data-column-index="<%= index %>"
-                    data-sort="asc"
-                  >
-                    <a href="javascript:void(0)"><%= header %></a>
-                  </th>
+  <% tablesData.forEach(table => { %>
+    <div class="row">
+      <div class="col-12">
+        <div class="card mb-4">
+          <div class="card-header pb-0">
+            <h6><%= table.title %> table</h6>
+          </div>
+          <div class="card-body px-0 pt-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <% table.headers.forEach((header, index) => { %>
+                      <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 sortable-header" data-column-index="<%= index %>" data-sort="asc">
+                        <a href="javascript:void(0)"><%= header %></a>
+                      </th>
+                    <% }); %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% table.data.forEach(item => { %>
+                    <tr>
+                      <% table.headers.forEach(header => { %>
+                        <td>
+                          <!-- <p>Header: <%= header %></p>
+                          <p>Item Object: <%= JSON.stringify(item) %></p> -->
+                          <% if (header === "Product" && item.name) { %>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="../assets/img/productImg.jpg" class="avatar avatar-sm me-3" alt="user1" />
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm"><%= item.name %></h6>
+                                <p class="text-xs text-secondary mb-0"><%= item.quantity %></p>
+                              </div>
+                            </div>
+                          <% } else { %>
+                            <p class="text-xs font-weight-bold mb-0">
+                              <p><%= item[header] %></p>
+                              <%= item[header.toLowerCase()] %>
+                            </p>
+                          <% } %>
+                        </td>
+                      <% }); %>
+                      <td class="align-middle">
+                        <a href="/admin/detail/<%= item[`modelId`] %>" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit product">
+                          Edit
+                        </a>
+                      </td>
+                    </tr>
                   <% }); %>
-                </tr>
-              </thead>
-              <tbody>
-                <% alteredProducts.forEach(product => { %>
-
-                <tr>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%= product.product_id %>
-                    </p>
-                  </td>
-                  <td>
-                    <div class="d-flex px-2 py-1">
-                      <div>
-                        <img
-                          src="../assets/img/productImg.jpg"
-                          class="avatar avatar-sm me-3"
-                          alt="user1"
-                        />
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm"><%= product.name %></h6>
-                        <p class="text-xs text-secondary mb-0">
-                          <%= product.quantity %>
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%= product.shopName %>
-                    </p>
-                    <!-- <p class="text-xs text-secondary mb-0"></p> -->
-                  </td>
-                  <td class="align-middle text-center text-sm">
-                    <span class="badge badge-sm bg-gradient-success"
-                      ><%= product.subcategoryName %></span
-                    >
-                  </td>
-                  <td class="align-middle text-center">
-                    <span class="text-secondary text-xs font-weight-bold"
-                      ><%= product.categoryName %></span
-                    >
-                  </td>
-
-                  <td class="align-middle">
-                    <a href="/admin/detail/<%= product.product_id %>"
-                       class="text-secondary font-weight-bold text-xs"
-                       data-toggle="tooltip"
-                       data-original-title="Edit product"
-                    >
-                      Edit
-                    </a>
-                  </td>
-                </tr>
-                <% }); %>
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  <% }); %>
   <!-------------------------------------- END OF SINGLE TABLE ---------------------------------------->
-  <!-------------------------------------- START OF SINGLE TABLE ---------------------------------------->
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>SubCategory table</h6>
-        </div>
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
-
-              <thead>
-                <tr>
-                  <% const headers2 = ["ID", "SubCategory", "Category", "Updated At"]; %> 
-                  <% headers2.forEach((header,index) => { %>
-                  <th
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 sortable-header"
-                    data-column-index="<%= index %>"
-                    data-sort="asc"
-                  >
-                    <a href="javascript:void(0)"><%= header %></a>
-                  </th>
-                  <% }); %>
-                </tr>
-              </thead>
-              <tbody>
-                <% alteredSubCategories.forEach(subCategory => { %>
-
-                <tr>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%= subCategory.main_subcategory_id %>
-                    </p>
-                  </td>
-                  <td>
-                    <div class="d-flex px-2 py-1">
-                      <div>
-                        <img
-                          src="../assets/img/productImg.jpg"
-                          class="avatar avatar-sm me-3"
-                          alt="user1"
-                        />
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm"><%= subCategory.name %></h6>
-                        <p class="text-xs text-secondary mb-0">
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge badge-sm bg-gradient-success"
-                    ><%= subCategory.categoryName %></span
-                  >
-                  </td>
-                  <td class="align-middle text-center text-sm">
-                    <!-- <span class="badge badge-sm bg-gradient-success"
-                      ><%= subCategory.updatedAt %></span
-                    > -->
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%= subCategory.updatedAt %>
-                    </p>
-
-                  </td>
-
-
-                  <td class="align-middle">
-                    <a href="/admin/detail/<%= subCategory.main_subcategory_id %>"
-                       class="text-secondary font-weight-bold text-xs"
-                       data-toggle="tooltip"
-                       data-original-title="Edit product"
-                    >
-                      Edit
-                    </a>
-                  </td>
-                </tr>
-                <% }); %>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-------------------------------------- END OF SINGLE TABLE ---------------------------------------->
-
-
-
 </div>
+
+
+
+<!-- </div> -->
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -193,53 +108,55 @@
   }
 
   function sortTable(table, column) {
-    var rows = table.rows,
-      switching,
-      i,
-      x,
-      y,
-      shouldSwitch,
-      dir,
-      switchcount = 0;
+  var rows = table.rows,
+    switching,
+    i,
+    x,
+    y,
+    shouldSwitch,
+    dir,
+    switchcount = 0;
 
-    switching = true;
-    dir = "asc";
+  switching = true;
+  dir = "asc";
 
-    while (switching) {
-      switching = false;
+  while (switching) {
+    switching = false;
 
-      for (i = 1; i < rows.length - 1; i++) {
-        shouldSwitch = false;
+    for (i = 1; i < rows.length - 1; i++) {
+      shouldSwitch = false;
 
-        x = rows[i].getElementsByTagName("td")[column];
-        y = rows[i + 1].getElementsByTagName("td")[column];
+      // Get the values of the specific column for the current and next rows
+      x = rows[i].getElementsByTagName("td")[column].innerText;
+      y = rows[i + 1].getElementsByTagName("td")[column].innerText;
 
-        if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
+      if (dir == "asc") {
+        if (x.toLowerCase() > y.toLowerCase()) {
+          shouldSwitch = true;
+          break;
         }
-      }
-
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        switchcount++;
-      } else {
-        if (switchcount == 0 && dir == "asc") {
-          dir = "desc";
-          switching = true;
+      } else if (dir == "desc") {
+        if (x.toLowerCase() < y.toLowerCase()) {
+          shouldSwitch = true;
+          break;
         }
       }
     }
 
-    var currentSort = table.querySelector("th[data-sort]");
-    currentSort.setAttribute("data-sort", dir);
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      switchcount++;
+    } else {
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
   }
+
+  var currentSort = table.querySelector("th[data-sort]");
+  currentSort.setAttribute("data-sort", dir);
+}
+
 </script>
