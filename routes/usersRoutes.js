@@ -115,6 +115,134 @@ router.post("/api/add-address", apiController.createAddress);
 
 /**
  * @swagger
+ * /api/update-address:
+ *   put:
+ *     summary: Update an existing address
+ *     tags:
+ *       - Address
+ *     parameters:
+ *       - in: query
+ *         name: address_id
+ *         description: The ID of the address to be updated
+ *         required: true
+ *         schema:
+ *           type: number
+ *     requestBody:
+ *       description: Updated address data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               latitude:
+ *                 type: string
+ *               longitude:
+ *                 type: string
+ *               address:
+ *                 type: string
+ *               pincode:
+ *                 type: string
+ *               city:
+ *                 type: string
+ *               state:
+ *                 type: string
+ *               country:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Address updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       404:
+ *         description: Address not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                 message:
+ *                   type: string
+ *                   example: "Address not found"
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                   example: 1100
+ */
+router.put("/api/update-address", apiController.updateAddress);
+
+/**
+ * @swagger
+ * /api/address-details:
+ *   post:
+ *     summary: Get details of a specific address
+ *     tags:
+ *       - Address
+ *     requestBody:
+ *       description: Address ID data
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               address_id:
+ *                 type: number
+ *             required:
+ *               - address_id
+ *     responses:
+ *       200:
+ *         description: Address details retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Address'
+ *       748:
+ *         description: Address not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                   example: 748
+ *       750:
+ *         description: Missing address_id in request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                   example: 750
+ *       1100:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                   example: 1100
+ */
+router.post("/api/address-details", apiController.addressDetails);
+
+
+/**
+ * @swagger
  * /api/register:
  *   post:
  *     summary: Register a new user

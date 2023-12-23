@@ -4,6 +4,10 @@ const homeController = require("../controllers/Admin/homeController");
 
 router.get("/", homeController.indexView);
 router.get("/tables", homeController.tablesView);
+router.get("/tables/:tableName", homeController.singleTableView);
+
+
+
 router.get("/billing", homeController.billingView);
 router.get("/profile", homeController.profileView);
 

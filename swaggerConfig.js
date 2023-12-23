@@ -195,6 +195,14 @@ const options = {
             amount: { type: "string" },
           },
         },
+        Faq: {
+          type: "object",
+          properties: {
+            faq_id: { type: "string" },
+            question: { type: "string" },
+            answer: { type: "string" },
+          },
+        },        
       },
     },
   },

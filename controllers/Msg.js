@@ -266,6 +266,12 @@ class Msg {
       743: "Advertisement created successfully",
       744: "New Address is created",
       745: "New FAQ is created",
+      746: "Question is required",
+      747: "Answer is required",
+      748 : "Address not found",
+      749 : "Address updated",
+      750 : "Address id is required",
+      751 : "Address details fetched",
       900: "Success",
       1100: "Failure",
     };

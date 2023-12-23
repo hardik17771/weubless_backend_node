@@ -27,22 +27,69 @@ const createAddress = async (req, res) => {
   const error_msg = new Msg();
 
   // console.log("Create product api controller hit");
-  // try {
+  try {
   const Check = await apiRepository.createAddress(data);
 
   const msg = error_msg.responseMsg(Check.code); 
   if (Check.code === 744) {
-    const response = { status: "1", message: msg, data: Check.data };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: Check.data ,status_code : 200};
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg, data: Check.data };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg, data: Check.data ,status_code : 400};
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717); //707
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
+  } catch (error) {
+    const msg = error_msg.responseMsg(1100); //707
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
+  }
+};
+
+const updateAddress = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  try {
+  const Check = await apiRepository.updateAddress(data);
+
+  const msg = error_msg.responseMsg(Check.code); 
+  if (Check.code === 749) {
+    const response = { status: "1", message: msg, data: Check.data ,status_code : 200};
+    res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg, data: Check.data ,status_code : 400};
+    res.status(400).json(response);
+  }
+  } catch (error) {
+    const msg = error_msg.responseMsg(1100); 
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
+  }
+};
+
+
+const addressDetails = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  try {
+  const Check = await apiRepository.addressDetails(data);
+
+  const msg = error_msg.responseMsg(Check.code); 
+  if (Check.code === 751) {
+    const response = { status: "1", message: msg, data: Check.data ,status_code : 200};
+    res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg, data: Check.data ,status_code : 400};
+    res.status(400).json(response);
+  }
+  } catch (error) {
+    const msg = error_msg.responseMsg(1100); 
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
+  }
 };
 
 /*********************************************** AUTH  ***********************************/
@@ -58,9 +105,9 @@ const login = async (req, res) => {
   console.log(Check);
   if (Check.error_code === 200) {
     console.log("Check.data", Check.data);
-    res.status(200).json({ status: "1", message: msg, data: Check.data });
+    res.status(200).json({ status: "1", message: msg, data: Check.data,status_code : 200 });
   } else {
-    res.status(401).json({ status: "0", message: msg });
+    res.status(400).json({ status: "0", message: msg ,status_code : 400});
   }
 };
 
@@ -75,9 +122,9 @@ const fetchUser = async (req, res) => {
   console.log(Check);
   if (Check.error_code === 200) {
     console.log("Check.data", Check.data);
-    res.status(200).json({ status: "1", message: msg, data: Check.data });
+    res.status(200).json({ status: "1", message: msg, data: Check.data,status_code : 200 });
   } else {
-    res.status(401).json({ status: "0", message: msg  });
+    res.status(400).json({ status: "0", message: msg,status_code : 400  });
   }
 };
 
@@ -92,9 +139,9 @@ const updateProfile = async (req, res) => {
   console.log(Check);
   if (Check.error_code === 208) {
     console.log("Check.data", Check.data);
-    res.status(200).json({ status: "1", message: msg, data: Check.data });
+    res.status(200).json({ status: "1", message: msg, data: Check.data,status_code : 200 });
   } else {
-    res.status(400).json({ status: "0", message: msg ,  issue :Check.issue});
+    res.status(400).json({ status: "0", message: msg ,  issue :Check.issue ,status_code : 400});
   }
 };
 
@@ -108,9 +155,9 @@ const changePassword = async (req, res) => {
   const msg = errorMsg.responseMsg(Check.error_code);
 
   if (Check.error_code === 204) {
-    res.status(200).json({ status: "1", message: msg });
+    res.status(200).json({ status: "1", message: msg,status_code : 200 });
   } else {
-    res.status(200).json({ status: "0", message: msg });
+    res.status(400).json({ status: "0", message: msg ,status_code : 400});
   }
 };
 
@@ -214,6 +261,7 @@ const registerUser = async (req, res) => {
       status: 1,
       message: "User registered successfully",
       user: newUser,
+      status_code : 200
     });
   } catch (error) {
     let errorMessage = "Registration failed";
@@ -231,7 +279,7 @@ const registerUser = async (req, res) => {
       errorMessage = error.errors[field].message;
     }
 
-    res.status(401).json({ status: 0, message: errorMessage });
+    res.status(400).json({ status: 0, message: errorMessage ,status_code : 200});
   }
 };
 
@@ -339,16 +387,16 @@ const createCategory = async (req, res) => {
 
     const msg = error_msg.responseMsg(newCategory.code); //706
     if (newCategory.code === 706) {
-      const response = { status: "1", message: msg, data: newCategory.data };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, data: newCategory.data,status_code : 200 };
+      res.status(200).json(response);
     } else {
-      const response = { status: "0", message: msg, data: newCategory.data };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, data: newCategory.data,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(newCategory.code); //707
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -367,17 +415,18 @@ const updateCategory = async (req, res) => {
         status: "1",
         message: msg,
         updatedCategory: Check.updatedCategory,
+        status_code : 200
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     } else {
       console.log("status 0");
-      const response = { status: "0", message: msg };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(737);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -388,17 +437,17 @@ const categoryListing = async (req, res) => {
   try {
     if (data.code == 674) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list ,status_code : 200};
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 /*********************************************** SUB CATEGORY ***********************************/
@@ -417,16 +466,16 @@ const createSubCategory = async (req, res) => {
 
     const msg = error_msg.responseMsg(newSubCategory.code); //706
     if (newSubCategory.code === 712) {
-      const response = { status: "1", message: msg, data: newSubCategory.data };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, data: newSubCategory.data ,status_code : 200};
+      res.status(200).json(response);
     } else {
-      const response = { status: "0", message: msg, data: newSubCategory.data };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, data: newSubCategory.data,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(707); //707
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -437,17 +486,17 @@ const subCategoryListing = async (req, res) => {
   try {
     if (data.code == 690) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list ,status_code : 200};
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -466,17 +515,18 @@ const updateSubCategory = async (req, res) => {
         status: "1",
         message: msg,
         updatedSubCategory: Check.updatedSubCategory,
+        status_code : 200
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     } else {
       console.log("status 0");
-      const response = { status: "0", message: msg };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg,status_code : 200 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(737);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 200 };
+    res.status(500).json(response);
   }
 };
 
@@ -484,26 +534,28 @@ const mainSubCategory = async (req, res) => {
   const data = req.body;
   const error_msg = new Msg();
   const apiService = new ApiService();
-
+  
+  try
+  {
   const Check = await apiService.mainSubCategory(data);
   // console.log("controller data", Check);
   const msg = error_msg.responseMsg(Check.code);
   // console.log(Check);
   if (Check.code == 689) {
     // console.log("code: ", Check.code);
-    const response = { status: "1", message: msg, data: Check.list };
+    const response = { status: "1", message: msg, data: Check.list,status_code : 200 };
     return res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    return res.status(200).json(response);
+    const response = { status: "0", message: msg,status_code : 400 };
+    return res.status(400).json(response);
   }
-  // }
-  // } catch (error) {
-  //   console.error(error);
-  //   const msg = error_msg.responseMsg(642);
-  //   const response = { status: "0", message: msg };
-  //   return res.status(500).json(response);
-  // }
+  
+  } catch (error) {
+    console.error(error);
+    const msg = error_msg.responseMsg(642);
+    const response = { status: "0", message: msg ,status_code : 500};
+    return res.status(500).json(response);
+  }
 };
 
 // const createSubSubCategory = async (req, res) => {
@@ -525,14 +577,14 @@ const mainSubCategory = async (req, res) => {
 //         message: msg,
 //         data: newSubSubCategory.data,
 //       };
-//       res.status(201).json(response);
+//       res.status(200).json(response);
 //     } else {
 //       const response = {
 //         status: "0",
 //         message: msg,
 //         data: newSubSubCategory.data,
 //       };
-//       res.status(201).json(response);
+//       res.status(200).json(response);
 //     }
 //   } catch (error) {
 //     const msg = error_msg.responseMsg(707); //707
@@ -575,22 +627,22 @@ const createProduct = async (req, res) => {
   const error_msg = new Msg();
 
   // console.log("Create product api controller hit");
-  // try {
+  try {
   const newProduct = await apiRepository.createProduct(data);
 
   const msg = error_msg.responseMsg(newProduct.code); //706
   if (newProduct.code === 716) {
-    const response = { status: "1", message: msg, data: newProduct.data };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: newProduct.data,status_code : 200 };
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg, data: newProduct.data };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg, data: newProduct.data,status_code : 400 };
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717); //707
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717); //707
+    const response = { status: "0", message: msg ,status_code : 500 };
+    res.status(500).json(response);
+  }
 };
 
 const productListing = async (req, res) => {
@@ -600,17 +652,17 @@ const productListing = async (req, res) => {
   try {
     if (data.code == 732) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list,status_code : 200 };
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -629,21 +681,23 @@ const updateProduct = async (req, res) => {
         status: "1",
         message: msg,
         data: product.updatedProduct,
+        status_code : 200
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     } else {
       console.log("status 0");
       const response = {
         status: "0",
         message: msg,
         data: product.updatedProduct,
+        status_code : 400
       };
-      res.status(201).json(response);
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(736);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -658,18 +712,18 @@ const productDetails = async (req, res) => {
     const msg = error_msg.responseMsg(product.code);
     console.log(product.code);
     if (product.code === 664) {
-      console.log("status 1");
-      const response = { status: "1", message: msg, data: product.data };
-      res.status(201).json(response);
+      // console.log("status 1");
+      const response = { status: "1", message: msg, data: product.data,status_code : 200 };
+      res.status(200).json(response);
     } else {
-      console.log("status 0");
-      const response = { status: "0", message: msg, data: product.data };
-      res.status(201).json(response);
+      // console.log("status 0");
+      const response = { status: "0", message: msg, data: product.data ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(717);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -679,52 +733,51 @@ const productsFromMainSubCategoryId = async (req, res) => {
   const data = req.body;
   const error_msg = new Msg();
   const apiService = new ApiService();
-
+  try{
   const Check = await apiService.productsFromMainSubCategoryId(data);
   // console.log("controller data", Check);
   const msg = error_msg.responseMsg(Check.code);
 
   if (Check.code == 684) {
     // console.log("code: ", Check.code);
-    const response = { status: "1", message: msg, data: Check.list };
+    const response = { status: "1", message: msg, data: Check.list,status_code : 200 };
     return res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    return res.status(200).json(response);
+    const response = { status: "0", message: msg ,status_code : 400};
+    return res.status(400).json(response);
   }
   // }
-  // } catch (error) {
-  //   console.error(error);
-  //   const msg = error_msg.responseMsg(642);
-  //   const response = { status: "0", message: msg };
-  //   return res.status(500).json(response);
-  // }
+  } catch (error) {
+    console.error(error);
+    const msg = error_msg.responseMsg(642);
+    const response = { status: "0", message: msg };
+    return res.status(500).json(response);
+  }
 };
 
 const productsFromCategoryId = async (req, res) => {
   const data = req.body;
   const error_msg = new Msg();
   const apiService = new ApiService();
+  try{
+    const Check = await apiService.productsFromCategoryId(data);
+    // console.log("controller data", Check);
+    const msg = error_msg.responseMsg(Check.code);
 
-  const Check = await apiService.productsFromCategoryId(data);
-  // console.log("controller data", Check);
-  const msg = error_msg.responseMsg(Check.code);
-
-  if (Check.code == 684) {
-    // console.log("code: ", Check.code);
-    const response = { status: "1", message: msg, data: Check.list };
-    return res.status(200).json(response);
-  } else {
-    const response = { status: "0", message: msg };
-    return res.status(200).json(response);
+    if (Check.code == 684) {
+      // console.log("code: ", Check.code);
+      const response = { status: "1", message: msg, data: Check.list,status_code : 200 };
+      return res.status(200).json(response);
+    } else {
+      const response = { status: "0", message: msg ,status_code : 200};
+      return res.status(400).json(response);
+    }
+  } catch (error) {
+    console.error(error);
+    const msg = error_msg.responseMsg(642);
+    const response = { status: "0", message: msg ,status_code : 500};
+    return res.status(500).json(response);
   }
-  // }
-  // } catch (error) {
-  //   console.error(error);
-  //   const msg = error_msg.responseMsg(642);
-  //   const response = { status: "0", message: msg };
-  //   return res.status(500).json(response);
-  // }
 };
 
 /*********************************************** SHOPS ***********************************/
@@ -740,16 +793,16 @@ const createShop = async (req, res) => {
 
     const msg = error_msg.responseMsg(newShop.code); //706
     if (newShop.code === 720) {
-      const response = { status: "1", message: msg, data: newShop.data };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, data: newShop.data,status_code : 200 };
+      res.status(200).json(response);
     } else {
-      const response = { status: "0", message: msg, data: newShop.data };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, data: newShop.data,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(721); //707
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -760,17 +813,17 @@ const shopListing = async (req, res) => {
   try {
     if (data.code == 733) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list,status_code : 200 };
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -789,17 +842,18 @@ const updateShop = async (req, res) => {
         status: "1",
         message: msg,
         updatedShop: Check.updatedShop,
+        status_code : 200
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     } else {
       console.log("status 0");
-      const response = { status: "0", message: msg };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(737);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 200};
+    res.status(500).json(response);
   }
 };
 
@@ -815,17 +869,17 @@ const shopDetails = async (req, res) => {
     console.log(shop.code);
     if (shop.code === 667) {
       // console.log("status 1");
-      const response = { status: "1", message: msg, data: shop.data };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, data: shop.data,status_code : 200 };
+      res.status(200).json(response);
     } else {
       // console.log("status 0");
-      const response = { status: "0", message: msg, data: shop.data };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, data: shop.data,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(717);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -841,17 +895,17 @@ const getShopsByCategory = async (req, res) => {
     // console.log(shop.code);
     if (shop.code === 900) {
       // console.log("status 1");
-      const response = { status: "1", message: msg, data: shop.data };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, data: shop.data,status_code : 200 };
+      res.status(200).json(response);
     } else {
       // console.log("status 0");
-      const response = { status: "0", message: msg, data: shop.data };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, data: shop.data,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(717);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -873,11 +927,11 @@ const main_subcategoryproductLocation = async (req, res) => {
   console.log("controller msg", msg);
   if (Check.code === 900) {
     console.log(Check.productsList);
-    const response = { status: "1", message: msg, data: Check.productsList };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: Check.productsList,status_code : 200 };
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
   }
   // } catch (error) {}
 };
@@ -899,11 +953,11 @@ const main_subcategoryproductDistance = async (req, res) => {
   console.log("controller msg", msg);
   if (Check.code === 900) {
     console.log(Check.productsList);
-    const response = { status: "1", message: msg, data: Check.productsList };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: Check.productsList ,status_code : 200};
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
   }
   // } catch (error) {}
 };
@@ -926,11 +980,11 @@ const main_subcategoryproductLatLong = async (req, res) => {
   console.log("controller msg", msg);
   if (Check.code === 900) {
     console.log(Check.productsList);
-    const response = { status: "1", message: msg, data: Check.productsList };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: Check.productsList ,status_code : 200};
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
   }
   // } catch (error) {}
 };
@@ -951,11 +1005,11 @@ const main_subcategoryproductUserDistance = async (req, res) => {
   console.log("controller msg", msg);
   if (Check.code === 900) {
     console.log(Check.productsList);
-    const response = { status: "1", message: msg, data: Check.productsList };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: Check.productsList,status_code : 200 };
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
   }
   // } catch (error) {}
 };
@@ -977,11 +1031,11 @@ const buyProduct = async (req, res) => {
   console.log("controller msg", msg);
   if (Check.code === 900) {
     // console.log(Check.productsList);
-    const response = { status: "1", message: msg };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg ,status_code : 200};
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
   }
   // } catch (error) {}
 };
@@ -994,17 +1048,17 @@ const trendingProducts = async (req, res) => {
     if (Check.code === 732) {
       // console.log(Check.productsList);
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "1", message: msg, list: Check.productsList };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: Check.productsList ,status_code : 200};
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "0", message: msg, list: Check.productsList };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, list: Check.productsList ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -1017,17 +1071,17 @@ const trendingProductsByCategory = async (req, res) => {
     if (Check.code === 732) {
       // console.log(Check.productsList);
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "1", message: msg, list: Check.productsList };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: Check.productsList ,status_code : 200};
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "0", message: msg, list: Check.productsList };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, list: Check.productsList ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -1044,17 +1098,17 @@ const trendingProductsByLocation = async (req, res) => {
     if (Check.code === 732) {
       // console.log(Check.productsList);
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "1", message: msg, list: Check.productsList };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: Check.productsList ,status_code : 200 };
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "0", message: msg, list: Check.productsList };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, list: Check.productsList,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -1066,7 +1120,7 @@ const addToCart = async (req, res) => {
   const error_msg = new Msg();
 
   // console.log("Create product api controller hit");
-  // try {
+  try {
   const Check = await apiRepository.addToCart(data);
 
   const msg = error_msg.responseMsg(Check.code); //706
@@ -1077,17 +1131,18 @@ const addToCart = async (req, res) => {
       data: Check.data,
       amount: Check.amount,
       list: Check.productsList,
+      status_code : 200
     };
-    res.status(201).json(response);
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg, data: Check.data };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg, data: Check.data,status_code : 200 };
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717); //707
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717); //707
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
+  }
 };
 
 const cartListing = async (req, res) => {
@@ -1097,17 +1152,17 @@ const cartListing = async (req, res) => {
   try {
     if (data.code == 742) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list ,status_code : 200};
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -1123,17 +1178,17 @@ const cartDetails = async (req, res) => {
     console.log(cart.code);
     if (cart.code === 671) {
       // console.log("status 1");
-      const response = { status: "1", message: msg, data: cart.data };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, data: cart.data ,status_code : 200};
+      res.status(200).json(response);
     } else {
       // console.log("status 0");
-      const response = { status: "0", message: msg, data: cart.data };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg, data: cart.data ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(1100);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -1143,22 +1198,22 @@ const checkout = async (req, res) => {
   const error_msg = new Msg();
 
   // console.log("Create product api controller hit");
-  // try {
+  try {
   const Check = await apiRepository.checkout(data);
 
   const msg = error_msg.responseMsg(Check.code); //706
   if (Check.code === 683) {
-    const response = { status: "1", message: msg, data: Check.data };
-    res.status(201).json(response);
+    const response = { status: "1", message: msg, data: Check.data ,status_code : 200};
+    res.status(200).json(response);
   } else {
-    const response = { status: "0", message: msg, data: Check.data };
-    res.status(201).json(response);
+    const response = { status: "0", message: msg, data: Check.data ,status_code : 400};
+    res.status(400).json(response);
   }
-  // } catch (error) {
-  //   const msg = error_msg.responseMsg(717); //707
-  //   const response = { status: "0", message: msg };
-  //   res.status(400).json(response);
-  // }
+  } catch (error) {
+    const msg = error_msg.responseMsg(717); //707
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
+  }
 };
 
 const contactUs = async (req, res) => {
@@ -1182,7 +1237,7 @@ const contactUs = async (req, res) => {
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      const response = { status: "0", message: "Error in sending mail" };
+      const response = { status: "0", message: "Error in sending mail",status_code : 400 };
       res.status(400).json(response);
     }
     console.log(info);
@@ -1191,8 +1246,9 @@ const contactUs = async (req, res) => {
       status: "1",
       message: "Email sent successfully",
       data: info.response,
+      status_code : 200
     };
-    res.status(201).json(response);
+    res.status(200).json(response);
   });
 
   try {
@@ -1220,20 +1276,22 @@ const createAdvertisement = async (req, res) => {
         status: "1",
         message: msg,
         data: newAdvertisement.data,
+        status_code : 200
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     } else {
       const response = {
         status: "0",
         message: msg,
         data: newAdvertisement.data,
+        status_code : 400
       };
-      res.status(201).json(response);
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(1100);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 200};
+    res.status(500).json(response);
   }
 };
 
@@ -1244,17 +1302,17 @@ const advertisementListing = async (req, res) => {
   try {
     if (data.code == 678) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list,status_code : 200 };
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "0", message: msg };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
   }
 };
 
@@ -1266,17 +1324,17 @@ const advertisementListingByCategory = async (req, res) => {
   try {
     if (Check.code == 678) {
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "1", message: msg, list: Check.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: Check.list,status_code : 200 };
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(Check.code);
-      const response = { status: "0", message: msg };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg,status_code : 400 };
+      res.status(400).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
@@ -1324,14 +1382,14 @@ const createFaq = async (req, res) => {
         message: msg,
         data: newAdvertisement.data,
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     } else {
       const response = {
         status: "0",
         message: msg,
         data: newAdvertisement.data,
       };
-      res.status(201).json(response);
+      res.status(200).json(response);
     }
   } catch (error) {
     const msg = error_msg.responseMsg(1100);
@@ -1347,22 +1405,24 @@ const faqListing = async (req, res) => {
   try {
     if (data.code == 900) {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "1", message: msg, list: data.list };
-      res.status(201).json(response);
+      const response = { status: "1", message: msg, list: data.list,status_code : 200 };
+      res.status(200).json(response);
     } else {
       const msg = error_msg.responseMsg(data.code);
-      const response = { status: "0", message: msg };
-      res.status(201).json(response);
+      const response = { status: "0", message: msg ,status_code : 400};
+      res.status(400).json(response);
     }
   } catch (error) {
-    const msg = error_msg.responseMsg(425);
-    const response = { status: "0", message: msg };
-    res.status(400).json(response);
+    const msg = error_msg.responseMsg(1100);
+    const response = { status: "0", message: msg,status_code : 500 };
+    res.status(500).json(response);
   }
 };
 
 module.exports = {
   createAddress,
+  updateAddress,
+  addressDetails,
   login,
   changePassword,
   logout,

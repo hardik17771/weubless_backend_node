@@ -246,6 +246,15 @@ const findProducts = async (objectIds) => {
   }
 };
 
+const getTotalUserCount = async () => {
+  try {
+    const totalUserCount = await User2.countDocuments().exec();
+    return totalUserCount;
+  } catch (error) {
+    throw new Error(`Error fetching total user count: ${error.message}`);
+  }
+};
+
 const User2 = mongoose.model("User2", userSchema2);
 module.exports = {
   User2,
@@ -253,4 +262,5 @@ module.exports = {
   getUserById,
   getUserByUserUid,
   findProducts,
+  getTotalUserCount
 };

@@ -145,7 +145,53 @@ const populateLatLong = async (lat, long, product_id) => {
   // }
 };
 
+const getTotalProductSoldAndSalesAndQuantity = async () => {
+  try {
+    const products = await Product.find().exec();
+
+    // Calculate total product sold, total sales, and total quantity
+    let totalProductSold = 0;
+    let totalSales = 0;
+    let totalQuantity = 0;
+
+    products.forEach(product => {
+      totalProductSold += product.num_of_sale;
+      totalSales += product.num_of_sale * product.unit_price;
+      totalQuantity += product.quantity;
+    });
+
+    return {
+      totalProductSold,
+      totalSales,
+      totalQuantity,
+    };
+  } catch (error) {
+    throw new Error(`Error calculating totals: ${error.message}`);
+  }
+};
 productSchema.index({ name: 1 }, { unique: false });
+
+const getTopFourProducts = async () => {
+  try {
+    const topFourProducts = await Product.find({})
+      .sort({ num_of_sale: -1 })
+      .limit(5)
+      .exec();
+
+    const result = topFourProducts.map(product => ({
+      category: product.category_id, 
+      quantity: product.quantity,
+      num_of_sale: product.num_of_sale,
+      totalSales: product.num_of_sale * product.unit_price,
+      name : product.name
+    }));
+
+    return result;
+  } catch (error) {
+    throw new Error(`Error fetching top four products: ${error.message}`);
+  }
+};
+
 
 const Product = mongoose.model("Product", productSchema);
 
@@ -155,4 +201,6 @@ module.exports = {
   getProductById,
   populateCategory,
   populateLatLong,
+  getTotalProductSoldAndSalesAndQuantity,
+  getTopFourProducts
 };

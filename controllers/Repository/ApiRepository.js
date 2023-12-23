@@ -15,6 +15,7 @@ const Product = require("../../models/Product");
 const Shop = require("../../models/Shop");
 const Cart = require("../../models/Cart");
 const Advertisement = require("../../models/Advertisement");
+const Faq = require('../../models/Faq')
 
 class ApiRepository {
   constructor() {
@@ -81,6 +82,65 @@ class ApiRepository {
     //   return { code: 1100 };
     // }
   }
+
+
+  async updateAddress( data) {
+    try {
+      if(data.address_id)
+      {
+        const existingAddress = await Address.getAddressById(data.address_id);
+
+        if (!existingAddress) {
+          return { code: 748 }; 
+        }
+  
+        existingAddress.latitude = data.latitude || existingAddress.latitude;
+        existingAddress.longitude = data.longitude || existingAddress.longitude;
+        existingAddress.address = data.address || existingAddress.address;
+        existingAddress.pincode = data.pincode || existingAddress.pincode;
+        existingAddress.city = data.city || existingAddress.city;
+        existingAddress.state = data.state || existingAddress.state;
+        existingAddress.country = data.country || existingAddress.country;
+  
+        await existingAddress.save();
+  
+        
+        return { code: 749, data: existingAddress }; 
+      }
+      else{
+        return {code : 750}
+      }
+
+    } catch (error) {
+      console.error("Error updating address:", error.message);
+      return { code: 1100 }; 
+    }
+  }
+
+  async addressDetails(data) {
+    try {
+      if (data.address_id) {
+        console.log("name and image present");
+        const address = await Address.getAddressById(data.address_id);
+
+        if (address) {
+          return {
+            data: address,
+            code: 751,
+          };
+        } else {
+          return { code: 748 };
+        }
+      } else {
+        return { code: 750 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 1100 };
+    }
+  }
+
+
   
   async login(data) {
     try {
@@ -1723,9 +1783,7 @@ class ApiRepository {
   async createAdvertisement(data) {
     console.log(data);
     try {
-      // console.log("Create newShop api repo hit");
-      // console.log("name is ", data.name);
-      // console.log("data is ", data);
+
       if (data.name && data.category_id) {
         console.log("name and image present");
         const newAdvertisement = new Advertisement.Advertisement(data);
@@ -1733,7 +1791,6 @@ class ApiRepository {
         if (!category) {
           return { code: 714 };
         }
-        // console.log("new newShop present");
         await newAdvertisement.save();
         console.log(newAdvertisement);
         return { data: newAdvertisement, code: 743 };
@@ -1749,9 +1806,7 @@ class ApiRepository {
 
   async advertisementListing() {
     try {
-      // console.log(Category.Category);
       const advertisementList = await Advertisement.Advertisement.find();
-      console.log("advertisementList", advertisementList);
       return { list: advertisementList, code: 678 };
     } catch (error) {
       return { code: 425 };
@@ -1775,6 +1830,36 @@ class ApiRepository {
     //   return { code: 425 };
     // }
   }
+
+    /*********************************************** FAQ ***********************************/
+
+    async createFaq(data) {
+      try {
+        console.log("Create category api repo hit");
+  
+        if (data.question && data.answer) {
+          const newFaq = new Faq.Faq(data);
+          await newFaq.save();
+          console.log(newFaq);
+          return { data: newFaq, code: 745 };
+        } else if (data.question == "") {
+          return { code: 746 };
+        } else {
+          return { code: 747 };
+        }
+      } catch (error) {
+        return { code: 1100 };
+      }
+    }
+
+    async faqListing() {
+      try {
+        const faqList = await Faq.Faq.find();
+        return { list: faqList, code: 900 };
+      } catch (error) {
+        return { code: 1100 };
+      }
+    }
 
   /******************************************** END OF FUNCTION ********************************************/
 }

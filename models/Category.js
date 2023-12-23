@@ -117,6 +117,39 @@ const findProducts = async (objectIds) => {
 //   }
 // };
 
+const getTotalProductsInfoByCategoryId = async (category_id) => {
+  try {
+    const category = await Category.findOne({ category_id }).exec();
+
+    if (!category) {
+      throw new Error(`Category with ID ${category_id} not found`);
+    }
+
+    const productIds = category.products;
+
+    // Calculate total products and sales for the specific category
+    const categoryProducts = await Product.find({ _id: { $in: productIds } });
+    const totalCategoryProducts = categoryProducts.reduce(
+      (total, product) => total + product.num_of_sale,
+      0
+    );
+
+    // Calculate total products and sales for the entire database
+    const allProducts = await Product.find();
+    const totalAllProducts = allProducts.reduce(
+      (total, product) => total + product.num_of_sale,
+      0
+    );
+
+    return {
+      num_of_products_category: totalCategoryProducts,
+      num_of_products_all: totalAllProducts,
+    };
+  } catch (error) {
+    throw new Error(`Error fetching total products info: ${error.message}`);
+  }
+};
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = {
@@ -126,5 +159,6 @@ module.exports = {
   findSubCategories,
   getProdutsByCategoryId,
   findProducts,
+  getTotalProductsInfoByCategoryId
   // getTotalCountsByCategoryId, // Add the new function to exports
 };

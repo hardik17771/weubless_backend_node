@@ -18,27 +18,27 @@ const addressSchema = new mongoose.Schema(
     country: {
       type: String,
       default: null,
-      required: true,
+      required: false,
     },
     state: {
       type: String,
       default: null,
-      required: true,
+      required: false,
     },
     city: {
       type: String,
       default: null,
-      required: true,
+      required: false,
     },
     pincode: {
       type: String,
       default: null,
-      required: true,
+      required: false,
     },
     address: {
       type: String,
       default: null,
-      required: true,
+      required: false,
     },
   },
   {
@@ -65,7 +65,17 @@ addressSchema.pre("save", async function (next) {
   }
 });
 
+const getAddressById = async (address_id) => {
+  try {
+    const address = await Address.findOne({ address_id }).exec();
+    return address;
+  } catch (error) {
+    throw new Error(`Error fetching Address: ${error.message}`);
+  }
+};
+
 const Address = mongoose.model("Address", addressSchema);
 module.exports = {
   Address,
+  getAddressById
 };
