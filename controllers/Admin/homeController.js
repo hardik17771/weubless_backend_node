@@ -182,7 +182,9 @@ const tablesView = async (req, res, next) => {
 const singleTableView = async (req, res, next) => {
   try {
     const tableName = req.params.tableName;
-    const tableData = getTableData(tableName);
+    const tableData = await getTableData(tableName.toLowerCase());
+    console.log("tableName",tableName) 
+    console.log("tableData",tableData) 
     // console.log("productHeaders",productHeaders)
     // console.log("productAlteredData",productAlteredData)
     // console.log("subCategoryData",subCategoryHeaders)
@@ -199,26 +201,26 @@ const singleTableView = async (req, res, next) => {
 async function getTableData(tableName) {
 
   switch (tableName) {
-    case 'Users':
+    case 'users':
       const userHeaders = ["User ID", "UserName", "Email", "Phone", "City"];
       const userData = await getModelData(User.User2);
       const userAlteredData = await processModelData(userData, "user_id", userHeaders);
       return { headers: userHeaders, data: userAlteredData };
       
-    case 'Products':
+    case 'products':
       const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
       const productData = await getModelData(Product.Product);
       const productAlteredData = await processModelData(productData, "product_id", productHeaders);
       return { headers: productHeaders, data: productAlteredData };
         
         
-    case 'SubCategories':
+    case 'subcategories':
       const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category","Product Count"];
       const subCategoryData = await getModelData(SubCategory.SubCategory);
       const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
       return { headers: subCategoryHeaders, data: subCategoryAlteredData };
     
-    case 'Categories':
+    case 'categories':
       const categoryHeaders = ["Category Id", "Category","SubCategory Count","Product Count","Product Sales"];
       const categoryData = await getModelData(Category.Category);
       const categoryAlteredData = await processModelData(categoryData, "category_id", categoryHeaders);
