@@ -167,10 +167,7 @@ const tablesView = async (req, res, next) => {
     const productAlteredData = await processModelData(productData, "product_id", productHeaders);
     const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
     const categoryAlteredData = await processModelData(categoryData, "category_id", categoryHeaders);
-    // console.log("productHeaders",productHeaders)
-    // console.log("productAlteredData",productAlteredData)
-    // console.log("subCategoryData",subCategoryHeaders)
-    // console.log("subCategoryAlteredData",subCategoryAlteredData)
+
     console.log("CategoryAlteredData",categoryAlteredData)
     res.render("admin/tables", { userHeaders , userAlteredData,productHeaders,subCategoryHeaders,productAlteredData, subCategoryAlteredData , categoryHeaders ,categoryAlteredData});
   } catch (error) {
@@ -185,11 +182,6 @@ const singleTableView = async (req, res, next) => {
     const tableData = await getTableData(tableName.toLowerCase());
     console.log("tableName",tableName) 
     console.log("tableData",tableData) 
-    // console.log("productHeaders",productHeaders)
-    // console.log("productAlteredData",productAlteredData)
-    // console.log("subCategoryData",subCategoryHeaders)
-    // console.log("subCategoryAlteredData",subCategoryAlteredData)
-    // console.log("CategoryAlteredData",categoryAlteredData)
     res.render("admin/singletable", {  tableName, tableData});
   } catch (error) {
     console.error("Error fetching and processing data:", error);
@@ -255,9 +247,6 @@ const detailView = async (req, res, next) => {
   const subCategoryData = await getModelDataWithNames(SubCategory.SubCategory, 'main_subcategory_id');
   const categoryData = await getModelDataWithNames(Category.Category, 'category_id');
   
-  // Usage example
-  // console.log('Subcategories:', subCategoryData);
-  // console.log('Categories:', categoryData);
 
 
   const fieldTypes = Object.keys(Product.Product.schema.paths).reduce((acc, key) => {

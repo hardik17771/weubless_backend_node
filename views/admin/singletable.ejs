@@ -54,8 +54,8 @@
                                         aria-valuenow="<%= percentage %>"
                                         aria-valuemin="0"
                                         aria-valuemax="100"
-                                        style='width: <%= percentage %>%'
-                                      ></div>
+                                        style="width: 100px;"
+                                        ></div>
                                     </div>
                                   </div>
                                 </div>
@@ -83,4 +83,74 @@
       </div>
     </div>
   </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".sortable-header").forEach(function (header) {
+        header.addEventListener("click", function () {
+          var columnIndex = this.getAttribute("data-column-index");
+          var table = findParentTable(this);
+          sortTable(table, columnIndex);
+        });
+      });
+    });
+  
+    function findParentTable(element) {
+      while ((element = element.parentElement) && !element.tagName.includes("TABLE")) {}
+      return element;
+    }
+  
+    function sortTable(table, column) {
+    var rows = table.rows,
+      switching,
+      i,
+      x,
+      y,
+      shouldSwitch,
+      dir,
+      switchcount = 0;
+  
+    switching = true;
+    dir = "asc";
+  
+    while (switching) {
+      switching = false;
+  
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+  
+        // Get the values of the specific column for the current and next rows
+        x = rows[i].getElementsByTagName("td")[column].innerText;
+        y = rows[i + 1].getElementsByTagName("td")[column].innerText;
+  
+        if (dir == "asc") {
+          if (x.toLowerCase() > y.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.toLowerCase() < y.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+  
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+      } else {
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  
+    var currentSort = table.querySelector("th[data-sort]");
+    currentSort.setAttribute("data-sort", dir);
+  }
+  
+  </script>
   
