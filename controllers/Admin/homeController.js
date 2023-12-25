@@ -233,6 +233,7 @@ const profileView = (req, res, next) => {
 };
 
 
+
 const detailView = async (req, res, next) => {
   const product_id = req.params.product_id;
   const product = await Product.getProductById(product_id);
@@ -247,7 +248,6 @@ const detailView = async (req, res, next) => {
   const subCategoryData = await getModelDataWithNames(SubCategory.SubCategory, 'main_subcategory_id');
   const categoryData = await getModelDataWithNames(Category.Category, 'category_id');
   
-
 
   const fieldTypes = Object.keys(Product.Product.schema.paths).reduce((acc, key) => {
     acc[key] = Product.Product.schema.paths[key].instance;
@@ -306,6 +306,81 @@ const updateProduct = async (req, res, next) => {
     res.render("admin/detail", { product });
   }
 };
+
+
+const dynamicDetailView = async (req, res, next) => {
+  const model_name = req.params.model_name;
+  const model_id = req.params.model_id;
+
+  const Model = getModelByName(model_name);
+
+  if (!Model) {
+    res.status(404).send('Model not found');
+    return;
+  }
+
+  const model = await Model.getModelById(model_id);
+
+  if (!model) {
+    res.status(404).send(`${model_name} not found`);
+    return;
+  }
+
+  const uneditableFields = ["_id", "createdAt", "updatedAt", "__v"];
+
+  // Fetch category and subcategory data for dynamic models
+  const subCategoryData = await getModelDataWithNames(getSubCategoryModel(Model), 'main_subcategory_id');
+  const categoryData = await getModelDataWithNames(getCategoryModel(Model), 'category_id');
+
+  const fieldTypes = Object.keys(Model.schema.paths).reduce((acc, key) => {
+    acc[key] = Model.schema.paths[key].instance;
+    return acc;
+  }, {});
+
+  res.render("admin/detail", {
+    model,
+    uneditableFields,
+    fieldTypes,
+    categoryData,
+    subCategoryData
+  });
+};
+
+const getModelByName = (model_name) => {
+  switch (model_name) {
+    case 'product':
+      return Product.Product;
+    default:
+      return null;
+  }
+};
+
+const getSubCategoryModel = (parentModel) => {
+  return SubCategory.SubCategory;
+};
+
+const getCategoryModel = (parentModel) => {
+  return Category.Category;
+};
+
+
+const mapView = async (req, res, next) => {
+  try {
+    const shops = await Shop.Shop.find({}, 'name latitude longitude');
+    const locations = shops.map(shop => ({
+      lat: parseFloat(shop.latitude),
+      lon: parseFloat(shop.longitude),
+      name: shop.name
+  }));
+  console.log(locations)
+  res.render("admin/map", { locations: JSON.stringify(locations) });
+
+} catch (error) {
+    console.log(error);
+}};
+
+
+
 module.exports = {
   indexView,
   tablesView,
@@ -313,5 +388,7 @@ module.exports = {
   billingView,
   profileView,
   detailView,
-  updateProduct
+  updateProduct,
+  mapView,
+  dynamicDetailView
 };
