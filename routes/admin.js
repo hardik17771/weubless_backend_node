@@ -21,5 +21,6 @@ router.post("/detail/:product_id", homeController.updateProduct);
 
 
 router.get("/item-detail/:model_name/:model_id", homeController.dynamicDetailView);
+router.post("/item-detail/:model_name/:model_id", homeController.updateModel);
 
 module.exports = router;

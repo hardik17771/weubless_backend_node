@@ -56,7 +56,8 @@
 
 <ul class="list-group detail-page">
   <li class="list-group-item border-0 w-full  p-4 mb-2 bg-gray-100 border-radius-lg">
-    <form action="/admin/detail/<%= model_name %>/<%= model_id %>" method="POST">
+    
+    <form action="/admin/item-detail/<%= model_name %>/<%= model_id %>" method="POST">
       <div class="d-flex flex-column">
         <h6 class="mb-3 text-lg">Product Details</h6>
         
@@ -68,13 +69,18 @@
             <% } else { %>
               <input type="text" class="w-full mx-3 " id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(30%);">
             <% } %>
+            <% if (requiredFields.includes(key)) { %>
+              <span style="color: red;">(Required)</span>
+
+            <% } else { %>
+            <% } %>
           </div>
         <% }); %>  
         
         <% fieldModelsList.forEach(fieldModel => { %>
           <div class="mb-2 text-s">
-            <label for="selected_subcategory"><%=fieldModel["fields"]["title"] %> </label>
-            <select class="w-full mx-3" id="${fieldModel.fields.title}" name="${fieldModel.fields.title}">
+            <label for="selected_<%=fieldModel["fields"]["title"].toLowerCase() %>"><%=fieldModel["fields"]["title"] %> </label>
+            <select class="w-full mx-3" id="selected_<%=fieldModel["fields"]["title"].toLowerCase() %>" name="selected_<%=fieldModel["fields"]["title"].toLowerCase() %>">
               <% fieldModel["data"].forEach(data => { %>
                 <% let fieldID = fieldModel.fields["fieldmodelid"] %>
                 <option value=<%= data.id %> <% if (particularModel[fieldID].toString() === data.id.toString()) { %>selected<% } %>>

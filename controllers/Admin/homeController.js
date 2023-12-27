@@ -224,26 +224,26 @@ const singleTableView = async (req, res, next) => {
 async function getTableData(tableName) {
 
   switch (tableName) {
-    case 'users':
+    case 'user':
       const userHeaders = ["User ID", "UserName", "Email", "Phone", "City"];
       const userData = await getModelData(User.User2);
       const userAlteredData = await processModelData(userData, "user_id", userHeaders);
       return { headers: userHeaders, data: userAlteredData };
       
-    case 'products':
+    case 'product':
       const productHeaders = ["Product ID", "Product", "Shop", "SubCategory", "Category"];
       const productData = await getModelData(Product.Product);
       const productAlteredData = await processModelData(productData, "product_id", productHeaders);
       return { headers: productHeaders, data: productAlteredData };
         
         
-    case 'subcategories':
+    case 'subcategory':
       const subCategoryHeaders = ["Sub Category ID", "SubCategory", "Category","Product Count"];
       const subCategoryData = await getModelData(SubCategory.SubCategory);
       const subCategoryAlteredData = await processModelData(subCategoryData, "main_subcategory_id", subCategoryHeaders);
       return { headers: subCategoryHeaders, data: subCategoryAlteredData };
     
-    case 'categories':
+    case 'category':
       const categoryHeaders = ["Category Id", "Category","SubCategory Count","Product Count","Product Sales"];
       const categoryData = await getModelData(Category.Category);
       const categoryAlteredData = await processModelData(categoryData, "category_id", categoryHeaders);
@@ -294,6 +294,161 @@ const detailView = async (req, res, next) => {
 };
 
 
+
+const dynamicDetailView = async (req, res, next) => {
+  console.log("Hlleo")
+  const model_name = req.params.model_name;
+  const model_id = req.params.model_id;
+  const ModelParameters = getModelParameters(model_name);
+
+  // console.log("model_name",model_name)
+  // console.log("model_id",model_id)
+  // console.log("Model", ModelParameters)
+  if (!ModelParameters["name"]) {
+    res.status(404).send('Model not found');
+    return;
+  }
+
+  const particularModel = await getModelById(ModelParameters["idName"] , model_id);
+  // console.log("particular Model",particularModel)
+  // console.log("ModelParameters['idName']",ModelParameters["idName"])
+  if (!particularModel) {
+    res.status(404).send(`${model_name} not found`);
+    return;
+  }
+
+  const uneditableFields = ModelParameters["uneditableFields"]
+  const requiredFields = ModelParameters["requiredFields"]
+
+  let fieldModelsList = [];
+  for (const fieldModel of ModelParameters["fieldModels"]) {
+      const fieldModelData = await getModelDataWithNames(fieldModel[0], fieldModel[1]);
+      const modifiedFieldModelData = {"fields" : { "title" : fieldModel[2] , "fieldmodelid":fieldModel[1] } , "data" : fieldModelData }
+      fieldModelsList.push(modifiedFieldModelData);
+  }
+  
+  let onlyListFieldModelsList = []
+  
+  for (const onlyListFieldModel of ModelParameters["onlyListFieldModels"]) {
+      
+      const field = onlyListFieldModel[2]
+      // console.log("field",field)
+      if(field === "addresses")
+      {
+        // console.log("particularModel[field]",particularModel[field])
+        for(const address of particularModel[field])
+        {
+          const modifiedFieldModelData = {"fields" : { "title" : onlyListFieldModel[2] , "fieldmodelid":onlyListFieldModel[1] } , "data" : address }
+          onlyListFieldModelsList.push(modifiedFieldModelData);
+        }
+      }
+      else
+      {
+        const mongooseIds = particularModel[field]
+        // console.log(mongooseIds)
+        const onlyListFieldModelData = await getOnlyListModelDataWithNames(onlyListFieldModel[0], mongooseIds,onlyListFieldModel[1]);
+        const modifiedFieldModelData = {"fields" : { "title" : onlyListFieldModel[2] , "fieldmodelid":onlyListFieldModel[1] } , "data" : onlyListFieldModelData }
+        onlyListFieldModelsList.push(modifiedFieldModelData);
+      }
+  }
+  
+  // console.log("fieldModelList",fieldModelsList )
+  // console.log("onlyListFieldModelsList",onlyListFieldModelsList)
+  // console.log("onlyListFieldModelsList data",onlyListFieldModelsList[0]["data"])
+  // console.log("onlyListFieldModelsList",onlyListFieldModelsList[0]["data"][0])
+  // console.log("list field",ModelParameters["onlyListFieldModels"])
+  // const my_var = ModelParameters["onlyListFieldModels"][0][2]
+  // console.log("particularModel.my_var",particularModel[my_var])
+  // console.log('my_var',my_var)
+
+
+  // console.log("fieldModelsList",fieldModelsList)
+
+  const fieldTypes = Object.keys(ModelParameters["name"].schema.paths).reduce((acc, key) => {
+    acc[key] = ModelParameters["name"].schema.paths[key].instance;
+    return acc;
+  }, {});
+
+  
+
+  res.render("admin/dynamicdetail", {
+    model_name,
+    model_id,
+    particularModel,
+    uneditableFields,
+    requiredFields,
+    fieldTypes,
+    fieldModelsList,
+    onlyListFieldModelsList
+
+  });
+};
+
+const getModelParameters = (model_name) => {
+  switch (model_name) {
+    case 'product':
+      return {
+        "name": Product.Product,
+        "idName": "product_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"product_id","category_id","main_subcategory_id"],
+        "fieldModels" : [
+          [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
+          [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels" :[],
+        "requiredFields" : ['name','product_id','main_subcategory_id'],
+
+      };
+    case 'user':
+      return {
+        "name": User.User2,
+        "idName": "user_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"user_id"],
+        "fieldModels" : [
+          // [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
+          // [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels" :
+        [
+          [Product.Product , "product_id","products_bought"],
+          [Address.Address , "address_id","addresses"]
+        ],
+        "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
+
+      };
+    case 'category':
+      return {
+        "name": Category.Category,
+        "idName": "category_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"category_id","products","subCategories","image"],
+        "fieldModels" : [
+          // [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels":[
+          [SubCategory.SubCategory , "main_subcategory_id", 'subCategories'],
+          [Product.Product , "product_id","products"],
+        ],
+        "requiredFields" : ['name','image','category_id'],
+
+      };
+    case 'subcategory':
+      return {
+        "name": SubCategory.SubCategory,
+        "idName": "main_subcategory_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"main_subcategory_id","category_id"],
+        "fieldModels" : [
+          [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels" :[],
+        "requiredFields" : ['name','main_subcategory_id','category_id'],
+
+      };
+    default:
+      return null;
+  }
+};
+
+
 const updateProduct = async (req, res, next) => {
   const product_id = req.params.product_id;
   const product = await Product.getProductById(product_id);
@@ -305,7 +460,7 @@ const updateProduct = async (req, res, next) => {
 
   if (req.method === 'POST') {
     const updatedData = req.body;
-    // console.log(updatedData)
+    console.log(updatedData)
     const new_category_id = parseInt(updatedData.selected_category,10)
     updatedData.category_id = new_category_id
     const new_main_subcategory_id = parseInt(updatedData.selected_subcategory,10)
@@ -337,171 +492,159 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
-// const getIdfromModel = async (modelName, id) => {
-//   switch (modelName) {
-//     case "main_subcategory_id":
-//       return await SubCategory.getSubCategoryById(id);
-//     case "category_id":
-//       return await Category.getCategoryById(id);
-//     case "shop_id":
-//       return await Shop.getShopById(id);
-//     case "getProductStats":
-//       return await Category.getTotalProductsInfoByCategoryId(id);
-//     default:
-//       return null;
-//   }
-// };
+
+const convertToObjectId = (value) => {
+  try {
+    if (value === "") {
+      return null;
+    }
+    return mongoose.Types.ObjectId(value);
+  } catch (error) {
+    console.error(`Error converting ${value} to ObjectId:`, error);
+    return value; // Return the original value if conversion fails
+  }
+};
+
+const updateModel= async (req, res, next) => {
+  // console.log("Updated Model")
+  // res.render("admin/profile");
 
 
-const dynamicDetailView = async (req, res, next) => {
-  console.log("Hlleo")
   const model_name = req.params.model_name;
   const model_id = req.params.model_id;
-  const ModelParameters = getModelParameters(model_name);
+  const ModelParameters = getUpdateModelParameters(model_name);
+  // const model_id = req.params[`${Model.modelName.toLowerCase()}_id`];
 
   // console.log("model_name",model_name)
   // console.log("model_id",model_id)
   // console.log("Model", ModelParameters)
+  // const model = await Model.getById(model_id);
+
   if (!ModelParameters["name"]) {
     res.status(404).send('Model not found');
-    return;
   }
 
   const particularModel = await getModelById(ModelParameters["idName"] , model_id);
-  console.log("particular Model",particularModel)
-  console.log("ModelParameters['idName']",ModelParameters["idName"])
+  // console.log("particular Model",particularModel)
+  // console.log("ModelParameters['idName']",ModelParameters["idName"])
+  
   if (!particularModel) {
     res.status(404).send(`${model_name} not found`);
-    return;
   }
 
-  const uneditableFields = ModelParameters["uneditableFields"]
+  const noUpdateFields = ModelParameters["noUpdateFields"]
+  const requiredFields = ModelParameters["requiredFields"]
 
-  let fieldModelsList = [];
-  for (const fieldModel of ModelParameters["fieldModels"]) {
-      const fieldModelData = await getModelDataWithNames(fieldModel[0], fieldModel[1]);
-      const modifiedFieldModelData = {"fields" : { "title" : fieldModel[2] , "fieldmodelid":fieldModel[1] } , "data" : fieldModelData }
-      fieldModelsList.push(modifiedFieldModelData);
-  }
-  
-  let onlyListFieldModelsList = []
-  
-  for (const onlyListFieldModel of ModelParameters["onlyListFieldModels"]) {
-      
-      const field = onlyListFieldModel[2]
+  if (req.method === 'POST') {
+    const updatedData = req.body;
+    console.log(updatedData)
+
+    noUpdateFields.forEach((field) => {
+      delete updatedData[field];
+    });
+
+    requiredFields.forEach((field) => {
       console.log("field",field)
-      if(field === "addresses")
+      console.log("updatedData[field]",updatedData[field])
+      if(  updatedData[field] == null || updatedData[field] == undefined || updatedData[field] == "")
       {
-        console.log("particularModel[field]",particularModel[field])
-        for(const address of particularModel[field])
-        {
-          const modifiedFieldModelData = {"fields" : { "title" : onlyListFieldModel[2] , "fieldmodelid":onlyListFieldModel[1] } , "data" : address }
-          onlyListFieldModelsList.push(modifiedFieldModelData);
-        }
+        delete updatedData[field];
       }
-      else
-      {
-        const mongooseIds = particularModel[field]
-        console.log(mongooseIds)
-        const onlyListFieldModelData = await getOnlyListModelDataWithNames(onlyListFieldModel[0], mongooseIds,onlyListFieldModel[1]);
-        const modifiedFieldModelData = {"fields" : { "title" : onlyListFieldModel[2] , "fieldmodelid":onlyListFieldModel[1] } , "data" : onlyListFieldModelData }
-        onlyListFieldModelsList.push(modifiedFieldModelData);
-      }
+    });
+
+    console.log("updatedData",updatedData)
+
+    if(updatedData.selected_category)
+    {
+      const new_category_id = parseInt(updatedData.selected_category,10)
+      updatedData.category_id = new_category_id
+
+    }
+    if(updatedData.selected_subcategory)
+    {
+      const new_main_subcategory_id = parseInt(updatedData.selected_subcategory,10)
+      updatedData.main_subcategory_id = new_main_subcategory_id
+      const subcategory = await SubCategory.getSubCategoryById(new_main_subcategory_id)
+      updatedData.category_id = subcategory.category_id
+
+      console.log("subcategory.category_id",subcategory.category_id) 
+    }
+
+    // Convert specific fields to ObjectId
+    const objectIdFields = ModelParameters["convertToObjectIdFields"]
+    objectIdFields.forEach((field) => {
+      updatedData[field] = convertToObjectId(updatedData[field]);
+    });
+
+
+    const updateFunction = ModelParameters["updateFunction"]
+
+    try {
+    const updateResult = await updateFunction(updatedData);
+    const error_msg = msg.responseMsg(updateResult.code);
+    
+    if (updateResult.code === ModelParameters["success_code"]) {
+      res.redirect(`/admin/item-detail/${model_name}/${model_id}?success=true`);
+    } else {
+      res.redirect(`/admin/item-detail/${model_name}/${model_id}?success=false&msg=${error_msg}`);
+    }
+  } catch (error) {
+    res.redirect(`/admin/item-detail/${model_name}/${model_id}?success=false&msg=${error_msg}`);
+
+}
+  } else {
+    res.render("admin", { particularModel });
   }
-  
-  // console.log("fieldModelList",fieldModelsList )
-  console.log("onlyListFieldModelsList",onlyListFieldModelsList)
-  console.log("onlyListFieldModelsList data",onlyListFieldModelsList[0]["data"])
-  // console.log("onlyListFieldModelsList",onlyListFieldModelsList[0]["data"][0])
-  // console.log("list field",ModelParameters["onlyListFieldModels"])
-  // const my_var = ModelParameters["onlyListFieldModels"][0][2]
-  // console.log("particularModel.my_var",particularModel[my_var])
-  // console.log('my_var',my_var)
-
-
-  // console.log("fieldModelsList",fieldModelsList)
-
-  const fieldTypes = Object.keys(ModelParameters["name"].schema.paths).reduce((acc, key) => {
-    acc[key] = ModelParameters["name"].schema.paths[key].instance;
-    return acc;
-  }, {});
-
-  
-
-  res.render("admin/dynamicdetail", {
-    model_name,
-    model_id,
-    particularModel,
-    uneditableFields,
-    fieldTypes,
-    fieldModelsList,
-    onlyListFieldModelsList
-
-  });
 };
 
-const getModelParameters = (model_name) => {
+// Example usage for Product model
+// const updateProduct = updateModel(Product);
+
+const getUpdateModelParameters = (model_name) => {
   switch (model_name) {
     case 'product':
       return {
         "name": Product.Product,
-        "idName": "product_id",
-        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"product_id"],
-        "fieldModels" : [
-          [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
-          [Category.Category, "category_id" , 'Category']
-        ],
-        "onlyListFieldModels" :[]
+        "idName" : "product_id",
+        "updateFunction": apiRepository.updateProduct,
+        "convertToObjectIdFields": ["user_id", "brand_id"],
+        "noUpdateFields" : [],
+        "requiredFields" : ['name','product_id','main_subcategory_id'],
+        "success_code" : 297
       };
     case 'user':
       return {
         "name": User.User2,
-        "idName": "user_id",
-        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"user_id"],
-        "fieldModels" : [
-          // [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
-          // [Category.Category, "category_id" , 'Category']
-        ],
-        "onlyListFieldModels" :
-        [
-          [Product.Product , "product_id","products_bought"],
-          [Address.Address , "address_id","addresses"]
-        ]
+        "idName" : "user_id",
+        "updateFunction": apiRepository.updateProfile,
+        "convertToObjectIdFields": [],
+        "noUpdateFields" : [],
+        "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
+        "success_code" : 208
       };
     case 'category':
       return {
         "name": Category.Category,
-        "idName": "category_id",
-        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"category_id","products","subCategories","image"],
-        "fieldModels" : [
-          // [Category.Category, "category_id" , 'Category']
-        ],
-        "onlyListFieldModels":[
-          [SubCategory.SubCategory , "main_subcategory_id", 'subCategories'],
-          [Product.Product , "product_id","products"],
-        ]
+        "idName" : "category_id",
+        "updateFunction": apiRepository.updateCategory,
+        "convertToObjectIdFields": [],
+        "noUpdateFields" : ['subCategories','products'],
+        "requiredFields" : ['name','image','category_id'],
+        "success_code" : 297
       };
     case 'subcategory':
       return {
         "name": SubCategory.SubCategory,
-        "idName": "main_subcategory_id",
-        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"main_subcategory_id"],
-        "fieldModels" : [
-          [Category.Category, "category_id" , 'Category']
-        ],
-        "onlyListFieldModels" :[]
+        "idName" : "main_subcategory_id",
+        "updateFunction": apiRepository.updateSubCategory,
+        "convertToObjectIdFields": [],
+        "noUpdateFields" : ['products'],
+        "requiredFields" : ['name','main_subcategory_id','category_id'],
+        "success_code" : 297
       };
     default:
       return null;
   }
-};
-
-const getSubCategoryModel = (parentModel) => {
-  return SubCategory.SubCategory;
-};
-
-const getCategoryModel = (parentModel) => {
-  return Category.Category;
 };
 
 
@@ -545,5 +688,6 @@ module.exports = {
   updateProduct,
   mapView,
   userMapView,
-  dynamicDetailView
+  dynamicDetailView,
+  updateModel
 };
