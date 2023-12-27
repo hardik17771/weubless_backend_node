@@ -3,6 +3,7 @@ const SubCategory= require("../../models/SubCategory");
 const Category= require("../../models/Category");
 const Shop = require("../../models/Shop");
 const User = require("../../models/User");
+const Address = require("../../models/Address");
 const ApiRepository = require("../Repository/ApiRepository")
 const mongoose = require("mongoose");
 const Msg = require("../Msg")
@@ -27,6 +28,32 @@ const getModelDataWithNames = async (model, idField) => {
     }));
 
     return formattedData;
+  } catch (error) {
+    console.error('Error fetching model data:', error);
+    throw error;
+  }
+};
+
+// Helper function to get model data with names and custom ids
+const getOnlyListModelDataWithNames = async (model, mongooseIds , idField) => {
+  try {
+    // const data = await model.find().exec();
+
+    // // Extract custom id and name from each entry
+    // const formattedData = data.map(entry => ({
+    //   id: entry[idField], // Use the custom id field name
+    //   name: entry.name,    // Replace with the actual field name you want to use
+    // }));
+
+    const documents = await model.find({ _id: { $in: mongooseIds } });
+
+    console.log("documents",documents)
+    const result = documents.map(doc => ({
+      name: doc.name, 
+      id: doc[idField],
+    }));
+
+    return result;
   } catch (error) {
     console.error('Error fetching model data:', error);
     throw error;
@@ -77,14 +104,18 @@ const processModelData = async (data, idField, headers) => {
 };
 
 // Helper function to get model by ID
-const getModelById = async (modelName, id) => {
-  switch (modelName) {
+const getModelById = async (idName, id) => {
+  switch (idName) {
     case "main_subcategory_id":
       return await SubCategory.getSubCategoryById(id);
     case "category_id":
       return await Category.getCategoryById(id);
     case "shop_id":
       return await Shop.getShopById(id);
+    case "product_id":
+      return await Product.getProductById(id);
+    case "user_id":
+      return await User.getUserById(id);
     case "getProductStats":
       return await Category.getTotalProductsInfoByCategoryId(id);
     default:
@@ -244,7 +275,6 @@ const detailView = async (req, res, next) => {
   }
 
   const uneditableFields = ["_id", "createdAt", "updatedAt", "__v" ,];
-  
   const subCategoryData = await getModelDataWithNames(SubCategory.SubCategory, 'main_subcategory_id');
   const categoryData = await getModelDataWithNames(Category.Category, 'category_id');
   
@@ -307,49 +337,160 @@ const updateProduct = async (req, res, next) => {
   }
 };
 
+// const getIdfromModel = async (modelName, id) => {
+//   switch (modelName) {
+//     case "main_subcategory_id":
+//       return await SubCategory.getSubCategoryById(id);
+//     case "category_id":
+//       return await Category.getCategoryById(id);
+//     case "shop_id":
+//       return await Shop.getShopById(id);
+//     case "getProductStats":
+//       return await Category.getTotalProductsInfoByCategoryId(id);
+//     default:
+//       return null;
+//   }
+// };
+
 
 const dynamicDetailView = async (req, res, next) => {
+  console.log("Hlleo")
   const model_name = req.params.model_name;
   const model_id = req.params.model_id;
+  const ModelParameters = getModelParameters(model_name);
 
-  const Model = getModelByName(model_name);
-
-  if (!Model) {
+  // console.log("model_name",model_name)
+  // console.log("model_id",model_id)
+  // console.log("Model", ModelParameters)
+  if (!ModelParameters["name"]) {
     res.status(404).send('Model not found');
     return;
   }
 
-  const model = await Model.getModelById(model_id);
-
-  if (!model) {
+  const particularModel = await getModelById(ModelParameters["idName"] , model_id);
+  console.log("particular Model",particularModel)
+  console.log("ModelParameters['idName']",ModelParameters["idName"])
+  if (!particularModel) {
     res.status(404).send(`${model_name} not found`);
     return;
   }
 
-  const uneditableFields = ["_id", "createdAt", "updatedAt", "__v"];
+  const uneditableFields = ModelParameters["uneditableFields"]
 
-  // Fetch category and subcategory data for dynamic models
-  const subCategoryData = await getModelDataWithNames(getSubCategoryModel(Model), 'main_subcategory_id');
-  const categoryData = await getModelDataWithNames(getCategoryModel(Model), 'category_id');
+  let fieldModelsList = [];
+  for (const fieldModel of ModelParameters["fieldModels"]) {
+      const fieldModelData = await getModelDataWithNames(fieldModel[0], fieldModel[1]);
+      const modifiedFieldModelData = {"fields" : { "title" : fieldModel[2] , "fieldmodelid":fieldModel[1] } , "data" : fieldModelData }
+      fieldModelsList.push(modifiedFieldModelData);
+  }
+  
+  let onlyListFieldModelsList = []
+  
+  for (const onlyListFieldModel of ModelParameters["onlyListFieldModels"]) {
+      
+      const field = onlyListFieldModel[2]
+      console.log("field",field)
+      if(field === "addresses")
+      {
+        console.log("particularModel[field]",particularModel[field])
+        for(const address of particularModel[field])
+        {
+          const modifiedFieldModelData = {"fields" : { "title" : onlyListFieldModel[2] , "fieldmodelid":onlyListFieldModel[1] } , "data" : address }
+          onlyListFieldModelsList.push(modifiedFieldModelData);
+        }
+      }
+      else
+      {
+        const mongooseIds = particularModel[field]
+        console.log(mongooseIds)
+        const onlyListFieldModelData = await getOnlyListModelDataWithNames(onlyListFieldModel[0], mongooseIds,onlyListFieldModel[1]);
+        const modifiedFieldModelData = {"fields" : { "title" : onlyListFieldModel[2] , "fieldmodelid":onlyListFieldModel[1] } , "data" : onlyListFieldModelData }
+        onlyListFieldModelsList.push(modifiedFieldModelData);
+      }
+  }
+  
+  // console.log("fieldModelList",fieldModelsList )
+  console.log("onlyListFieldModelsList",onlyListFieldModelsList)
+  console.log("onlyListFieldModelsList data",onlyListFieldModelsList[0]["data"])
+  // console.log("onlyListFieldModelsList",onlyListFieldModelsList[0]["data"][0])
+  // console.log("list field",ModelParameters["onlyListFieldModels"])
+  // const my_var = ModelParameters["onlyListFieldModels"][0][2]
+  // console.log("particularModel.my_var",particularModel[my_var])
+  // console.log('my_var',my_var)
 
-  const fieldTypes = Object.keys(Model.schema.paths).reduce((acc, key) => {
-    acc[key] = Model.schema.paths[key].instance;
+
+  // console.log("fieldModelsList",fieldModelsList)
+
+  const fieldTypes = Object.keys(ModelParameters["name"].schema.paths).reduce((acc, key) => {
+    acc[key] = ModelParameters["name"].schema.paths[key].instance;
     return acc;
   }, {});
 
-  res.render("admin/detail", {
-    model,
+  
+
+  res.render("admin/dynamicdetail", {
+    model_name,
+    model_id,
+    particularModel,
     uneditableFields,
     fieldTypes,
-    categoryData,
-    subCategoryData
+    fieldModelsList,
+    onlyListFieldModelsList
+
   });
 };
 
-const getModelByName = (model_name) => {
+const getModelParameters = (model_name) => {
   switch (model_name) {
     case 'product':
-      return Product.Product;
+      return {
+        "name": Product.Product,
+        "idName": "product_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"product_id"],
+        "fieldModels" : [
+          [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
+          [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels" :[]
+      };
+    case 'user':
+      return {
+        "name": User.User2,
+        "idName": "user_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"user_id"],
+        "fieldModels" : [
+          // [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
+          // [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels" :
+        [
+          [Product.Product , "product_id","products_bought"],
+          [Address.Address , "address_id","addresses"]
+        ]
+      };
+    case 'category':
+      return {
+        "name": Category.Category,
+        "idName": "category_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"category_id","products","subCategories","image"],
+        "fieldModels" : [
+          // [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels":[
+          [SubCategory.SubCategory , "main_subcategory_id", 'subCategories'],
+          [Product.Product , "product_id","products"],
+        ]
+      };
+    case 'subcategory':
+      return {
+        "name": SubCategory.SubCategory,
+        "idName": "main_subcategory_id",
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"main_subcategory_id"],
+        "fieldModels" : [
+          [Category.Category, "category_id" , 'Category']
+        ],
+        "onlyListFieldModels" :[]
+      };
     default:
       return null;
   }
@@ -374,7 +515,20 @@ const mapView = async (req, res, next) => {
   }));
   console.log(locations)
   res.render("admin/map", { locations: JSON.stringify(locations) });
+} catch (error) {
+    console.log(error);
+}};
 
+const userMapView = async (req, res, next) => {
+  try {
+    const users = await User.User2.find({}, 'name latitude longitude');
+    const locations = users.map(user => ({
+      lat: parseFloat(user.latitude),
+      lon: parseFloat(user.longitude),
+      name: user.name
+  }));
+  console.log(locations)
+  res.render("admin/map", { locations: JSON.stringify(locations) });
 } catch (error) {
     console.log(error);
 }};
@@ -390,5 +544,6 @@ module.exports = {
   detailView,
   updateProduct,
   mapView,
+  userMapView,
   dynamicDetailView
 };

@@ -117,64 +117,7 @@ const userSchema2 = new mongoose.Schema(
         address: { type: String, default: null, required: false },
       },
     ],
-    // latitude: {
-    //   type: String,
-    //   required: [true, "Latitude is required"],
-    // },
-    // longitude: {
-    //   type: String,
-    //   required: [true, "Longitude is required"],
-    // },
-    // country: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
-    // state: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
-    // liveCity: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
-    // livePincode: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
-    // liveAddress: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
 
-    // input_latitude: {
-    //   type: String,
-    //   // required: [true, "Latitude is required"],
-    // },
-    // input_longitude: {
-    //   type: String,
-    //   // required: [true, "Longitude is required"],
-    // },
-
-    // input_liveCity: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
-    // input_livePincode: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
-    // input_liveAddress: {
-    //   type: String,
-    //   default: null,
-    //   required: false,
-    // },
   },
   {
     toJSON: {
@@ -187,10 +130,7 @@ const userSchema2 = new mongoose.Schema(
   }
 );
 
-// userSchema.pre("findOne", function (next) {
-//   this.select("-_id -__v");
-//   next();
-// });
+
 
 userSchema2.pre("save", async function (next) {
   try {

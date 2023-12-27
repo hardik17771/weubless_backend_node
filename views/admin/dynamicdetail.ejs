@@ -1,0 +1,168 @@
+<!-- Add this CSS to your page or include it in your stylesheet -->
+<style>
+    #save-text{
+      color:#fff;
+    }
+    #update-save-button {
+    display: block;
+    margin: 0 auto;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .custom-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  .custom-modal p {
+    margin-bottom: 15px;
+  }
+
+  .custom-modal button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+    .show-modal {
+    display: block;
+    opacity: 1;
+    }
+</style>
+
+<ul class="list-group detail-page">
+  <li class="list-group-item border-0 w-full  p-4 mb-2 bg-gray-100 border-radius-lg">
+    <form action="/admin/detail/<%= model_name %>/<%= model_id %>" method="POST">
+      <div class="d-flex flex-column">
+        <h6 class="mb-3 text-lg">Product Details</h6>
+        
+        <% Object.entries(particularModel.toObject()).forEach(([key, value]) => { %>
+          <div class="mb-2 text-s">
+            <label for="<%= key %>"><%= key %> (<%= fieldTypes[key] %>):</label>
+            <% if (uneditableFields.includes(key)) { %>
+              <input type="text" class="w-full mx-3 " id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(30%); background-color: #f2f2f2; color: #888;" readonly>
+            <% } else { %>
+              <input type="text" class="w-full mx-3 " id="<%= key %>" name="<%= key %>" value="<%= value %>" style="width: calc(30%);">
+            <% } %>
+          </div>
+        <% }); %>  
+        
+        <% fieldModelsList.forEach(fieldModel => { %>
+          <div class="mb-2 text-s">
+            <label for="selected_subcategory"><%=fieldModel["fields"]["title"] %> </label>
+            <select class="w-full mx-3" id="${fieldModel.fields.title}" name="${fieldModel.fields.title}">
+              <% fieldModel["data"].forEach(data => { %>
+                <% let fieldID = fieldModel.fields["fieldmodelid"] %>
+                <option value=<%= data.id %> <% if (particularModel[fieldID].toString() === data.id.toString()) { %>selected<% } %>>
+                  <%= data.name %>
+                </option>
+              <% }); %>
+            </select>
+          </div>
+  
+        <% }); %>
+
+        <% onlyListFieldModelsList.forEach(fieldModel => { %>
+          <div class="mb-2 text-s">
+            <label for="field"><%=fieldModel["fields"]["title"] %> </label>
+            <% if (fieldModel["fields"]["title"] === "addresses") { %>
+              <ul class="list-disc mx-3">
+              <% Object.entries(fieldModel["data"].toObject()).forEach(([key, value]) => { %>
+                <li >
+                  <%= key %>:<%= value %>
+                </li>
+                <% }); %> 
+              </ul>
+                  <% } else { %>
+                    <ul class="list-disc mx-3">
+
+                    <% fieldModel["data"].forEach(data => { %>
+                      <!-- <% let fieldID = fieldModel.fields["fieldmodelid"] %> -->
+                      <%  fieldModel.fields["fieldmodelid"] %>
+                    
+                      <li>
+                        <%= data.name %>
+                      </li>
+                    <% }); %>
+                  <% }; %>
+                </ul>
+                <% }); %>
+          </div>
+        
+        </div>
+      <div class="mx-auto ">
+        <button type="submit" class="btn btn-link text-dark px-3 mb-0" id = "update-save-button">
+          <i class="fas fa-save text-light me-2" aria-hidden="true" ></i><span id="save-text"> Save</span>
+        </button>
+      </div>
+    </form>
+  </li>
+</ul>
+
+
+<div class="modal-overlay"></div>
+<div class="custom-modal"></div>
+
+
+
+
+<script>
+  const showPopup = (message) => {
+    const modal = document.querySelector('.custom-modal');
+    const overlay = document.querySelector('.modal-overlay');
+
+    modal.innerHTML = `<p>${message}</p><button onclick="closePopup()">OK</button>`;
+    modal.classList.add('show-modal'); 
+    overlay.classList.add('show-modal');
+
+    overlay.addEventListener('click', closePopup);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      urlParams.delete('success'); 
+      window.history.replaceState(null, null, '?' + urlParams.toString());
+    }
+  };
+
+  const closePopup = () => {
+    const modal = document.querySelector('.custom-modal');
+    const overlay = document.querySelector('.modal-overlay');
+
+    modal.classList.remove('show-modal'); 
+    overlay.classList.remove('show-modal'); 
+  };
+
+const urlParams = new URLSearchParams(window.location.search);
+const successParam = urlParams.get('success');
+const msg = urlParams.get('msg');
+
+if (successParam === 'true') {
+  showPopup('Data has been updated successfully!');
+} else if (successParam === 'false') {
+  showPopup(`Error updating product.<br>Error Message: ${msg}`);
+}
+</script>

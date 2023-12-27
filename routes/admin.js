@@ -11,6 +11,7 @@ router.get("/table/:tableName", homeController.singleTableView);
 router.get("/billing", homeController.billingView);
 router.get("/profile", homeController.profileView);
 router.get("/map", homeController.mapView);
+router.get("/user-map", homeController.userMapView);
 
 // GET request for displaying the detail page
 router.get("/detail/:product_id", homeController.detailView);
@@ -19,6 +20,6 @@ router.get("/detail/:product_id", homeController.detailView);
 router.post("/detail/:product_id", homeController.updateProduct);
 
 
-router.get("/detail/:model_name/:model_id", homeController.detailView);
+router.get("/item-detail/:model_name/:model_id", homeController.dynamicDetailView);
 
 module.exports = router;
