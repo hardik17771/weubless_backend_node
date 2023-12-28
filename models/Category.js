@@ -6,11 +6,11 @@ const categorySchema = new mongoose.Schema(
   {
     category_id: { type: Number, unique: true },
     name: { type: String, required: true },
-    banner: String,
-    icon: String,
+    banner: {type: String , default: ""},
+    icon: {type: String, default: ""},
     image: { type: String, required: true },
-    featured: Number,
-    top: Number,
+    featured: {type: Number,default : 0},
+    top: {type: Number, default : ""},
     subCategories: [
       { type: mongoose.Schema.Types.ObjectId, ref: "SubCategory" },
     ],

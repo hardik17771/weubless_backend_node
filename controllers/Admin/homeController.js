@@ -169,6 +169,7 @@ const getFieldName = (header) => {
 const indexView = async (req, res, next) => {
   const totals = await Product.getTotalProductSoldAndSalesAndQuantity()
   const total_users = await User.getTotalUserCount() 
+  const total_products = await User.getTotalUserCount() 
   const popularProducts = await Product.getTopFourProducts()
   
   for (const product of popularProducts) {
@@ -178,7 +179,7 @@ const indexView = async (req, res, next) => {
 
   // const category_products = await Category.getTotalProductsInfoByCategoryId(1)
   // console.log(category_products)
-  res.render("admin/home" , {totals,total_users,popularProducts});
+  res.render("admin/home" , {totals,total_users,total_products,popularProducts});
 };
 
 
@@ -307,6 +308,7 @@ const deleteView = async (req, res, next) => {
     const model_name = req.body.model_name;
     const model_id = req.body.model_id;
     const ModelParameters = getModelParameters(model_name);
+    console.log(ModelParameters)
     const particularModel = await getModelById(ModelParameters["idName"], model_id);
     const Model = ModelParameters["name"]
     // const idName = ModelParameters["idName"]
@@ -322,15 +324,22 @@ const deleteView = async (req, res, next) => {
   }
 };
 
-const showDeleteConfirmationPage = (req, res) => {
+const showDeleteConfirmationPage = async (req, res) => {
   const model_name = req.params.model_name;
   const model_id = req.params.model_id;
   const ModelParameters = getModelParameters(model_name);
+  const particularModel = await getModelById(ModelParameters["idName"] , model_id);
+  console.log("ModelParameters[idName]",ModelParameters["idName"])
+  console.log("model_id",model_id)
+  console.log("particularModel",particularModel)
+  const item_name = particularModel["name"]
+  console.log("item_name",item_name)
 
   res.render('admin/deleteconfirmation', {
     model_name,
     model_id,
-    idName: ModelParameters["idName"]
+    idName: ModelParameters["idName"],
+    item_name
   });
 };
 

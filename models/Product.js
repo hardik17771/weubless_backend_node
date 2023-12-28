@@ -88,7 +88,7 @@ productSchema.pre("save", async function (next) {
   
     this.product_id = max ? max.product_id + 1 : 1;
     next();
-    
+
   } catch (error) {
     next(error);
   }
@@ -197,6 +197,14 @@ const getTopFourProducts = async () => {
   }
 };
 
+const getTotalProductCount = async () => {
+  try {
+    const totalProductCount = await Product.countDocuments().exec();
+    return totalProductCount;
+  } catch (error) {
+    throw new Error(`Error fetching total product count: ${error.message}`);
+  }
+};
 
 const Product = mongoose.model("Product", productSchema);
 
@@ -207,5 +215,6 @@ module.exports = {
   populateCategory,
   populateLatLong,
   getTotalProductSoldAndSalesAndQuantity,
-  getTopFourProducts
+  getTopFourProducts,
+  getTotalProductCount
 };

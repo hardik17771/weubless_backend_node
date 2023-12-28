@@ -371,20 +371,13 @@ async function hashPassword(password) {
 /*********************************************** CATEGORY ***********************************/
 
 const createCategory = async (req, res) => {
-  const { name, banner, icon, image, featured, top } = req.body;
+  const data = req.body;
   const apiRepository = new ApiRepository();
   const error_msg = new Msg();
 
   console.log("Create category api controller hit");
   try {
-    const newCategory = await apiRepository.createCategory({
-      name,
-      banner,
-      icon,
-      image,
-      featured,
-      top,
-    });
+    const newCategory = await apiRepository.createCategory(data);
 
     const msg = error_msg.responseMsg(newCategory.code); //706
     if (newCategory.code === 706) {
@@ -1120,8 +1113,7 @@ const addToCart = async (req, res) => {
   const apiRepository = new ApiRepository();
   const error_msg = new Msg();
 
-  // console.log("Create product api controller hit");
-  try {
+  // try {
   const Check = await apiRepository.addToCart(data);
 
   const msg = error_msg.responseMsg(Check.code); //706
@@ -1130,8 +1122,8 @@ const addToCart = async (req, res) => {
       status: "1",
       message: msg,
       data: Check.data,
-      amount: Check.amount,
-      list: Check.productsList,
+      // amount: Check.amount,
+      // list: Check.productsList,
       status_code : 200
     };
     res.status(200).json(response);
@@ -1139,11 +1131,11 @@ const addToCart = async (req, res) => {
     const response = { status: "0", message: msg, data: Check.data,status_code : 200 };
     res.status(400).json(response);
   }
-  } catch (error) {
-    const msg = error_msg.responseMsg(717); //707
-    const response = { status: "0", message: msg ,status_code : 500};
-    res.status(500).json(response);
-  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(717); 
+  //   const response = { status: "0", message: msg ,status_code : 500};
+  //   res.status(500).json(response);
+  // }
 };
 
 const cartListing = async (req, res) => {

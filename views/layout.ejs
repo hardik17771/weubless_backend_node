@@ -18,6 +18,7 @@
     <link href="/assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="/assets/css/nucleo-svg.css" rel="stylesheet" />
     <!-- Font Awesome Icons -->
+
     <script
       src="https://kit.fontawesome.com/42d5adcbca.js"
       crossorigin="anonymous"
@@ -29,6 +30,15 @@
       href="/assets/css/argon-dashboard.css?v=2.0.4"
       rel="stylesheet"
     />
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // Trigger the click event on the dark mode toggle checkbox
+        const darkModeCheckbox = document.getElementById("dark-version");
+        if (darkModeCheckbox) {
+          darkModeCheckbox.click();
+        }
+      });
+    </script>
   </head>
   <body>
     <div class="min-height-300 bg-primary position-absolute w-100"></div>
@@ -63,29 +73,47 @@
           </li>
 
           <li class="nav-item">
-            <a class="nav-link active" href="/admin/map">
+            <a class="nav-link" href="javascript:void(0)" onclick="toggleMapsAccordion()">
               <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="ni ni-archive-2 text-muted text-sm opacity-10"></i>
-              </div>
-              <span class="nav-link-text ms-1">Shops Locations</span>
-            </a>
-          </li>
-
-          <li class="nav-item">
-            <a class="nav-link active" href="/admin/user-map">
-              <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="ni ni-archive-2 text-muted text-sm opacity-10"></i>
-              </div>
-              <span class="nav-link-text ms-1">Users Locations</span>
-            </a>
-          </li>
+                <i class="ni ni-map-big text-warning text-sm opacity-10"></i>
     
+              </div>
+              <span class="nav-link-text ms-1">Maps</span>
+              <i class="ni ni-bold-down text-warning text-sm opacity-10 mx-7"></i>
+            </a>
+            <div id="mapsAccordion" class="submenu">
+              <ul class="nav flex-column">
+
+                <li class="nav-item">
+                  <a class="nav-link active" href="/admin/map">
+                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-basket text-info text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Shops Locations</span>
+                    
+                  </a>
+                </li>
+                
+                <li class="nav-item">
+                  <a class="nav-link active" href="/admin/user-map">
+                    <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
+                      <i class="ni ni-single-02 text-info text-sm opacity-10"></i>
+                    </div>
+                    <span class="nav-link-text ms-1">Users Locations</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+          
+          
           <li class="nav-item">
             <a class="nav-link" href="javascript:void(0)" onclick="toggleTablesAccordion()">
               <div class="icon icon-shape icon-sm border-radius-md text-center me-2 d-flex align-items-center justify-content-center">
                 <i class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"></i>
               </div>
               <span class="nav-link-text ms-1">Tables</span>
+              <i class="ni ni-bold-down text-warning text-sm opacity-10 mx-7"></i>
             </a>
 
             <div id="tablesAccordion" class="submenu">
@@ -699,6 +727,12 @@
         const tablesAccordion = document.getElementById('tablesAccordion');
         tablesAccordion.style.display = tablesAccordion.style.display === 'none' ? 'block' : 'none';
       }
+      
+      function toggleMapsAccordion() {
+        const mapsAccordion = document.getElementById('mapsAccordion');
+        mapsAccordion.style.display = mapsAccordion.style.display === 'none' ? 'block' : 'none';
+      }
+
     </script>
   </body>
 </html>

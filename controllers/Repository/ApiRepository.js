@@ -1736,11 +1736,18 @@ class ApiRepository {
           updatedCart.cart_id
         );
 
+        // newUpdateCart.amount = amount;
+        // newUpdateCart.list = productsList;
+        // console.log("newUpdateCart", newUpdateCart)
         await newUpdateCart.save();
+        
+        const updatedCartWithNewFields = { ...newUpdateCart.toObject(),'list':productsList , 'amount':amount };
+        console.log("updatedCartWithNewFields",updatedCartWithNewFields)
+        
         return {
-          data: newUpdateCart,
-          amount: amount,
-          productsList: productsList,
+          data: updatedCartWithNewFields,
+          // amount: amount,
+          // productsList: productsList,
           code: 669,
         };
       } else if (!user) {
