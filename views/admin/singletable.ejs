@@ -1,12 +1,44 @@
 <!-- table.ejs -->
+
+<style>
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h6 {
+  margin: 0; /* Remove default margin */
+}
+
+#add-button-link {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #3498db; /* Change to your desired button color */
+  color: #fff; /* Change to your desired text color */
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+#add-button-link:hover {
+  background-color: #2980b9; /* Change to your desired hover color */
+}
+
+
+</style>
 <div class="container-fluid py-4">
     <div class="row">
       <div class="col-12">
         <div class="card mb-4">
           <div class="card-header pb-0">
-            <h6><%= tableName %> table</h6>
+            <div class="header-content">
+              <h6><%= tableName %> table</h6>
+              <a href="/admin/add-item/<%= tableName %>" id="add-button-link">Add</a>
+            </div>
           </div>
-          <div class="card-body px-0 pt-0 pb-2">
+                    <div class="card-body px-0 pt-0 pb-2">
             <div class="table-responsive p-0">
               <table class="table align-items-center mb-0">
                 <thead>
