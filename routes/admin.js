@@ -20,6 +20,7 @@ router.get("/detail/:product_id", homeController.detailView);
 router.post("/detail/:product_id", homeController.updateProduct);
 
 
+router.get("/add-item/:model_name/", homeController.addView);
 router.get("/item-detail/:model_name/:model_id", homeController.dynamicDetailView);
 router.post("/item-detail/:model_name/:model_id", homeController.updateModel);
 

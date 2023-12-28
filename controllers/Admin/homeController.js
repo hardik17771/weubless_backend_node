@@ -7,6 +7,7 @@ const Address = require("../../models/Address");
 const ApiRepository = require("../Repository/ApiRepository")
 const mongoose = require("mongoose");
 const Msg = require("../Msg")
+const ApiController = require("../../controllers/APIController")
 
 const apiRepository = new ApiRepository();
 const msg = new Msg();
@@ -264,6 +265,117 @@ const profileView = (req, res, next) => {
 };
 
 
+const addView = async (req, res, next) => {
+
+  const model_name = req.params.model_name;
+  // const model_id = req.params.model_id;
+  const ModelParameters = getAddModelParameters(model_name);
+  const createFunction  = ModelParameters["createFunction"]
+  const requiredFieldsDummyData = ModelParameters["requiredFieldsDummyData"]
+  const idName = ModelParameters["idName"]
+  const success_code = ModelParameters["success_code"]
+  console.log("requiredFieldsDummyData",requiredFieldsDummyData)
+  const response = await createFunction(requiredFieldsDummyData)
+  
+  console.log("response",response)
+  console.log("responseCode",response["code"])
+  console.log("responseData",response["data"])
+  const model_id = response["data"][idName]
+  if(model_name === "user")
+  {
+
+    if (response["status_code"] === success_code) {
+      res.redirect(`/admin/item-detail/${model_name}/${model_id}`);
+    } else {
+      alert(`Couldn't create new ${model_name}`)
+      res.redirect(`/admin/`)
+    }
+  }
+  else
+  {
+    if (response["code"] === success_code) {
+      res.redirect(`/admin/item-detail/${model_name}/${model_id}`);
+    } else {
+      alert(`Couldn't create new ${model_name}`)
+      res.redirect(`/admin/`)
+    }
+  }
+
+};
+
+// Function to generate a random 3-digit number
+function getRandomThreeDigitNumber() {
+  return Math.floor(100 + Math.random() * 900);
+}
+
+// Function to generate a random 10-digit number
+function getRandomTenDigitNumber() {
+  return Math.floor(1000000000 + Math.random() * 9000000000);
+}
+
+const getAddModelParameters = (model_name) => {
+  switch (model_name) {
+    case 'product':
+      return {
+        "name": Product.Product,
+        "idName": "product_id",
+        "createFunction" : apiRepository.createProduct,
+        "requiredFields" : ['name','product_id','main_subcategory_id'],
+        "requiredFieldsDummyData" : {'name': "DummyProduct",'main_subcategory_id' : 1 , 'shop_id': 1},
+        "success_code" : 716
+      };
+    case 'user':
+      return {
+        "name": User.User2,
+        "idName": "user_id",
+        "createFunction" : apiRepository.register,
+        "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
+        "requiredFieldsDummyData" : {
+          "userUid": "DummyUserUid" + getRandomThreeDigitNumber(),
+          "name": "Dummy Name",
+          "username": "DummyUserName" + getRandomThreeDigitNumber(),
+          "phone": getRandomTenDigitNumber().toString(),
+          "email": "dummy" + getRandomThreeDigitNumber() + "@email.com",          "user_type": 1,
+          "profileImage" : "image_url",
+          "latitude": "100",
+          "longitude": "100",
+          "country" : "dummycountry",
+          "state" : "dummystate",
+          "city" : "dummycity",
+          "pincode" : "123456",
+          "address" : "dummyaddress",
+          "dob" : "01/01/2000",
+          "deviceToken" : "1234"
+      },
+      "success_code" : 200
+
+        
+      };
+    case 'category':
+      return {
+        "name": Category.Category,
+        "idName": "category_id",
+        "createFunction" : apiRepository.createCategory,
+        "requiredFields" : ['name','image','category_id'],
+        "requiredFieldsDummyData" : {'name': "DummyCategory",'image' : 'https://weucart.online/public/uploads/all/zadqgmYfjv2x5gWDrBqzT81ddRyaCvLUkprIIhKU.png'},
+        "success_code" : 706
+        
+        
+      };
+      case 'subcategory':
+        return {
+          "name": SubCategory.SubCategory,
+          "idName": "main_subcategory_id",
+          "createFunction" : apiRepository.createSubCategory,
+          "requiredFields" : ['name','main_subcategory_id','category_id'],
+          "requiredFieldsDummyData" : {'name': "DummySubCategory",'category_id' : 1},
+          "success_code" : 712
+      };
+    default:
+      return null;
+  }
+};
+
 
 const detailView = async (req, res, next) => {
   const product_id = req.params.product_id;
@@ -403,7 +515,7 @@ const getModelParameters = (model_name) => {
       return {
         "name": User.User2,
         "idName": "user_id",
-        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"user_id"],
+        "uneditableFields": ["_id", "createdAt", "updatedAt", "__v" ,"user_id","addresses","primary_address_index"],
         "fieldModels" : [
           // [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
           // [Category.Category, "category_id" , 'Category']
@@ -689,5 +801,6 @@ module.exports = {
   mapView,
   userMapView,
   dynamicDetailView,
-  updateModel
+  updateModel,
+  addView
 };

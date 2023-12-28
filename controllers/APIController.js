@@ -211,7 +211,7 @@ const registerUser = async (req, res) => {
   const data = req.body;
   // console.log("API Controller data");
   // console.log(data);
-
+  console.log("registerUser Data", data)
   const newAddress = new Address.Address({
     latitude: data.latitude,
     longitude: data.longitude,
@@ -260,7 +260,7 @@ const registerUser = async (req, res) => {
     res.status(200).json({
       status: 1,
       message: "User registered successfully",
-      user: newUser,
+      data: newUser,
       status_code : 200
     });
   } catch (error) {
@@ -282,6 +282,7 @@ const registerUser = async (req, res) => {
     res.status(400).json({ status: 0, message: errorMessage ,status_code : 200});
   }
 };
+
 
 // Save Token
 const save_token = async (req) => {

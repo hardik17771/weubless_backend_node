@@ -397,27 +397,82 @@ class ApiRepository {
   }
 
   async register(data) {
+    // const data = req.body;
+    // console.log("API Controller data");
+    // console.log(data);
+    console.log("register Data", data)
+    const newAddress = new Address.Address({
+      latitude: data.latitude,
+      longitude: data.longitude,
+      address: data.address,
+      pincode: data.pincode,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+    })
+    await newAddress.save();
+  
     try {
-      console.log("Register API Repository data");
-      console.log(data);
-      const user = new User.User2({
+      const newUser = new User.User2({
+        userUid: data.userUid,
         username: data.username,
         name: data.name,
-        country_code: data.country_code,
         phone: data.phone,
         email: data.email,
-        password: hashPassword(data.password),
         user_type: data.user_type,
+        deviceToken: data.deviceToken,
+        profileImage: data.profileImage,
         latitude: data.latitude,
         longitude: data.longitude,
+        address: data.address,
+        pincode: data.pincode,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        dob : data.dob,
+        // input_latitude: data.input_latitude,
+        // input_longitude: data.input_longitude,
+        // input_liveAddress: data.input_liveAddress,
+        // input_livePincode: data.input_livePincode,
+        // input_liveCity: data.input_liveCity,
+        addresses: [
+          newAddress
+        ],
       });
-
-      await user.save();
-      return user;
+  
+  
+      // console.log('dob that is entered value before validation:', data.dob);
+      // console.log('dob for user value before validation:', newUser.dob);
+  
+      // console.log(newAddress)
+      await newUser.save();
+      return{
+        status: 1,
+        message: "User registered successfully",
+        data: newUser,
+        status_code : 200
+      };
     } catch (error) {
-      throw error; // Rethrow the error to be caught in the higher level
+      let errorMessage = "Registration failed";
+      if (error.code === 11000) {
+        if (error.keyPattern.username === 1) {
+          errorMessage = "Username already in use";
+        } else if (error.keyPattern.phone === 1) {
+          errorMessage = "Phone number already in use";
+        } else if (error.keyPattern.email === 1) {
+          errorMessage = "Email already in use";
+        }
+      } else if (error.name === "ValidationError") {
+        // Validation error
+        const field = Object.keys(error.errors)[0];
+        errorMessage = error.errors[field].message;
+      }
+  
+      return{ status: 0, message: errorMessage ,status_code : 200};
     }
   }
+
+
   // Change password
   async changePassword(data) {
     try {
