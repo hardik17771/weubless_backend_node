@@ -23,8 +23,14 @@ faqSchema.pre("save", async function (next) {
     if (!this.isNew) {
       return next();
     }
-    const count = await this.constructor.countDocuments({});
-    this.faq_id = count + 1;
+    const max = await this.constructor.findOne({}, { faq_id: 1 })
+    .sort({ faq_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.faq_id = max ? max.faq_id + 1 : 1;
+
     next();
   } catch (error) {
     next(error);

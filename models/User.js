@@ -137,8 +137,13 @@ userSchema2.pre("save", async function (next) {
     if (!this.isNew) {
       return next();
     }
-    const count = await this.constructor.countDocuments({});
-    this.user_id = count + 1;
+    const max = await this.constructor.findOne({}, { user_id: 1 })
+    .sort({ user_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.user_id = max ? max.user_id + 1 : 1;
     next();
   } catch (error) {
     next(error);

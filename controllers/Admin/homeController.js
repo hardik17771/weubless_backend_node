@@ -266,10 +266,9 @@ const profileView = (req, res, next) => {
 
 
 const addView = async (req, res, next) => {
-
   const model_name = req.params.model_name;
   // const model_id = req.params.model_id;
-  const ModelParameters = getAddModelParameters(model_name);
+  const ModelParameters = getModelParameters(model_name);
   const createFunction  = ModelParameters["createFunction"]
   const requiredFieldsDummyData = ModelParameters["requiredFieldsDummyData"]
   const idName = ModelParameters["idName"]
@@ -300,8 +299,42 @@ const addView = async (req, res, next) => {
       res.redirect(`/admin/`)
     }
   }
-
 };
+
+
+const deleteView = async (req, res, next) => {
+  try {
+    const model_name = req.body.model_name;
+    const model_id = req.body.model_id;
+    const ModelParameters = getModelParameters(model_name);
+    const particularModel = await getModelById(ModelParameters["idName"], model_id);
+    const Model = ModelParameters["name"]
+    // const idName = ModelParameters["idName"]
+    if (!Model) {
+      res.status(404).send(`${model_name} not found`);
+      return;
+    }
+      await Model.deleteOne({_id : particularModel._id});
+      console.log("deletedData", particularModel)
+      res.redirect(`/admin/table/${model_name}?success=deleted`);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const showDeleteConfirmationPage = (req, res) => {
+  const model_name = req.params.model_name;
+  const model_id = req.params.model_id;
+  const ModelParameters = getModelParameters(model_name);
+
+  res.render('admin/deleteconfirmation', {
+    model_name,
+    model_id,
+    idName: ModelParameters["idName"]
+  });
+};
+
+
 
 // Function to generate a random 3-digit number
 function getRandomThreeDigitNumber() {
@@ -313,68 +346,68 @@ function getRandomTenDigitNumber() {
   return Math.floor(1000000000 + Math.random() * 9000000000);
 }
 
-const getAddModelParameters = (model_name) => {
-  switch (model_name) {
-    case 'product':
-      return {
-        "name": Product.Product,
-        "idName": "product_id",
-        "createFunction" : apiRepository.createProduct,
-        "requiredFields" : ['name','product_id','main_subcategory_id'],
-        "requiredFieldsDummyData" : {'name': "DummyProduct",'main_subcategory_id' : 1 , 'shop_id': 1},
-        "success_code" : 716
-      };
-    case 'user':
-      return {
-        "name": User.User2,
-        "idName": "user_id",
-        "createFunction" : apiRepository.register,
-        "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
-        "requiredFieldsDummyData" : {
-          "userUid": "DummyUserUid" + getRandomThreeDigitNumber(),
-          "name": "Dummy Name",
-          "username": "DummyUserName" + getRandomThreeDigitNumber(),
-          "phone": getRandomTenDigitNumber().toString(),
-          "email": "dummy" + getRandomThreeDigitNumber() + "@email.com",          "user_type": 1,
-          "profileImage" : "image_url",
-          "latitude": "100",
-          "longitude": "100",
-          "country" : "dummycountry",
-          "state" : "dummystate",
-          "city" : "dummycity",
-          "pincode" : "123456",
-          "address" : "dummyaddress",
-          "dob" : "01/01/2000",
-          "deviceToken" : "1234"
-      },
-      "success_code" : 200
+// const getAddModelParameters = (model_name) => {
+//   switch (model_name) {
+//     case 'product':
+//       return {
+//         "name": Product.Product,
+//         "idName": "product_id",
+//         "requiredFields" : ['name','product_id','main_subcategory_id'],
+//         "createFunction" : apiRepository.createProduct,
+//         "requiredFieldsDummyData" : {'name': "DummyProduct",'main_subcategory_id' : 1 , 'shop_id': 1},
+//         "success_code" : 716
+//       };
+//     case 'user':
+//       return {
+//         "name": User.User2,
+//         "idName": "user_id",
+//         "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
+//         "createFunction" : apiRepository.register,
+//         "requiredFieldsDummyData" : {
+//           "userUid": "DummyUserUid" + getRandomThreeDigitNumber(),
+//           "name": "Dummy Name",
+//           "username": "DummyUserName" + getRandomThreeDigitNumber(),
+//           "phone": getRandomTenDigitNumber().toString(),
+//           "email": "dummy" + getRandomThreeDigitNumber() + "@email.com",          "user_type": 1,
+//           "profileImage" : "image_url",
+//           "latitude": "100",
+//           "longitude": "100",
+//           "country" : "dummycountry",
+//           "state" : "dummystate",
+//           "city" : "dummycity",
+//           "pincode" : "123456",
+//           "address" : "dummyaddress",
+//           "dob" : "01/01/2000",
+//           "deviceToken" : "1234"
+//       },
+//       "success_code" : 200
 
         
-      };
-    case 'category':
-      return {
-        "name": Category.Category,
-        "idName": "category_id",
-        "createFunction" : apiRepository.createCategory,
-        "requiredFields" : ['name','image','category_id'],
-        "requiredFieldsDummyData" : {'name': "DummyCategory",'image' : 'https://weucart.online/public/uploads/all/zadqgmYfjv2x5gWDrBqzT81ddRyaCvLUkprIIhKU.png'},
-        "success_code" : 706
+//       };
+//     case 'category':
+//       return {
+//         "name": Category.Category,
+//         "idName": "category_id",
+//         "requiredFields" : ['name','image','category_id'],
+//         "createFunction" : apiRepository.createCategory,
+//         "requiredFieldsDummyData" : {'name': "DummyCategory",'image' : 'https://weucart.online/public/uploads/all/zadqgmYfjv2x5gWDrBqzT81ddRyaCvLUkprIIhKU.png'},
+//         "success_code" : 706
         
         
-      };
-      case 'subcategory':
-        return {
-          "name": SubCategory.SubCategory,
-          "idName": "main_subcategory_id",
-          "createFunction" : apiRepository.createSubCategory,
-          "requiredFields" : ['name','main_subcategory_id','category_id'],
-          "requiredFieldsDummyData" : {'name': "DummySubCategory",'category_id' : 1},
-          "success_code" : 712
-      };
-    default:
-      return null;
-  }
-};
+//       };
+//       case 'subcategory':
+//         return {
+//           "name": SubCategory.SubCategory,
+//           "idName": "main_subcategory_id",
+//           "requiredFields" : ['name','main_subcategory_id','category_id'],
+//           "createFunction" : apiRepository.createSubCategory,
+//           "requiredFieldsDummyData" : {'name': "DummySubCategory",'category_id' : 1},
+//           "success_code" : 712
+//       };
+//     default:
+//       return null;
+//   }
+// };
 
 
 const detailView = async (req, res, next) => {
@@ -506,9 +539,17 @@ const getModelParameters = (model_name) => {
         "fieldModels" : [
           [SubCategory.SubCategory , "main_subcategory_id", 'SubCategory'],
           [Category.Category, "category_id" , 'Category']
+          // [Shop.Shop, "shop_id" , 'Shop']
         ],
         "onlyListFieldModels" :[],
-        "requiredFields" : ['name','product_id','main_subcategory_id'],
+        "requiredFields" : ['name','product_id','main_subcategory_id','shop_id'],
+        "createFunction" : apiRepository.createProduct,
+        "requiredFieldsDummyData" : {'name': "DummyProduct",'main_subcategory_id' : 1 , 'shop_id': 1},
+        "success_code" : 716,
+        "updateFunction": apiRepository.updateProduct,
+        "convertToObjectIdFields": ["user_id", "brand_id"],
+        "noUpdateFields" : [],
+        "update_success_code" : 297
 
       };
     case 'user':
@@ -526,6 +567,32 @@ const getModelParameters = (model_name) => {
           [Address.Address , "address_id","addresses"]
         ],
         "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
+        "createFunction" : apiRepository.register,
+        "requiredFieldsDummyData" : {
+          "userUid": "DummyUserUid" + getRandomThreeDigitNumber(),
+          "name": "Dummy Name",
+          "username": "DummyUserName" + getRandomThreeDigitNumber(),
+          "phone": getRandomTenDigitNumber().toString(),
+          "email": "dummy" + getRandomThreeDigitNumber() + "@email.com",          "user_type": 1,
+          "profileImage" : "image_url",
+          "latitude": "100",
+          "longitude": "100",
+          "country" : "dummycountry",
+          "state" : "dummystate",
+          "city" : "dummycity",
+          "pincode" : "123456",
+          "address" : "dummyaddress",
+          "dob" : "01/01/2000",
+          "deviceToken" : "1234"
+      },
+      "success_code" : 200,
+      "updateFunction": apiRepository.updateProfile,
+      "convertToObjectIdFields": [],
+      "noUpdateFields" : [],
+      "update_success_code" : 208,
+      
+
+
 
       };
     case 'category':
@@ -541,6 +608,15 @@ const getModelParameters = (model_name) => {
           [Product.Product , "product_id","products"],
         ],
         "requiredFields" : ['name','image','category_id'],
+        "createFunction" : apiRepository.createCategory,
+        "requiredFieldsDummyData" : {'name': "DummyCategory",'image' : 'https://weucart.online/public/uploads/all/zadqgmYfjv2x5gWDrBqzT81ddRyaCvLUkprIIhKU.png'},
+        "success_code" : 706,
+        "updateFunction": apiRepository.updateCategory,
+        "convertToObjectIdFields": [],
+        "noUpdateFields" : ['subCategories','products'],
+        "update_success_code" : 297
+
+
 
       };
     case 'subcategory':
@@ -553,6 +629,14 @@ const getModelParameters = (model_name) => {
         ],
         "onlyListFieldModels" :[],
         "requiredFields" : ['name','main_subcategory_id','category_id'],
+        "createFunction" : apiRepository.createSubCategory,
+        "requiredFieldsDummyData" : {'name': "DummySubCategory",'category_id' : 1},
+        "success_code" : 712,
+        "updateFunction": apiRepository.updateSubCategory,
+        "convertToObjectIdFields": [],
+        "noUpdateFields" : ['products'],
+        "update_success_code" : 297
+
 
       };
     default:
@@ -624,7 +708,7 @@ const updateModel= async (req, res, next) => {
 
   const model_name = req.params.model_name;
   const model_id = req.params.model_id;
-  const ModelParameters = getUpdateModelParameters(model_name);
+  const ModelParameters = getModelParameters(model_name);
   // const model_id = req.params[`${Model.modelName.toLowerCase()}_id`];
 
   // console.log("model_name",model_name)
@@ -695,7 +779,7 @@ const updateModel= async (req, res, next) => {
     const updateResult = await updateFunction(updatedData);
     const error_msg = msg.responseMsg(updateResult.code);
     
-    if (updateResult.code === ModelParameters["success_code"]) {
+    if (updateResult.code === ModelParameters["update_success_code"]) {
       res.redirect(`/admin/item-detail/${model_name}/${model_id}?success=true`);
     } else {
       res.redirect(`/admin/item-detail/${model_name}/${model_id}?success=false&msg=${error_msg}`);
@@ -712,52 +796,52 @@ const updateModel= async (req, res, next) => {
 // Example usage for Product model
 // const updateProduct = updateModel(Product);
 
-const getUpdateModelParameters = (model_name) => {
-  switch (model_name) {
-    case 'product':
-      return {
-        "name": Product.Product,
-        "idName" : "product_id",
-        "updateFunction": apiRepository.updateProduct,
-        "convertToObjectIdFields": ["user_id", "brand_id"],
-        "noUpdateFields" : [],
-        "requiredFields" : ['name','product_id','main_subcategory_id'],
-        "success_code" : 297
-      };
-    case 'user':
-      return {
-        "name": User.User2,
-        "idName" : "user_id",
-        "updateFunction": apiRepository.updateProfile,
-        "convertToObjectIdFields": [],
-        "noUpdateFields" : [],
-        "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
-        "success_code" : 208
-      };
-    case 'category':
-      return {
-        "name": Category.Category,
-        "idName" : "category_id",
-        "updateFunction": apiRepository.updateCategory,
-        "convertToObjectIdFields": [],
-        "noUpdateFields" : ['subCategories','products'],
-        "requiredFields" : ['name','image','category_id'],
-        "success_code" : 297
-      };
-    case 'subcategory':
-      return {
-        "name": SubCategory.SubCategory,
-        "idName" : "main_subcategory_id",
-        "updateFunction": apiRepository.updateSubCategory,
-        "convertToObjectIdFields": [],
-        "noUpdateFields" : ['products'],
-        "requiredFields" : ['name','main_subcategory_id','category_id'],
-        "success_code" : 297
-      };
-    default:
-      return null;
-  }
-};
+// const getUpdateModelParameters = (model_name) => {
+//   switch (model_name) {
+//     case 'product':
+//       return {
+//         "name": Product.Product,
+//         "idName" : "product_id",
+//         "requiredFields" : ['name','product_id','main_subcategory_id'],
+//         "updateFunction": apiRepository.updateProduct,
+//         "convertToObjectIdFields": ["user_id", "brand_id"],
+//         "noUpdateFields" : [],
+//         "update_success_code" : 297
+//       };
+//     case 'user':
+//       return {
+//         "name": User.User2,
+//         "idName" : "user_id",
+//         "requiredFields" : ['name','user_id','username','userUid','phone','email','user_type','dob','deviceToken','profileImage','primary_address_index','latitude','longitude','country','state','city','pincode','address'],
+//         "updateFunction": apiRepository.updateProfile,
+//         "convertToObjectIdFields": [],
+//         "noUpdateFields" : [],
+//         "update_success_code" : 208
+//       };
+//     case 'category':
+//       return {
+//         "name": Category.Category,
+//         "idName" : "category_id",
+//         "requiredFields" : ['name','image','category_id'],
+//         "updateFunction": apiRepository.updateCategory,
+//         "convertToObjectIdFields": [],
+//         "noUpdateFields" : ['subCategories','products'],
+//         "update_success_code" : 297
+//       };
+//     case 'subcategory':
+//       return {
+//         "name": SubCategory.SubCategory,
+//         "idName" : "main_subcategory_id",
+//         "requiredFields" : ['name','main_subcategory_id','category_id'],
+//         "updateFunction": apiRepository.updateSubCategory,
+//         "convertToObjectIdFields": [],
+//         "noUpdateFields" : ['products'],
+//         "update_success_code" : 297
+//       };
+//     default:
+//       return null;
+//   }
+// };
 
 
 const mapView = async (req, res, next) => {
@@ -802,5 +886,7 @@ module.exports = {
   userMapView,
   dynamicDetailView,
   updateModel,
-  addView
+  addView,
+  deleteView,
+  showDeleteConfirmationPage
 };

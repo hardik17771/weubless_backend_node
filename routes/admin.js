@@ -21,6 +21,8 @@ router.post("/detail/:product_id", homeController.updateProduct);
 
 
 router.get("/add-item/:model_name/", homeController.addView);
+router.post("/delete-item", homeController.deleteView);
+router.get("/confirm-delete/:model_name/:model_id", homeController.showDeleteConfirmationPage);
 router.get("/item-detail/:model_name/:model_id", homeController.dynamicDetailView);
 router.post("/item-detail/:model_name/:model_id", homeController.updateModel);
 

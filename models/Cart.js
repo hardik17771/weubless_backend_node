@@ -35,8 +35,14 @@ cartSchema.pre("save", async function (next) {
     if (!this.isNew) {
       return next();
     }
-    const count = await this.constructor.countDocuments({});
-    this.cart_id = count + 1;
+    const max = await this.constructor.findOne({}, { cart_id: 1 })
+    .sort({ cart_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.cart_id = max ? max.cart_id + 1 : 1;
+
     next();
   } catch (error) {
     next(error);

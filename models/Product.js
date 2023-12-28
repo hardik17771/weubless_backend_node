@@ -80,10 +80,15 @@ productSchema.pre("save", async function (next) {
       return next();
     }
 
-    // Find the current count of documents and use it as the next category_id
-    const count = await this.constructor.countDocuments({});
-    this.product_id = count + 1;
+    const max = await this.constructor.findOne({}, { product_id: 1 })
+    .sort({ product_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.product_id = max ? max.product_id + 1 : 1;
     next();
+    
   } catch (error) {
     next(error);
   }

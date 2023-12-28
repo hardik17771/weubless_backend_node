@@ -42,8 +42,14 @@ shopSchema.pre("save", async function (next) {
     if (!this.isNew) {
       return next();
     }
-    const count = await this.constructor.countDocuments({});
-    this.shop_id = count + 1;
+    const max = await this.constructor.findOne({}, { shop_id: 1 })
+    .sort({ shop_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.shop_id = max ? max.shop_id + 1 : 1;
+
     next();
   } catch (error) {
     next(error);
