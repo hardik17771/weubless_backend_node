@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-// const { SubSubCategory } = require("./SubSubCategory");
-
 const productSchema = new mongoose.Schema(
   {
     product_id: { type: Number, unique: true },
@@ -9,15 +7,12 @@ const productSchema = new mongoose.Schema(
     added_by: { type: String, default: "" },
     category_id: { type: Number, ref: "Category", default: 0 },
     main_subcategory_id: { type: Number, ref: "SubCategory", required: true },
-    // subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
     shop_id: { type: Number, ref: "Shop", required: true },
     latitude: {
       type: String,
-      // required: [true, "Latitude is required"],
     },
     longitude: {
       type: String,
-      // required: [true, "Longitude is required"],
     },
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -154,7 +149,6 @@ const getTotalProductSoldAndSalesAndQuantity = async () => {
   try {
     const products = await Product.find().exec();
 
-    // Calculate total product sold, total sales, and total quantity
     let totalProductSold = 0;
     let totalSales = 0;
     let totalQuantity = 0;

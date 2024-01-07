@@ -4,6 +4,7 @@ const Category= require("../../models/Category");
 const Shop = require("../../models/Shop");
 const User = require("../../models/User");
 const Address = require("../../models/Address");
+const Order = require("../../models/Order");
 const ApiRepository = require("../Repository/ApiRepository")
 const mongoose = require("mongoose");
 const Msg = require("../Msg")
@@ -12,20 +13,17 @@ const ApiController = require("../../controllers/APIController")
 const apiRepository = new ApiRepository();
 const msg = new Msg();
 
-// Helper function to get model data
 const getModelData = async (model) => {
   return await model.find().exec();
 };
 
-// Helper function to get model data with names and custom ids
 const getModelDataWithNames = async (model, idField) => {
   try {
     const data = await model.find().exec();
 
-    // Extract custom id and name from each entry
     const formattedData = data.map(entry => ({
-      id: entry[idField], // Use the custom id field name
-      name: entry.name,    // Replace with the actual field name you want to use
+      id: entry[idField], 
+      name: entry.name,    
     }));
 
     return formattedData;
@@ -35,12 +33,10 @@ const getModelDataWithNames = async (model, idField) => {
   }
 };
 
-// Helper function to get model data with names and custom ids
 const getOnlyListModelDataWithNames = async (model, mongooseIds , idField) => {
   try {
     // const data = await model.find().exec();
 
-    // // Extract custom id and name from each entry
     // const formattedData = data.map(entry => ({
     //   id: entry[idField], // Use the custom id field name
     //   name: entry.name,    // Replace with the actual field name you want to use
@@ -180,6 +176,12 @@ const indexView = async (req, res, next) => {
   // const category_products = await Category.getTotalProductsInfoByCategoryId(1)
   // console.log(category_products)
   res.render("admin/home" , {totals,total_users,total_products,popularProducts});
+};
+
+
+const ordersView = async (req, res, next) => {
+  const orders = await Order.Order.find().exec();
+  res.render("admin/orders", {orders});
 };
 
 
@@ -886,6 +888,7 @@ const userMapView = async (req, res, next) => {
 module.exports = {
   indexView,
   tablesView,
+  ordersView,
   singleTableView,
   billingView,
   profileView,

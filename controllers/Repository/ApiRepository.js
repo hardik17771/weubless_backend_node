@@ -14,6 +14,7 @@ const SubSubCategory = require("../../models/SubSubCategory");
 const Product = require("../../models/Product");
 const Shop = require("../../models/Shop");
 const Cart = require("../../models/Cart");
+const Order = require("../../models/Order");
 const Advertisement = require("../../models/Advertisement");
 const Faq = require('../../models/Faq')
 
@@ -1570,41 +1571,6 @@ class ApiRepository {
     }
   }
 
-  async buyProduct(data) {
-    try {
-      if (data.product_id && data.user_id) {
-        const product = await Product.getProductById(data.product_id);
-        const user = await User.getUserById(data.user_id);
-
-        if (product && user) {
-          if (product.quantity > 0) {
-            product.num_of_sale += 1;
-            product.quantity -= 1;
-            product.save();
-            user.products_bought.push(product._id);
-            user.save();
-          } else {
-            return { code: 734 };
-          }
-        } else if (!product) {
-          return { code: 735 };
-        } else {
-          return { code: 461 };
-        }
-
-        console.log("product", product, "user", user);
-        return { code: 900 };
-      } else if (!data.product_id) {
-        return { code: 718 };
-      } else {
-        return { code: 730 };
-      }
-      // console.log(Category.Category);
-    } catch (error) {
-      return { code: 425 };
-    }
-  }
-
   async trendingProducts() {
     try {
       const productList = await Product.Product.find()
@@ -1680,54 +1646,84 @@ class ApiRepository {
   /*********************************************** CART ***********************************/
 
   async addToCart(data) {
+    // console.log("data",data)
     // try {
-    if (data.product_id && data.user_id && data.quantity && data.category_id && data.userUid) {
+    if (Array.isArray(data.products) && data.user_id && data.category_id && data.userUid) {
       let productsList = [];
+      let category_id;
+      // let shop_id;
 
-      const newCart = new Cart.Cart(data);
-      const product = await Product.getProductById(data.product_id);
+      const newCart = new Cart.Cart({
+        user_id: data.user_id,
+        category_id: data.category_id,
+        userUid: data.userUid,
+      });      
+      
+      let amount = 0;
+      // let commonShopId = null;
+
+      for (const productData of data.products) {
+
+        if (!productData.product_id)
+        {
+          return { code : 718}
+        }
+        if (!productData.quantity)
+        {
+          return { code : 757}
+        }
+
+        const product = await Product.getProductById(productData.product_id);
+
+        if (!product || product.category_id !== data.category_id) {
+          return { code: 741 }; 
+        }
+
+        if (productData.quantity > product.quantity) {
+          return { code: 740 }; 
+        }
+        category_id = product.category_id
+
+        // if (commonShopId === null) {
+        //   commonShopId = product.shop_id;
+        // } else if (commonShopId !== product.shop_id) {
+        //   return { code: 758 }; 
+        // }
+        
+        // shop_id = commonShopId
+
+        // newCart.category_id = product.category_id
+        amount += (product.unit_price * productData.quantity);
+        console.log("productData.unit_price",product.unit_price)
+        newCart.products.push({
+          _id: product._id,
+          product_id : product.product_id,
+          quantity: productData.quantity,
+          shop_id : productData.shop_id
+        });
+
+        // product.quantity -= productData.quantity;
+        // await product.save();
+        // console.log()
+        productsList.push(product.toObject());
+      }
+
+      // await newCart.save();
+      
+      // const product = await Product.getProductById(data.product_id);
       const user =
       (await User.getUserById(data.user_id)) ||
       (await User.getUserByUserUid(data.userUid));
 
-      if (product && user) {
-        // Product
-        if (data.quantity > product.quantity) {
-          return { code: 740 };
-        }
-        if (product.category_id != data.category_id) {
-          return { code: 741 };
-        }
-        const unit_price = product.unit_price;
-        product.cart_id = newCart.cart_id;
-
-        product.quantity -= data.quantity;
-
-        const amount = unit_price * data.quantity;
-        await product.save();
-        // Cart
-        newCart.products.push(product._id);
-
-        // Category ID
-        const categoryId = product.category_id;
-
+      if ( user) {
+        
         await newCart.save();
-
-        const productIds = await Cart.getProdutsByCartId(newCart.cart_id);
-
-        const productObjects = await Cart.findProducts(productIds);
-        if (productObjects && productObjects.length > 0) {
-          productObjects.forEach((product) => {
-            // const item = {
-            //   product_id: product.product_id,
-            //   product_name: product.name || "",
-            // };
-            productsList.push(product);
-          });
-        }
+        user.cart_id = newCart.cart_id;
+        await user.save()
+        
 
         const updatedCart = await Cart.populateCategoryId(
-          categoryId,
+          category_id,
           newCart.cart_id
         );
 
@@ -1735,32 +1731,37 @@ class ApiRepository {
           data.user_id,
           updatedCart.cart_id
         );
+        
+        console.log("amount",amount)
+        const finalUpdateCart = await Cart.populateAmount(
+          amount,
+          newUpdateCart.cart_id
+        );
+
+        // const finalUpdateCart = await Cart.populateShopId(
+        //   shop_id,
+        //   newUpdateCart.cart_id
+        // );
 
         // newUpdateCart.amount = amount;
         // newUpdateCart.list = productsList;
         // console.log("newUpdateCart", newUpdateCart)
-        await newUpdateCart.save();
+
+        await finalUpdateCart.save();
         
-        const updatedCartWithNewFields = { ...newUpdateCart.toObject(),'list':productsList , 'amount':amount };
-        console.log("updatedCartWithNewFields",updatedCartWithNewFields)
+        const updatedCartWithNewFields = { ...finalUpdateCart.toObject(),'list':productsList  };
+        // console.log("updatedCartWithNewFields",updatedCartWithNewFields)
         
         return {
           data: updatedCartWithNewFields,
-          // amount: amount,
-          // productsList: productsList,
           code: 669,
         };
-      } else if (!user) {
+      } else  {
         return { code: 404 };
-      } else {
-        return { code: 735 };
-      }
-      // await newProduct.save();
-      // console.log("new newProduct present");
-      // await newProduct.save();
-      // console.log(newProduct);
-    } else if (!data.product_id) {
-      return { code: 718 };
+      } 
+
+    } else if (!(Array.isArray(data.products))) {
+      return { code: 756 };
     } else if (!data.category_id) {
       return { code: 711 };
     } else {
@@ -1770,6 +1771,128 @@ class ApiRepository {
     //   return { code: 670 };
     // }
   }
+
+  async placeOrder(data) {
+    // try {
+      console.log("data incoming" , data)
+      // console.log("placeorder repo")
+      if (data.user_id) {
+        const user =(await User.getUserById(data.user_id)) || (await User.getUserByUserUid(data.userUid));
+        
+        // if (!user)
+        // {
+        //   return {code : 461}
+        // }
+
+        const cart = await Cart.getCartById(user.cart_id)
+        if(!cart)
+        {
+          return {code : 759 }
+        }
+        // const product_id = cart.product_id
+        const products = cart.products
+        console.log("cart Products: ",products)
+        const user_id = cart.user_id
+        const userUid = cart.userUid
+        // const shop_id = cart.shop_id
+        const quantity = cart.quantity
+        const total_amount = cart.amount
+        // for (const productData of products)
+        // {
+          
+        // }
+        console.log("cart details: ", cart)
+        for (const productData of products)
+        {
+          
+          const product = await Product.getProductById(productData.product_id);
+          if (product ) {
+            if (product.quantity > 0) {
+              product.num_of_sale += quantity;
+              product.quantity -= quantity;
+              product.save();
+              user.products_bought.push(product._id);
+            } else {
+              return { code: 734 };
+            }
+          } else {
+            return { code: 735 };
+          }
+        }
+
+        user.save();
+        const newOrder = Order.Order({
+          user_id : user_id,
+          // shop_id : shop_id,
+          products : products,
+          userUid : userUid,
+          total_amount : total_amount,
+          status : "Placed"
+        })
+        await newOrder.save()
+        await Cart.Cart.deleteOne({ cart_id: cart.cart_id });
+        return { code: 753 , data : newOrder};
+
+      } else {
+        return { code: 730 };
+      }
+    // } catch (error) {
+    //   return { code: 1100 };
+    // }
+  }
+
+  
+
+  async completeOrder(data) {
+    try {
+      console.log("completeorder repo")
+      if (data.order_id ) {
+        const order = await Order.getOrderById(data.order_id)
+        
+        if (order)
+        {
+          order.status = "Completed"
+          await order.save()
+          return { code: 754 , data : order };
+        }
+
+      } else {
+        return { code: 755 };
+      }
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
+
+  async orderDetails(data) {
+    try {
+      if (data.order_id) {
+        // console.log("name and image present");
+        const order = await Order.getOrderById(data.order_id);
+
+        if (order) {
+          const data = order;
+
+          return {
+            data: data,
+            code: 671,
+          };
+        } else {
+          return { code: 738 };
+        }
+      } else {
+        return { code: 739 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 1100 };
+    }
+  }
+
+
+
+
 
   async cartListing() {
     try {

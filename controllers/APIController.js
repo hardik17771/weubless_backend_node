@@ -1010,30 +1010,6 @@ const main_subcategoryproductUserDistance = async (req, res) => {
 
 /*********************************************** BUY PRODUCT ***********************************/
 
-const buyProduct = async (req, res) => {
-  // try {
-  const { user_id, product_id } = req.body;
-  const error_msg = new Msg();
-  const apiService = new ApiService();
-
-  const Check = await apiService.buyProduct({
-    user_id,
-    product_id,
-  });
-
-  const msg = error_msg.responseMsg(Check.code);
-  console.log("controller msg", msg);
-  if (Check.code === 900) {
-    // console.log(Check.productsList);
-    const response = { status: "1", message: msg ,status_code : 200};
-    res.status(200).json(response);
-  } else {
-    const response = { status: "0", message: msg ,status_code : 400};
-    res.status(400).json(response);
-  }
-  // } catch (error) {}
-};
-
 const trendingProducts = async (req, res) => {
   const error_msg = new Msg();
   const apiService = new ApiService();
@@ -1137,6 +1113,50 @@ const addToCart = async (req, res) => {
   //   res.status(500).json(response);
   // }
 };
+
+
+const placeOrder = async (req, res) => {
+  // try {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiRepository = new ApiRepository();
+
+  const Check = await apiRepository.placeOrder(data);
+
+  const msg = error_msg.responseMsg(Check.code);
+  console.log("controller msg", msg);
+  if (Check.code === 753) {
+    // console.log(Check.productsList);
+    const response = { status: "1", message: msg , data:Check.data ,status_code : 200};
+    res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
+  }
+  // } catch (error) {}
+};
+
+const completeOrder = async (req, res) => {
+  // try {
+  const data = req.body;
+  const error_msg = new Msg();
+  const apiRepository = new ApiRepository();
+
+  const Check = await apiRepository.completeOrder(data);
+
+  const msg = error_msg.responseMsg(Check.code);
+  console.log("controller msg", msg);
+  if (Check.code === 754) {
+    // console.log(Check.productsList);
+    const response = { status: "1", message: msg , data:Check.data ,status_code : 200};
+    res.status(200).json(response);
+  } else {
+    const response = { status: "0", message: msg ,status_code : 400};
+    res.status(400).json(response);
+  }
+  // } catch (error) {}
+};
+
 
 const cartListing = async (req, res) => {
   const apiRepository = new ApiRepository();
@@ -1449,11 +1469,12 @@ module.exports = {
   main_subcategoryproductDistance,
   main_subcategoryproductLatLong,
   main_subcategoryproductUserDistance,
-  buyProduct,
   trendingProducts,
   trendingProductsByCategory,
   trendingProductsByLocation,
   addToCart,
+  placeOrder,
+  completeOrder,
   cartListing,
   cartDetails,
   checkout,

@@ -119,6 +119,13 @@ const apiController = require("../controllers/APIController");
  */
 router.post("/api/add-to-cart", apiController.addToCart);
 
+/**** BUY PRODUCTS *****/
+
+
+router.post("/api/place-order", apiController.placeOrder);
+
+router.post("/api/order-complete", apiController.completeOrder);
+
 /**
  * @swagger
  * /api/cart-list:
@@ -276,6 +283,6 @@ router.post("/api/cart-details", apiController.cartDetails);
  *                   type: integer
  *                   enum: [670]
  */
-router.post("/api/checkout", apiController.checkout);
+// router.post("/api/checkout", apiController.checkout);
 
 module.exports = router;

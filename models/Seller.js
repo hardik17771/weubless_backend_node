@@ -1,17 +1,11 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const { Product } = require("./Product");
-const { Address } = require("./Address");
+const { Shop } = require("./Shop");
 
-const userSchema2 = new mongoose.Schema(
+const sellerSchema = new mongoose.Schema(
   {
-    user_id: { type: Number, unique: true },
+    seller_id: { type: Number, unique: true },
 
-    username: {
-      type: String,
-      required: [true, "Username is required"],
-      unique: [true, "Username should be unique"],
-    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -20,8 +14,7 @@ const userSchema2 = new mongoose.Schema(
 
     userUid: {
       type: String,
-      required : true,
-      unique:true
+      required : true
     },
 
 
@@ -44,11 +37,7 @@ const userSchema2 = new mongoose.Schema(
       },
     },
 
-    user_type: {
-      type: Number,
-      required: [true, "User type is required"],
-    },
-    is_deleted: Number,
+
     dob: {
       type: String,
       required: true,
@@ -66,7 +55,7 @@ const userSchema2 = new mongoose.Schema(
       default: null,
       required: false,
     },
-    products_bought: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    shops_owned: [{ type: mongoose.Schema.Types.ObjectId, ref: "Shop" }],
 
     primary_address_index: {
       type: Number,
@@ -107,12 +96,6 @@ const userSchema2 = new mongoose.Schema(
       default: null,
       required: true,
     },
-    
-    cart_id: {
-      type: Number,
-      default: 0,
-    },
-    
     addresses: [
       {
         latitude: { type: String, required: [true, "Latitude is required"] },
@@ -139,80 +122,71 @@ const userSchema2 = new mongoose.Schema(
 
 
 
-userSchema2.pre("save", async function (next) {
+sellerSchema.pre("save", async function (next) {
   try {
     if (!this.isNew) {
       return next();
     }
-    const max = await this.constructor.findOne({}, { user_id: 1 })
-    .sort({ user_id: -1 })
+    const max = await this.constructor.findOne({}, { seller_id: 1 })
+    .sort({ seller_id: -1 })
     .limit(1)
     .lean();
 
   
-    this.user_id = max ? max.user_id + 1 : 1;
+    this.seller_id = max ? max.seller_id + 1 : 1;
     next();
   } catch (error) {
     next(error);
   }
 });
 
-const getUser = async (email) => {
-  try {
-    const user = await User2.findOne({ email }).exec();
-    console.log(user);
-    return user;
-  } catch (error) {
-    throw new Error(`Error fetching user: ${error.message}`);
-  }
-};
 
-const getUserById = async (user_id) => {
+
+const getSellerById = async (seller_id) => {
   try {
-    const user = await User2.findOne({ user_id: user_id }).exec();
-    console.log(user);
-    return user;
+    const seller = await Seller.findOne({ seller_id: seller_id }).exec();
+    console.log(seller);
+    return seller;
   } catch (error) {
-    throw new Error(`Error fetching user: ${error.message}`);
+    throw new Error(`Error fetching seller: ${error.message}`);
   }
 };
 
 const getUserByUserUid = async (userUid) => {
   try {
-    const user = await User2.findOne({ userUid: userUid }).exec();
-    console.log(user);
-    return user;
+    const seller = await User2.findOne({ userUid: userUid }).exec();
+    console.log(seller);
+    return seller;
   } catch (error) {
-    throw new Error(`Error fetching user: ${error.message}`);
+    throw new Error(`Error fetching seller: ${error.message}`);
   }
 };
 
-const findProducts = async (objectIds) => {
+const findShops = async (objectIds) => {
   try {
-    const products = await Product.find({
+    const shops = await Shop.find({
       _id: { $in: objectIds },
     });
-    return products;
+    return shops;
   } catch (error) {
     throw new Error(`Error fetching categories: ${error.message}`);
   }
 };
 
-const getTotalUserCount = async () => {
+const getTotalSellerCount = async () => {
   try {
-    const totalUserCount = await User2.countDocuments().exec();
-    return totalUserCount;
+    const totalSellerCount = await Seller.countDocuments().exec();
+    return totalSellerCount;
   } catch (error) {
-    throw new Error(`Error fetching total user count: ${error.message}`);
+    throw new Error(`Error fetching total seller count: ${error.message}`);
   }
 };
 
-const User2 = mongoose.model("User2", userSchema2);
+const Seller = mongoose.model("Seller", sellerSchema);
 module.exports = {
-  User2,
-  getUser,
-  getUserById,
+  Seller,
+  getSellerById,
   getUserByUserUid,
-  findProducts,
-  getTotalUserCount
+  findShops,
+  getTotalSellerCount
 };

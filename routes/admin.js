@@ -9,6 +9,7 @@ router.get("/table/:tableName", homeController.singleTableView);
 
 
 router.get("/billing", homeController.billingView);
+router.get("/orders", homeController.ordersView);
 router.get("/profile", homeController.profileView);
 router.get("/map", homeController.mapView);
 router.get("/user-map", homeController.userMapView);
