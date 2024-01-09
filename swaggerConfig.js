@@ -161,19 +161,47 @@ const options = {
           type: "object",
           properties: {
             cart_id: { type: "number" },
+            product_id: { type: "number" },
             user_id: { type: "number" },
+            userUid: { type: "string" },
             category_id: { type: "number" },
-            products: { type: "array" },
-            address_id: { type: "string" },
-            price: { type: "number" },
-            tax: { type: "number" },
-            shipping_cost: { type: "number" },
-            discount: { type: "number" },
-            coupon_code: { type: "string" },
-            coupon_applied: { type: "boolean" },
-            quantity: { type: "number" },
-            owner_id: { type: "string" },
-            variation: { type: "string" },
+            products: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  product_id: { type: "number" },
+                  quantity: { type: "number", default: 0 },
+                  shop_id: { type: "number" },
+                },
+              },
+            },
+            price: { type: "number", default: 0 },
+            tax: { type: "number", default: 0 },
+            quantity: { type: "number", default: 0 },
+            amount: { type: "number", default: 0 },
+          },
+        },
+        Order: {
+          type: "object",
+          properties: {
+            order_id: { type: "number" },
+            user_id: { type: "number" },
+            userUid: { type: "string" },
+            products: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  product_id: { type: "number" },
+                  quantity: { type: "number", default: 0 },
+                  shop_id: { type: "number" },
+                },
+              },
+            },
+            cart_id: { type: "number" },
+            total_amount: { type: "number", default: 0 },
+            status: { type: "string" },
           },
         },
         ContactUs: {
