@@ -3,22 +3,31 @@ const productSchema = new mongoose.Schema(
   {
     product_id: { type: Number, unique: true },
     name: { type: String, required: true },
-    quantity: { type: Number, default: 0 },
     added_by: { type: String, default: "" },
     category_id: { type: Number, ref: "Category", default: 0 },
     main_subcategory_id: { type: Number, ref: "SubCategory", required: true },
-    shop_id: { type: Number, ref: "Shop", required: true },
-    latitude: {
-      type: String,
-    },
-    longitude: {
-      type: String,
-    },
+    // shop_id: { type: Number, ref: "Shop", required: true },
+    // latitude: {
+    //   type: String,
+    // },
+    // longitude: {
+    //   type: String,
+    // },
+    shops : [
+      {
+        shop_id : { type: Number, ref: "Shop" },
+        quantity : { type: Number ,default : 0},
+        shop_price : { type: Number,default : 0 },
+      }
+    ],
+
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users2",
       default: null,
     },
+
+    total_quantity : {type: Number ,default : 0},
     num_of_sale: { type: Number, default: 0 },
     brand_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,34 +36,8 @@ const productSchema = new mongoose.Schema(
     },
     photos: { type: String, default: "" },
     thumbnail_img: { type: String, default: "" },
-    featured_img: { type: String, default: "" },
-    flash_deal_img: { type: String, default: "" },
-    video_provider: { type: String, default: "" },
-    video_link: { type: String, default: "" },
-    tags: { type: String, default: "" },
-    description: { type: String, default: "" },
     unit_price: { type: Number, default: 0 },
-    purchase_price: { type: Number, default: 0 },
-    choice_options: { type: String, default: "" },
-    colors: { type: String, default: "" },
-    variations: { type: String, default: "" },
-    todays_deal: { type: Number, default: 0 },
-    published: { type: Number, default: 0 },
-    featured: { type: Number, default: 0 },
-    current_stock: { type: Number, default: 0 },
-    unit: { type: String, default: "" },
-    discount: { type: Number, default: 0 },
-    discount_type: { type: String, default: "" },
-    tax: { type: Number, default: 0 },
-    tax_type: { type: String, default: "" },
-    shipping_type: { type: String, default: "" },
-    shipping_cost: { type: Number, default: 0 },
-    meta_title: { type: String, default: "" },
-    meta_description: { type: String, default: "" },
-    meta_img: { type: String, default: "" },
-    pdf: { type: String, default: "" },
-    slug: { type: String, default: "" },
-    rating: { type: Number, default: 0 },
+    mrp_price: { type: Number, default: 0 },
   },
   { timestamps: true },
   {
@@ -109,9 +92,10 @@ const getProductById = async (product_id) => {
 
 const populateCategory = async (category_id, product_id) => {
   // try {
-  console.log(category_id);
+  // console.log("category_id" , category_id);
+  // console.log("product_id" , product_id);
   const product = await Product.findOne({ product_id }).exec();
-
+  // console.log("product" , product);
   if (category_id) {
     product.category_id = category_id;
 

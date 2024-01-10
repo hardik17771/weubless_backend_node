@@ -37,12 +37,10 @@ const sellerSchema = new mongoose.Schema(
       },
     },
 
-
     dob: {
       type: String,
       required: true,
     },
-
 
     deviceToken: {
       type: String,
@@ -55,7 +53,7 @@ const sellerSchema = new mongoose.Schema(
       default: null,
       required: false,
     },
-    shops_owned: [{ type: mongoose.Schema.Types.ObjectId, ref: "Shop" }],
+    shops_owned: [{ shop_id: Number }],
 
     primary_address_index: {
       type: Number,

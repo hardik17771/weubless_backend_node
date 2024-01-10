@@ -621,7 +621,7 @@ const createProduct = async (req, res) => {
   const error_msg = new Msg();
 
   // console.log("Create product api controller hit");
-  try {
+  // try {
   const newProduct = await apiRepository.createProduct(data);
 
   const msg = error_msg.responseMsg(newProduct.code); //706
@@ -632,11 +632,11 @@ const createProduct = async (req, res) => {
     const response = { status: "0", message: msg, data: newProduct.data,status_code : 400 };
     res.status(400).json(response);
   }
-  } catch (error) {
-    const msg = error_msg.responseMsg(717); //707
-    const response = { status: "0", message: msg ,status_code : 500 };
-    res.status(500).json(response);
-  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(717); //707
+  //   const response = { status: "0", message: msg ,status_code : 500 };
+  //   res.status(500).json(response);
+  // }
 };
 
 const productListing = async (req, res) => {
@@ -782,7 +782,7 @@ const createShop = async (req, res) => {
   const error_msg = new Msg();
 
   console.log("Create product api controller hit");
-  try {
+  // try {
     const newShop = await apiRepository.createShop(data);
 
     const msg = error_msg.responseMsg(newShop.code); //706
@@ -793,11 +793,60 @@ const createShop = async (req, res) => {
       const response = { status: "0", message: msg, data: newShop.data,status_code : 400 };
       res.status(400).json(response);
     }
-  } catch (error) {
-    const msg = error_msg.responseMsg(721); //707
-    const response = { status: "0", message: msg ,status_code : 500};
-    res.status(500).json(response);
-  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(721); //707
+  //   const response = { status: "0", message: msg ,status_code : 500};
+  //   res.status(500).json(response);
+  // }
+};
+
+
+const addProductsToShop = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create product api controller hit");
+  // try {
+    const Check = await apiRepository.addProductsToShop(data);
+
+    const msg = error_msg.responseMsg(Check.code); //706
+    if (Check.code === 763) {
+      const response = { status: "1", message: msg, data: Check.data,status_code : 200 };
+      res.status(200).json(response);
+    } else {
+      const response = { status: "0", message: msg, data: Check.data,status_code : 400 };
+      res.status(400).json(response);
+    }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(721); //707
+  //   const response = { status: "0", message: msg ,status_code : 500};
+  //   res.status(500).json(response);
+  // }
+};
+
+const deleteProductOfShop = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create product api controller hit");
+  // try {
+    const Check = await apiRepository.deleteProductOfShop(data);
+
+    const msg = error_msg.responseMsg(Check.code); //706
+    if (Check.code === 767) {
+      const response = { status: "1", message: msg, data: Check.data,status_code : 200 };
+      res.status(200).json(response);
+    } else {
+      const response = { status: "0", message: msg, data: Check.data,status_code : 400 };
+      res.status(400).json(response);
+    }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(721); //707
+  //   const response = { status: "0", message: msg ,status_code : 500};
+  //   res.status(500).json(response);
+  // }
 };
 
 const shopListing = async (req, res) => {
@@ -856,7 +905,7 @@ const shopDetails = async (req, res) => {
   const apiRepository = new ApiRepository();
   const error_msg = new Msg();
 
-  try {
+  // try {
     const shop = await apiRepository.shopDetails(data);
 
     const msg = error_msg.responseMsg(shop.code);
@@ -870,11 +919,11 @@ const shopDetails = async (req, res) => {
       const response = { status: "0", message: msg, data: shop.data,status_code : 400 };
       res.status(400).json(response);
     }
-  } catch (error) {
-    const msg = error_msg.responseMsg(717);
-    const response = { status: "0", message: msg,status_code : 500 };
-    res.status(500).json(response);
-  }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(717);
+  //   const response = { status: "0", message: msg,status_code : 500 };
+  //   res.status(500).json(response);
+  // }
 };
 
 const getShopsByCategory = async (req, res) => {
@@ -902,6 +951,57 @@ const getShopsByCategory = async (req, res) => {
     res.status(500).json(response);
   }
 };
+
+/*********************************************** SHOPS ***********************************/
+
+const createSeller = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  console.log("Create product api controller hit");
+  // try {
+    const newSeller = await apiRepository.createSeller(data);
+
+    const msg = error_msg.responseMsg(newSeller.code); 
+    if (newSeller.code === 764) {
+      const response = { status: "1", message: msg, data: newSeller.data,status_code : 200 };
+      res.status(200).json(response);
+    } else {
+      const response = { status: "0", message: newSeller.msg , status_code : 400 };
+      res.status(400).json(response);
+    }
+  // } catch (error) {
+  //   const msg = error_msg.responseMsg(721); //707
+  //   const response = { status: "0", message: msg ,status_code : 500};
+  //   res.status(500).json(response);
+  // }
+};
+
+const sellerDetails = async (req, res) => {
+  const data = req.body;
+  const apiRepository = new ApiRepository();
+  const error_msg = new Msg();
+
+  // console.log("seller details api controller hit");
+  try {
+    const seller = await apiRepository.sellerDetails(data);
+
+    const msg = error_msg.responseMsg(seller.code); 
+    if (seller.code === 766) {
+      const response = { status: "1", message: msg, data: seller.data,status_code : 200 };
+      res.status(200).json(response);
+    } else {
+      const response = { status: "0", message: msg , status_code : 400 };
+      res.status(400).json(response);
+    }
+  } catch (error) {
+    const msg = error_msg.responseMsg(721); //707
+    const response = { status: "0", message: msg ,status_code : 500};
+    res.status(500).json(response);
+  }
+};
+
 
 /*********************************************** LOCATION FEATURES ***********************************/
 
@@ -1459,9 +1559,13 @@ module.exports = {
   updateProduct,
   productDetails,
   createShop,
+  addProductsToShop,
+  deleteProductOfShop,
   shopListing,
   updateShop,
   shopDetails,
+  createSeller,
+  sellerDetails,
   getShopsByCategory,
   productsFromMainSubCategoryId,
   productsFromCategoryId,

@@ -3,7 +3,6 @@ const router = express.Router();
 const apiController = require("../controllers/APIController");
 
 /**** PRODUCT ROUTES *****/
-
 /**
  * @swagger
  * /api/create-product:
@@ -11,22 +10,31 @@ const apiController = require("../controllers/APIController");
  *     summary: Create a new product
  *     tags:
  *       - Product
- *     parameters:
- *       - in: body
- *         name: data
- *         description: Product information (Only Required fields are mentioned here rest fields can also be added by looking at the schema and category_id shall not be given since it is autopopulated using the subcategory)
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             name:
- *               type: string
- *             main_subcategory_id:
- *               type: number
- *             shop_id:
- *               type: number
+ *     requestBody:
+ *       description: Product information (Only Required fields are mentioned here; rest fields can also be added by looking at the schema. Category_id shall not be given since it is autopopulated using the subcategory)
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               main_subcategory_id:
+ *                 type: number
+ *               shops:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     shop_id:
+ *                       type: number
+ *                     quantity:
+ *                       type: number
+ *                     shop_price:
+ *                       type: number
  *     responses:
- *       716:
+ *       '200':
  *         description: Product created successfully
  *         content:
  *           application/json:
@@ -38,8 +46,8 @@ const apiController = require("../controllers/APIController");
  *                 code:
  *                   type: integer
  *                   enum: [716]
- *       708:
- *         description: Name is missing
+ *       '400':
+ *         description: Bad Request. Check the response for specific error codes.
  *         content:
  *           application/json:
  *             schema:
@@ -47,9 +55,9 @@ const apiController = require("../controllers/APIController");
  *               properties:
  *                 code:
  *                   type: integer
- *                   enum: [708]
- *       723:
- *         description: Shop ID is missing
+ *                   enum: [708, 723, 725, 726]
+ *       '500':
+ *         description: Internal Server Error. Check the response for specific error codes.
  *         content:
  *           application/json:
  *             schema:
@@ -57,27 +65,7 @@ const apiController = require("../controllers/APIController");
  *               properties:
  *                 code:
  *                   type: integer
- *                   enum: [723]
- *       725:
- *         description: Main Subcategory ID is missing
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [725]
- *       726:
- *         description: Subcategory with provided main_subcategory_id does not exist
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [726]
+ *                   enum: [717]
  */
 router.post("/api/create-product", apiController.createProduct);
 

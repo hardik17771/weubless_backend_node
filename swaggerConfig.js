@@ -95,67 +95,102 @@ const options = {
           properties: {
             product_id: { type: "number" },
             name: { type: "string" },
-            quantity: { type: "number" },
             added_by: { type: "string" },
             category_id: { type: "number" },
             main_subcategory_id: { type: "number" },
-            shop_id: { type: "number" },
-            latitude: { type: "string" },
-            longitude: { type: "string" },
+            shops: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  shop_id: { type: "number" },
+                  quantity: { type: "number" },
+                  shop_price: { type: "number" }
+                },
+                required: ["shop_id"]
+              }
+            },
             user_id: { type: "string" },
+            total_quantity: { type: "number" },
             num_of_sale: { type: "number" },
             brand_id: { type: "string" },
             photos: { type: "string" },
             thumbnail_img: { type: "string" },
-            featured_img: { type: "string" },
-            flash_deal_img: { type: "string" },
-            video_provider: { type: "string" },
-            video_link: { type: "string" },
-            tags: { type: "string" },
-            description: { type: "string" },
             unit_price: { type: "number" },
-            purchase_price: { type: "number" },
-            choice_options: { type: "string" },
-            colors: { type: "string" },
-            variations: { type: "string" },
-            todays_deal: { type: "number" },
-            published: { type: "number" },
-            featured: { type: "number" },
-            current_stock: { type: "number" },
-            unit: { type: "string" },
-            discount: { type: "number" },
-            discount_type: { type: "string" },
-            tax: { type: "number" },
-            tax_type: { type: "string" },
-            shipping_type: { type: "string" },
-            shipping_cost: { type: "number" },
-            meta_title: { type: "string" },
-            meta_description: { type: "string" },
-            meta_img: { type: "string" },
-            pdf: { type: "string" },
-            slug: { type: "string" },
-            rating: { type: "number" },
+            mrp_price: { type: "number" }
+            
           },
+          required: ["product_id", "name", "main_subcategory_id"]
         },
         Shop: {
           type: "object",
           properties: {
-            user_id: { type: "string" },
+            user_id: { "type": "string" },
             shop_id: { type: "number" },
             name: { type: "string" },
             latitude: { type: "string" },
             longitude: { type: "string" },
-            products: { type: "array" },
+            products: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  product_id: { type: "number" },
+                  quantity: { type: "number" },
+                  shop_price: { type: "number" }
+                },
+                required: ["product_id"]
+              }
+            },
             logo: { type: "string" },
-            sliders: { type: "string" },
             address: { type: "string" },
             facebook: { type: "string" },
             google: { type: "string" },
             twitter: { type: "string" },
             youtube: { type: "string" },
             instagram: { type: "string" },
-            slug: { type: "string" },
+            slug: { type: "string" }
+            // ... (other fields)
           },
+          required: ["shop_id", "name", "latitude", "longitude"]
+        },
+        Seller: {
+          type: "object",
+          properties: {
+            seller_id: { type: "number" },
+            name: { type: "string" },
+            userUid: { type: "string" },
+            phone: { type: "string" },
+            email: { type: "string" },
+            dob: { type: "string" },
+            deviceToken: { type: "string" },
+            profileImage: { type: "string" },
+            shops_owned: { type: "array", items: { type: "object", properties: { shop_id: { type: "number" } } } },
+            primary_address_index: { type: "number" },
+            latitude: { type: "string" },
+            longitude: { type: "string" },
+            country: { type: "string" },
+            state: { type: "string" },
+            city: { type: "string" },
+            pincode: { type: "string" },
+            address: { type: "string" },
+            addresses: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  latitude: { type: "string" },
+                  longitude: { type: "string" },
+                  country: { type: "string" },
+                  state: { type: "string" },
+                  city: { type: "string" },
+                  pincode: { type: "string" },
+                  address: { type: "string" },
+                },
+              },
+            },
+          },
+          required: ["seller_id", "name", "userUid", "phone", "email", "dob", "deviceToken", "primary_address_index", "latitude", "longitude", "country", "state", "city", "pincode", "address"]
         },
         Cart: {
           type: "object",
