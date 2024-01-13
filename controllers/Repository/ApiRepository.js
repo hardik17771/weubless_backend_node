@@ -1120,6 +1120,7 @@ class ApiRepository {
     // }
   }
 
+  // In this function whatever you send is overwritten... so if the shop_price is not changed or something do not send that to this endpoint
   async addProductsToShop(data) {
     console.log(data);
     // try {
@@ -1138,30 +1139,37 @@ class ApiRepository {
           {
             if (existingProduct.product_id == productData.product_id)
             {
+              let quantity = productData.quantity || 0
+              let shop_price = productData.shop_price || existingProduct.shop_price
+              const product = await Product.getProductById(existingProduct.product_id)
+
               if(productData.quantity)
               {
-                existingProduct.quantity += productData.quantity
+                console.log("quantity exist")
+                existingProduct.quantity += quantity
               }
               if(productData.shop_price)
               {
-                existingProduct.shop_price = productData.shop_price
+                console.log("shop price exist")
+                existingProduct.shop_price = shop_price
               }
-              if(productData.images || productData.length !== 0)
+              console.log("product daa test" , productData)
+              if(productData.images)
               {
+                console.log("image list is empty")
                 existingProduct.images = productData.images
               }
 
-              const product = await Product.getProductById(existingProduct.product_id)
               for (const shopData of product.shops)
               {
-                console.log("shopData in the add product to shop api", shopData)
-                console.log("shopData.shop_id",shopData.shop_id)
-                console.log("shop.shop_id",shop.shop_id)
+                // console.log("shopData in the add product to shop api", shopData)
+                // console.log("shopData.shop_id",shopData.shop_id)
+                // console.log("shop.shop_id",shop.shop_id)
                 if(shopData.shop_id === shop.shop_id )
                 {
-                  console.log("shopData and shop id equal")
-                    shopData.quantity += productData.quantity
-                    shopData.shop_price = productData.shop_price 
+                  // console.log("shopData and shop id equal")
+                    shopData.quantity += quantity
+                    shopData.shop_price = shop_price 
                     shopData.images = existingProduct.images
                 }
               }
@@ -1172,19 +1180,19 @@ class ApiRepository {
           if(!alreadyExisting)
           {
             const product = await Product.getProductById(productData.product_id)
-            console.log("product.photos",product.photos)
+            // console.log("product.photos",product.photos)
             let {images , ...productDataWithoutImages} = productData
-            console.log("images" , images)
-            console.log("productDataWithoutImages" , productDataWithoutImages)
+            // console.log("images" , images)
+            // console.log("productDataWithoutImages" , productDataWithoutImages)
             if (!images || images.length === 0) {
-              console.log("Image list is empty");
+              // console.log("Image list is empty");
               images = product.photos;
             }
             const updatedProductData = {
               ...productDataWithoutImages,
               images
             }
-            console.log("updatedProductData",updatedProductData)
+            // console.log("updatedProductData",updatedProductData)
             shop.products.push(updatedProductData)
             
             product.shops.push({
@@ -1193,14 +1201,14 @@ class ApiRepository {
               shop_price : updatedProductData.shop_price,
               images : updatedProductData.images
             })
-            console.log("product.shops",product.shops)
+            // console.log("product.shops",product.shops)
 
             await product.save();
           }
         }
         await shop.save();
         
-        console.log("shop after the products added: " ,shop );
+        // console.log("shop after the products added: " ,shop );
         return { data: shop, code: 763 };
       } else if (!data.shop_id) {
         return { code: 723 };
