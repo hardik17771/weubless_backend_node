@@ -839,9 +839,8 @@ class ApiRepository {
           newProduct.product_id
         );
 
-
-          let total_quantity = 0
-
+        let total_quantity = 0
+        let photo_images = []
           // This code will effectively take place only when it is required that when the seller is creating a new product and then it is pushing it in it's database hand to hand
           if (data.shops)
           {
@@ -865,18 +864,21 @@ class ApiRepository {
 
               const quantity = shop.quantity || 0;
               const shop_price = shop.shop_price || 0;
+              const images = shop.images || [""];
               const productData = {
                 product_id : newProduct.product_id,
                 quantity : quantity,
-                shop_price : shop_price
+                shop_price : shop_price,
+                images : images
               } 
               total_quantity += quantity
+              photo_images = images
               shopFound.products.push(productData)
               shopFound.save();
               console.log("shopFound after updating" , shopFound)
             }
-          
         
+        updated_product.photos = photo_images
         updated_product.total_quantity += total_quantity
         await subCategory.save();
         await category.save();
@@ -1021,53 +1023,6 @@ class ApiRepository {
         const product = await Product.getProductById(data.product_id);
 
         if (product) {
-          // const {
-          //   name,
-          //   createdAt,
-          //   updatedAt,
-          //   product_id,
-          //   main_subcategory_id,
-          //   subcategory_id,
-          //   latitude,
-          //   longitude,
-          //   quantity,
-          //   added_by,
-          //   user_id,
-          //   category_id,
-          //   brand_id,
-          //   photos,
-          //   thumbnail_img,
-          //   featured_img,
-          //   flash_deal_img,
-          //   video_provider,
-          //   video_link,
-          //   tags,
-          //   description,
-          //   unit_price,
-          //   purchase_price,
-          //   choice_options,
-          //   colors,
-          //   variations,
-          //   todays_deal,
-          //   published,
-          //   featured,
-          //   current_stock,
-          //   unit,
-          //   discount,
-          //   discount_type,
-          //   tax,
-          //   tax_type,
-          //   shipping_type,
-          //   shipping_cost,
-          //   num_of_sale,
-          //   meta_title,
-          //   meta_description,
-          //   meta_img,
-          //   pdf,
-          //   slug,
-          //   rating,
-          // } = product;
-
           return {
             data: product,
             code: 664,
@@ -1191,17 +1146,23 @@ class ApiRepository {
               {
                 existingProduct.shop_price = productData.shop_price
               }
+              if(productData.images || productData.length !== 0)
+              {
+                existingProduct.images = productData.images
+              }
 
               const product = await Product.getProductById(existingProduct.product_id)
-              
-              console.log("product.shops",product)
-
               for (const shopData of product.shops)
               {
+                console.log("shopData in the add product to shop api", shopData)
+                console.log("shopData.shop_id",shopData.shop_id)
+                console.log("shop.shop_id",shop.shop_id)
                 if(shopData.shop_id === shop.shop_id )
                 {
+                  console.log("shopData and shop id equal")
                     shopData.quantity += productData.quantity
                     shopData.shop_price = productData.shop_price 
+                    shopData.images = existingProduct.images
                 }
               }
               await product.save();
@@ -1210,19 +1171,30 @@ class ApiRepository {
           }
           if(!alreadyExisting)
           {
-            shop.products.push(productData)
             const product = await Product.getProductById(productData.product_id)
-            for (const shopData of product.shops)
-            {
-              if (shopData.shop_id === shop.shop_id)
-              {
-                product.shops.push({
-                  shop_id : shop.shop_id,
-                  quantity : productData.quantity,
-                  shop_price : productData.shop_price,
-                })
-              }
+            console.log("product.photos",product.photos)
+            let {images , ...productDataWithoutImages} = productData
+            console.log("images" , images)
+            console.log("productDataWithoutImages" , productDataWithoutImages)
+            if (!images || images.length === 0) {
+              console.log("Image list is empty");
+              images = product.photos;
             }
+            const updatedProductData = {
+              ...productDataWithoutImages,
+              images
+            }
+            console.log("updatedProductData",updatedProductData)
+            shop.products.push(updatedProductData)
+            
+            product.shops.push({
+              shop_id : shop.shop_id,
+              quantity : updatedProductData.quantity,
+              shop_price : updatedProductData.shop_price,
+              images : updatedProductData.images
+            })
+            console.log("product.shops",product.shops)
+
             await product.save();
           }
         }
@@ -1911,7 +1883,9 @@ class ApiRepository {
         
         await newCart.save();
         user.cart_id = newCart.cart_id;
+        
         await user.save()
+      
         
 
         const updatedCart = await Cart.populateCategoryId(

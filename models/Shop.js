@@ -20,7 +20,8 @@ const shopSchema = new mongoose.Schema(
       {
         product_id : {type : Number},
         quantity : {type: Number , default : 0},
-        shop_price : {type:Number , default : 0}
+        shop_price : {type:Number , default : 0},
+        images : [ { type:String , default : ""}]
       }
     ],
     logo: { type: String, default: null },

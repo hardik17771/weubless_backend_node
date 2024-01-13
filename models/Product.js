@@ -18,15 +18,17 @@ const productSchema = new mongoose.Schema(
         shop_id : { type: Number, ref: "Shop" },
         quantity : { type: Number ,default : 0},
         shop_price : { type: Number,default : 0 },
+        images : [{ type: String,default : "" }],
       }
     ],
 
-    user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "users2",
-      default: null,
-    },
-
+    // user_id: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "users2",
+    //   default: null,
+    // },
+    isbn_value : {type:Number , default : 0},
+    description : {type : String,default : ""},    
     total_quantity : {type: Number ,default : 0},
     num_of_sale: { type: Number, default: 0 },
     brand_id: {
@@ -34,7 +36,7 @@ const productSchema = new mongoose.Schema(
       ref: "Brand",
       default: null,
     },
-    photos: { type: String, default: "" },
+    photos: [{ type: String, default: "" }],
     thumbnail_img: { type: String, default: "" },
     unit_price: { type: Number, default: 0 },
     mrp_price: { type: Number, default: 0 },
