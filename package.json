@@ -9,7 +9,7 @@
     "stop": "pm2 stop weucart-backend",
     "restart": "pm2 restart weucart-backend",
     "delete": "pm2 delete weucart-backend",
-    "status": "pm2 status",
+    "status": "pm2 status"
   },
   "keywords": [],
   "author": "",
@@ -37,8 +37,5 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "validator": "^13.11.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
   }
 }
