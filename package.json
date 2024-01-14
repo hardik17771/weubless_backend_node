@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "nodemon": "^3.0.2"
     "@forestadmin/agent": "^1.36.0",
     "@forestadmin/datasource-mongoose": "^1.5.30",
     "@turf/turf": "^6.5.0",
