@@ -32,8 +32,14 @@ subCategorySchema.pre("save", async function (next) {
     if (!this.isNew) {
       return next();
     }
-    const count = await this.constructor.countDocuments({});
-    this.main_subcategory_id = count + 1;
+    const max = await this.constructor.findOne({}, { main_subcategory_id: 1 })
+    .sort({ main_subcategory_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.main_subcategory_id = max ? max.main_subcategory_id + 1 : 1;
+
     next();
   } catch (error) {
     next(error);
@@ -51,27 +57,6 @@ const getSubCategoryById = async (main_subcategory_id) => {
   }
 };
 
-// const getSubSubCategoriesByMainSubCategoryId = async (main_subcategory_id) => {
-//   try {
-//     const subCategory = await SubCategory.findOne({
-//       main_subcategory_id,
-//     }).exec();
-//     return subCategory ? subCategory.subsubCategories : [];
-//   } catch (error) {
-//     throw new Error(`Error fetching user: ${error.message}`);
-//   }
-// };
-
-// const findSubSubCategories = async (objectIds) => {
-//   try {
-//     const subSubCategories = await SubSubCategory.find({
-//       _id: { $in: objectIds },
-//     });
-//     return subSubCategories;
-//   } catch (error) {
-//     throw new Error(`Error fetching categories: ${error.message}`);
-//   }
-// };
 
 const getProdutsByMainSubCategoryId = async (main_subcategory_id) => {
   try {

@@ -1,0 +1,113 @@
+<style>
+    /* Add your styling here */
+    .order-container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  
+    .shop-container {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  
+    .order-card {
+      width: calc(33.33% - 20px);
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  
+    .completed {
+      background-color: green;
+    }
+  
+    .placed {
+      background-color: rgb(174, 174, 45);
+    }
+  
+    .pending {
+      background-color: red;
+    }
+  </style>
+  
+  <h1>Orders</h1>
+  <% const ordersByShop = {}; %>
+  <% const completedOrders = []; %>
+  <% const placedOrders = []; %>
+  
+  <% orders.forEach(order => { %>
+    <% order.products.forEach(product => { %>
+      <% const shopId = product.shop_id || 'miscellaneous'; %>
+      <% if (!ordersByShop[shopId]) { %>
+        <% ordersByShop[shopId] = []; %>
+      <% } %>
+      <% ordersByShop[shopId].push(order); %>
+  
+    <% }) %>
+  <% }) %>
+
+  <% orders.forEach(order => { %>
+    <% if (order.status === 'Completed') { %>
+      <% completedOrders.push(order); %>
+    <% } else if (order.status === 'Placed') { %>
+      <% placedOrders.push(order); %>
+    <% } %>
+  <% }) %>
+  
+  <h3>Orders By Shops: </h3>
+  <% Object.keys(ordersByShop).forEach(shopId => { %>
+    <div class="shop-container">
+      <h4>Shop ID: <%= shopId %></h4>
+      <div class="order-container">
+        <% ordersByShop[shopId].forEach(order => { %>
+          <div class="order-card <%= order.status === 'Completed' ? 'completed' : (order.status === 'Placed' ? 'placed' : 'pending') %>">
+            <h3>Order ID: <%= order.order_id %></h3>
+            <p>User ID: <%= order.user_id %></p>
+            <% order.products.forEach(product => { %>
+              <p>Product ID: <%= product.product_id %></p>
+            <% }) %>
+            <p>Status: <%= order.status %></p>
+            <p>Total Amount: <%= order.total_amount %></p>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  <% }) %>
+
+  <br />
+  <br />
+    <h3>All Orders</h3>
+  <!-- Completed Orders List -->
+  <h4>Completed Orders</h4>
+  <div class="order-container">
+    <% completedOrders.forEach(order => { %>
+      <div class="order-card completed">
+        <h3>Order ID: <%= order.order_id %></h3>
+        <p>User ID: <%= order.user_id %></p>
+        <% order.products.forEach(product => { %>
+          <p>Product ID: <%= product.product_id %></p>
+        <% }) %>
+        <p>Status: <%= order.status %></p>
+        <p>Total Amount: <%= order.total_amount %></p>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- Placed Orders List -->
+  <h4>Placed Orders</h4>
+  <div class="order-container">
+    <% placedOrders.forEach(order => { %>
+      <div class="order-card placed">
+        <h3>Order ID: <%= order.order_id %></h3>
+        <p>User ID: <%= order.user_id %></p>
+        <% order.products.forEach(product => { %>
+          <p>Product ID: <%= product.product_id %></p>
+        <% }) %>
+        <p>Status: <%= order.status %></p>
+        <p>Total Amount: <%= order.total_amount %></p>
+
+      </div>
+    <% }) %>
+  </div>
+  

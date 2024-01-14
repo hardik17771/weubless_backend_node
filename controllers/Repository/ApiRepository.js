@@ -13,8 +13,11 @@ const SubCategory = require("../../models/SubCategory");
 const SubSubCategory = require("../../models/SubSubCategory");
 const Product = require("../../models/Product");
 const Shop = require("../../models/Shop");
+const Seller = require("../../models/Seller");
 const Cart = require("../../models/Cart");
+const Order = require("../../models/Order");
 const Advertisement = require("../../models/Advertisement");
+const Faq = require('../../models/Faq')
 
 class ApiRepository {
   constructor() {
@@ -81,6 +84,65 @@ class ApiRepository {
     //   return { code: 1100 };
     // }
   }
+
+
+  async updateAddress( data) {
+    try {
+      if(data.address_id)
+      {
+        const existingAddress = await Address.getAddressById(data.address_id);
+
+        if (!existingAddress) {
+          return { code: 748 }; 
+        }
+  
+        existingAddress.latitude = data.latitude || existingAddress.latitude;
+        existingAddress.longitude = data.longitude || existingAddress.longitude;
+        existingAddress.address = data.address || existingAddress.address;
+        existingAddress.pincode = data.pincode || existingAddress.pincode;
+        existingAddress.city = data.city || existingAddress.city;
+        existingAddress.state = data.state || existingAddress.state;
+        existingAddress.country = data.country || existingAddress.country;
+  
+        await existingAddress.save();
+  
+        
+        return { code: 749, data: existingAddress }; 
+      }
+      else{
+        return {code : 750}
+      }
+
+    } catch (error) {
+      console.error("Error updating address:", error.message);
+      return { code: 1100 }; 
+    }
+  }
+
+  async addressDetails(data) {
+    try {
+      if (data.address_id) {
+        console.log("name and image present");
+        const address = await Address.getAddressById(data.address_id);
+
+        if (address) {
+          return {
+            data: address,
+            code: 751,
+          };
+        } else {
+          return { code: 748 };
+        }
+      } else {
+        return { code: 750 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 1100 };
+    }
+  }
+
+
   
   async login(data) {
     try {
@@ -337,27 +399,82 @@ class ApiRepository {
   }
 
   async register(data) {
+    // const data = req.body;
+    // console.log("API Controller data");
+    // console.log(data);
+    console.log("register Data", data)
+    const newAddress = new Address.Address({
+      latitude: data.latitude,
+      longitude: data.longitude,
+      address: data.address,
+      pincode: data.pincode,
+      city: data.city,
+      state: data.state,
+      country: data.country,
+    })
+    await newAddress.save();
+  
     try {
-      console.log("Register API Repository data");
-      console.log(data);
-      const user = new User.User2({
+      const newUser = new User.User2({
+        userUid: data.userUid,
         username: data.username,
         name: data.name,
-        country_code: data.country_code,
         phone: data.phone,
         email: data.email,
-        password: hashPassword(data.password),
         user_type: data.user_type,
+        deviceToken: data.deviceToken,
+        profileImage: data.profileImage,
         latitude: data.latitude,
         longitude: data.longitude,
+        address: data.address,
+        pincode: data.pincode,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        dob : data.dob,
+        // input_latitude: data.input_latitude,
+        // input_longitude: data.input_longitude,
+        // input_liveAddress: data.input_liveAddress,
+        // input_livePincode: data.input_livePincode,
+        // input_liveCity: data.input_liveCity,
+        addresses: [
+          newAddress
+        ],
       });
-
-      await user.save();
-      return user;
+  
+  
+      // console.log('dob that is entered value before validation:', data.dob);
+      // console.log('dob for user value before validation:', newUser.dob);
+  
+      // console.log(newAddress)
+      await newUser.save();
+      return{
+        status: 1,
+        message: "User registered successfully",
+        data: newUser,
+        status_code : 200
+      };
     } catch (error) {
-      throw error; // Rethrow the error to be caught in the higher level
+      let errorMessage = "Registration failed";
+      if (error.code === 11000) {
+        if (error.keyPattern.username === 1) {
+          errorMessage = "Username already in use";
+        } else if (error.keyPattern.phone === 1) {
+          errorMessage = "Phone number already in use";
+        } else if (error.keyPattern.email === 1) {
+          errorMessage = "Email already in use";
+        }
+      } else if (error.name === "ValidationError") {
+        // Validation error
+        const field = Object.keys(error.errors)[0];
+        errorMessage = error.errors[field].message;
+      }
+  
+      return{ status: 0, message: errorMessage ,status_code : 200};
     }
   }
+
+
   // Change password
   async changePassword(data) {
     try {
@@ -701,70 +818,87 @@ class ApiRepository {
 
   async createProduct(data) {
     // try {
-    console.log("Create newProduct api repo hit");
-    console.log("name is ", data.name);
-    console.log("data is ", data);
-    if (data.name && data.main_subcategory_id && data.shop_id) {
-      // console.log("name and image present");
-      const newProduct = new Product.Product(data);
 
+    if (data.name && data.main_subcategory_id ) {
+      const newProduct = new Product.Product(data);
       const subCategory = await SubCategory.getSubCategoryById(
         data.main_subcategory_id
       );
-      const shop = await Shop.getShopById(data.shop_id);
 
-      // console.log(subSubCategory.main_subcategory_id);
 
-      if (subCategory && shop) {
-        // Sub Categories
+      if (subCategory ) {
         subCategory.products.push(newProduct._id);
-        await subCategory.save();
-
-        // Category
         const categoryId = subCategory.category_id;
         const category = await Category.getCategoryById(categoryId);
         category.products.push(newProduct._id);
-        await category.save();
-        console.log(category);
-
-        // Shop
-        console.log("shop data is", shop);
-        const lat = shop.latitude;
-        const long = shop.longitude;
-        console.log("shop lat long is", lat, long);
-        shop.products.push(newProduct._id);
-        await shop.save();
-
+        
         await newProduct.save();
-        // console.log(newProduct);
-
+        
         const updated_product = await Product.populateCategory(
           categoryId,
           newProduct.product_id
         );
 
-        const new_updated_product = await Product.populateLatLong(
-          lat,
-          long,
-          updated_product.product_id
-        );
+        let total_quantity = 0
+        let photo_images = []
+          // This code will effectively take place only when it is required that when the seller is creating a new product and then it is pushing it in it's database hand to hand
+          if (data.shops)
+          {
+            // console.log("data.shops is present")
+          
+            console.log("data.shops: ", data.shops)
+            for(const shop of data.shops)
+            {
+              console.log("shop in the data.shops: ", shop)
+              if(!shop.shop_id)
+              {
+                return {code : 723}
+              }
 
-        await new_updated_product.save();
-        return { data: new_updated_product, code: 716 };
-      } else if (!subCategory) {
-        return { code: 726 };
-      } else {
-        return { code: 723 };
+              const shopFound = await Shop.getShopById(shop.shop_id)
+              console.log("shopFound",shopFound)
+              if(!shopFound)
+              {
+                return {code : 722}
+              }
+
+              const quantity = shop.quantity || 0;
+              const shop_price = shop.shop_price || 0;
+              const images = shop.images || [""];
+              const productData = {
+                product_id : newProduct.product_id,
+                quantity : quantity,
+                shop_price : shop_price,
+                images : images
+              } 
+              total_quantity += quantity
+              photo_images = images
+              shopFound.products.push(productData)
+              shopFound.save();
+              console.log("shopFound after updating" , shopFound)
+            }
+        
+        updated_product.photos = photo_images
+        updated_product.total_quantity += total_quantity
+        await subCategory.save();
+        await category.save();
+        await updated_product.save();
+
       }
+      console.log("final updated product" , updated_product)
+      return { data: updated_product, code: 716 };
+      } else {
+        return { code: 726 };
+      }
+
+
       // await newProduct.save();
       // console.log("new newProduct present");
       // await newProduct.save();
       // console.log(newProduct);
     } else if (!data.main_subcategory_id) {
       return { code: 725 };
-    } else if (!data.shop_id) {
-      return { code: 723 };
-    } else {
+    }  else {
       return { code: 708 };
     }
     // } catch (error) {
@@ -784,7 +918,7 @@ class ApiRepository {
   }
 
   async updateProduct(data) {
-    try {
+    // try {
       // console.log(Category.Category);
       if (data.product_id) {
         const oldProduct = await Product.getProductById(data.product_id);
@@ -792,34 +926,39 @@ class ApiRepository {
 
         if (updatedProduct) {
           Object.assign(updatedProduct, data);
-          console.log("Updated product present", updatedProduct);
-          if (data.shop_id) {
-            if (oldProduct.shop_id != data.shop_id) {
-              const oldShop = await Shop.getShopById(oldProduct.shop_id);
-              const shop = await Shop.getShopById(data.shop_id);
+          // console.log("Updated product present", updatedProduct);
+          // if (data.shop_id) {
+          //   if (oldProduct.shop_id != data.shop_id) {
+          //     const oldShop = await Shop.getShopById(oldProduct.shop_id);
+          //     const shop = await Shop.getShopById(data.shop_id);
 
-              if (!shop) {
-                return { code: 722 };
-              }
+          //     if (!shop) {
+          //       return { code: 722 };
+          //     }
 
-              console.log(oldShop._id);
-              await Shop.Shop.findOneAndUpdate(
-                { _id: oldShop._id },
-                { $pull: { products: updatedProduct._id } }
-              );
+          //     console.log(oldShop._id);
+          //     await Shop.Shop.findOneAndUpdate(
+          //       { _id: oldShop._id },
+          //       { $pull: { products: updatedProduct._id } }
+          //     );
 
-              // Add product_id to new shop
-              await Shop.Shop.findOneAndUpdate(
-                { _id: shop._id },
-                { $push: { products: updatedProduct._id } }
-              );
-            }
+          //     // Add product_id to new shop
+          //     await Shop.Shop.findOneAndUpdate(
+          //       { _id: shop._id },
+          //       { $push: { products: updatedProduct._id } }
+          //     );
+          //   }
+          // }
+
+          if(data.shops || data.total_quantity)
+          {
+            return { code : 760}
           }
 
           if (data.main_subcategory_id) {
-            console.log("SubCategory ID present");
+            // console.log("SubCategory ID present");
             if (oldProduct.main_subcategory_id != data.main_subcategory_id) {
-              console.log("Old Product not equal data main subcategory id ");
+              // console.log("Old Product not equal data main subcategory id ");
               // Sub Category
               const oldSubCategory = await SubCategory.getSubCategoryById(
                 oldProduct.main_subcategory_id
@@ -832,8 +971,8 @@ class ApiRepository {
                 return { code: 726 };
               }
 
-              console.log("old Subcategory", oldSubCategory);
-              console.log("new Subcategory", subCategory);
+              // console.log("old Subcategory", oldSubCategory);
+              // console.log("new Subcategory", subCategory);
               await SubCategory.SubCategory.findOneAndUpdate(
                 { _id: oldSubCategory._id },
                 { $pull: { products: updatedProduct._id } }
@@ -872,9 +1011,9 @@ class ApiRepository {
       } else {
         return { code: 718 };
       }
-    } catch (error) {
-      return { code: 425 };
-    }
+    // } catch (error) {
+    //   return { code: 425 };
+    // }
   }
 
   async productDetails(data) {
@@ -884,107 +1023,15 @@ class ApiRepository {
         const product = await Product.getProductById(data.product_id);
 
         if (product) {
-          const {
-            name,
-            createdAt,
-            updatedAt,
-            product_id,
-            main_subcategory_id,
-            subcategory_id,
-            latitude,
-            longitude,
-            quantity,
-            added_by,
-            user_id,
-            category_id,
-            brand_id,
-            photos,
-            thumbnail_img,
-            featured_img,
-            flash_deal_img,
-            video_provider,
-            video_link,
-            tags,
-            description,
-            unit_price,
-            purchase_price,
-            choice_options,
-            colors,
-            variations,
-            todays_deal,
-            published,
-            featured,
-            current_stock,
-            unit,
-            discount,
-            discount_type,
-            tax,
-            tax_type,
-            shipping_type,
-            shipping_cost,
-            num_of_sale,
-            meta_title,
-            meta_description,
-            meta_img,
-            pdf,
-            slug,
-            rating,
-          } = product;
-
           return {
-            data: {
-              name,
-              createdAt,
-              updatedAt,
-              product_id,
-              main_subcategory_id,
-              subcategory_id,
-              latitude,
-              longitude,
-              quantity,
-              added_by,
-              user_id,
-              category_id,
-              brand_id,
-              photos,
-              thumbnail_img,
-              featured_img,
-              flash_deal_img,
-              video_provider,
-              video_link,
-              tags,
-              description,
-              unit_price,
-              purchase_price,
-              choice_options,
-              colors,
-              variations,
-              todays_deal,
-              published,
-              featured,
-              current_stock,
-              unit,
-              discount,
-              discount_type,
-              tax,
-              tax_type,
-              shipping_type,
-              shipping_cost,
-              num_of_sale,
-              meta_title,
-              meta_description,
-              meta_img,
-              pdf,
-              slug,
-              rating,
-            },
+            data: product,
             code: 664,
           };
         } else {
-          return { code: 422 }; // Assuming 422 is the appropriate error code
+          return { code: 422 }; 
         }
       } else {
-        return { code: 718 }; // Assuming 422 is the appropriate error code
+        return { code: 718 }; 
       }
     } catch (error) {
       console.error(error);
@@ -1040,24 +1087,179 @@ class ApiRepository {
 
   async createShop(data) {
     console.log(data);
-    try {
+    // try {
       console.log("Create newShop api repo hit");
       console.log("name is ", data.name);
       console.log("data is ", data);
-      if (data.name && data.latitude && data.longitude) {
+      if (data.name && data.latitude && data.longitude && data.seller_id) {
         console.log("name and image present");
         const newShop = new Shop.Shop(data);
         console.log("new newShop present");
         await newShop.save();
         console.log(newShop);
+        const seller = await Seller.getSellerById(data.seller_id)
+        if(!seller){
+          return {code : 765}
+        }
+
+        seller.shops_owned.push({
+          shop_id : newShop.shop_id
+        })
+        await seller.save();
         return { data: newShop, code: 720 };
       } else if (!data.name) {
         return { code: 708 };
-      } else {
+      }
+      else if (!data.seller_id) {
+        return { code: 761 };
+      }  else {
         return { code: 719 };
       }
-    } catch (error) {
-      return { code: 721 };
+    // } catch (error) {
+    //   return { code: 721 };
+    // }
+  }
+
+  // In this function whatever you send is overwritten... so if the shop_price is not changed or something do not send that to this endpoint
+  async addProductsToShop(data) {
+    console.log(data);
+    // try {
+      if (Array.isArray(data.products) && data.shop_id) {
+        const shop = await Shop.getShopById(data.shop_id)
+        for(const productData of data.products)
+        {
+          if (!productData.product_id)
+          {
+            return { code : 718}
+          }
+
+          let alreadyExisting = false
+
+          for(const existingProduct of shop.products)
+          {
+            if (existingProduct.product_id == productData.product_id)
+            {
+              let quantity = productData.quantity || 0
+              let shop_price = productData.shop_price || existingProduct.shop_price
+              const product = await Product.getProductById(existingProduct.product_id)
+
+              if(productData.quantity)
+              {
+                console.log("quantity exist")
+                existingProduct.quantity += quantity
+              }
+              if(productData.shop_price)
+              {
+                console.log("shop price exist")
+                existingProduct.shop_price = shop_price
+              }
+              console.log("product daa test" , productData)
+              if(productData.images)
+              {
+                console.log("image list is empty")
+                existingProduct.images = productData.images
+              }
+
+              for (const shopData of product.shops)
+              {
+                // console.log("shopData in the add product to shop api", shopData)
+                // console.log("shopData.shop_id",shopData.shop_id)
+                // console.log("shop.shop_id",shop.shop_id)
+                if(shopData.shop_id === shop.shop_id )
+                {
+                  // console.log("shopData and shop id equal")
+                    shopData.quantity += quantity
+                    shopData.shop_price = shop_price 
+                    shopData.images = existingProduct.images
+                }
+              }
+              await product.save();
+              alreadyExisting = true
+            }
+          }
+          if(!alreadyExisting)
+          {
+            const product = await Product.getProductById(productData.product_id)
+            // console.log("product.photos",product.photos)
+            let {images , ...productDataWithoutImages} = productData
+            // console.log("images" , images)
+            // console.log("productDataWithoutImages" , productDataWithoutImages)
+            if (!images || images.length === 0) {
+              // console.log("Image list is empty");
+              images = product.photos;
+            }
+            const updatedProductData = {
+              ...productDataWithoutImages,
+              images
+            }
+            // console.log("updatedProductData",updatedProductData)
+            shop.products.push(updatedProductData)
+            
+            product.shops.push({
+              shop_id : shop.shop_id,
+              quantity : updatedProductData.quantity,
+              shop_price : updatedProductData.shop_price,
+              images : updatedProductData.images
+            })
+            // console.log("product.shops",product.shops)
+
+            await product.save();
+          }
+        }
+        await shop.save();
+        
+        // console.log("shop after the products added: " ,shop );
+        return { data: shop, code: 763 };
+      } else if (!data.shop_id) {
+        return { code: 723 };
+      }
+      else  {
+        return { code: 756 };
+      }  
+    // } catch (error) {
+    //   return { code: 721 };
+    // }
+  }
+
+  async deleteProductOfShop(data){
+    if(data.product_id && data.shop_id)
+    {
+      const shop = await Shop.getShopById(data.shop_id)
+      const product = await Product.getProductById(data.product_id)
+      if(!shop)
+      {
+        return {code : 722}
+      }
+      if(!product)
+      {
+        return {code : 735}
+      }
+      for(const productData of shop.products)
+      {
+        if (productData.product_id === data.product_id)
+        {
+          shop.products.pop(productData)
+        }
+      }
+      await shop.save();
+      
+      for(const shopData of product.shops)
+      {
+        if(shopData.shop_id === data.shop_id)
+        {
+          product.shops.pop(shopData)
+        }
+      }
+      await product.save();
+
+      return { data : {shop , product }, code : 767 }
+    }
+    else if(!data.product_id)
+    {
+      return { code : 718}
+    }
+    else{
+      return { code : 723 }
     }
   }
 
@@ -1101,39 +1303,24 @@ class ApiRepository {
       if (data.shop_id) {
         console.log("name and image present");
         const shop = await Shop.getShopById(data.shop_id);
-
+        console.log("shop fetched by getShopId", shop);
+  
         if (shop) {
-          const {
-            name,
-            createdAt,
-            updatedAt,
-            shop_id,
-            latitude,
-            longitude,
-            products,
-            // user_id,
-          } = shop;
-
+          const { products } = shop;
+          console.log("products", products);
+  
           let productsList = [];
-          // console.log(products);
-          const productObjects = await Shop.findProducts(products);
-          if (productObjects && productObjects.length > 0) {
-            productObjects.forEach((product) => {
-              productsList.push(product);
-            });
+          for (const productData of products) {
+            const productObject = await Product.getProductById(productData.product_id);
+            productsList.push(productObject);
           }
-
+  
+          // Add productsList property to the existing shop object
+          const shopWithProductsList = { ...shop.toObject(), productsList };
+  
+          // Return the modified shop object
           return {
-            data: {
-              name,
-              createdAt,
-              updatedAt,
-              shop_id,
-              latitude,
-              longitude,
-              productsList,
-              // user_id,
-            },
+            data: shopWithProductsList,
             code: 667,
           };
         } else {
@@ -1147,7 +1334,7 @@ class ApiRepository {
       return { code: 724 };
     }
   }
-
+  
   async getShopsByCategory(data) {
     try {
       if (data.category_id) {
@@ -1164,6 +1351,107 @@ class ApiRepository {
     }
   }
   
+    /*********************************************** SELLER ***********************************/
+
+  async createSeller(data) {
+    // const data = req.body;
+    // console.log("API Controller data");
+    // console.log(data);
+    console.log("register Data", data)
+
+    try {
+      const newAddress = new Address.Address({
+        latitude: data.latitude,
+        longitude: data.longitude,
+        address: data.address,
+        pincode: data.pincode,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+      })
+      await newAddress.save();
+    
+      const newSeller = new Seller.Seller({
+        userUid: data.userUid,
+        username: data.username,
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        user_type: data.user_type,
+        deviceToken: data.deviceToken,
+        profileImage: data.profileImage,
+        latitude: data.latitude,
+        longitude: data.longitude,
+        address: data.address,
+        pincode: data.pincode,
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        dob : data.dob,
+        // input_latitude: data.input_latitude,
+        // input_longitude: data.input_longitude,
+        // input_liveAddress: data.input_liveAddress,
+        // input_livePincode: data.input_livePincode,
+        // input_liveCity: data.input_liveCity,
+        addresses: [
+          newAddress
+        ],
+      });
+  
+      await newSeller.save();
+      return{
+        code: 764,
+        data: newSeller,
+      };
+    } catch (error) {
+      let errorMessage = "Registration failed";
+      if (error.code === 11000) {
+        if (error.keyPattern.username === 1) {
+          errorMessage = "Username already in use";
+        } else if (error.keyPattern.phone === 1) {
+          errorMessage = "Phone number already in use";
+        } else if (error.keyPattern.email === 1) {
+          errorMessage = "Email already in use";
+        }
+      } else if (error.name === "ValidationError") {
+        // Validation error
+        const field = Object.keys(error.errors)[0];
+        errorMessage = error.errors[field].message;
+      }
+      else {
+        return {code : 1100}
+      }
+  
+      return{ code:1100 , msg: errorMessage };
+    }
+  }
+
+  async sellerDetails(data) {
+    try {
+      if (data.seller_id) {
+        console.log("name and image present");
+        const seller = await Seller.getSellerById(data.seller_id);
+
+        if (seller) {
+          return {
+            data: seller,
+            code: 766,
+          };
+        } else {
+          return { code: 765 }; 
+        }
+      } else {
+        return { code: 761 }; 
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 1100 };
+    }
+  }
+
+
+
+
   /*********************************************** LOCATION FEATURES ***********************************/
 
   async main_subcategoryproductLocation(data) {
@@ -1455,41 +1743,6 @@ class ApiRepository {
     }
   }
 
-  async buyProduct(data) {
-    try {
-      if (data.product_id && data.user_id) {
-        const product = await Product.getProductById(data.product_id);
-        const user = await User.getUserById(data.user_id);
-
-        if (product && user) {
-          if (product.quantity > 0) {
-            product.num_of_sale += 1;
-            product.quantity -= 1;
-            product.save();
-            user.products_bought.push(product._id);
-            user.save();
-          } else {
-            return { code: 734 };
-          }
-        } else if (!product) {
-          return { code: 735 };
-        } else {
-          return { code: 461 };
-        }
-
-        console.log("product", product, "user", user);
-        return { code: 900 };
-      } else if (!data.product_id) {
-        return { code: 718 };
-      } else {
-        return { code: 730 };
-      }
-      // console.log(Category.Category);
-    } catch (error) {
-      return { code: 425 };
-    }
-  }
-
   async trendingProducts() {
     try {
       const productList = await Product.Product.find()
@@ -1565,54 +1818,86 @@ class ApiRepository {
   /*********************************************** CART ***********************************/
 
   async addToCart(data) {
+    // console.log("data",data)
     // try {
-    if (data.product_id && data.user_id && data.quantity && data.category_id && data.userUid) {
+    if (Array.isArray(data.products) && data.user_id && data.category_id && data.userUid) {
       let productsList = [];
+      let category_id;
+      // let shop_id;
 
-      const newCart = new Cart.Cart(data);
-      const product = await Product.getProductById(data.product_id);
+      const newCart = new Cart.Cart({
+        user_id: data.user_id,
+        category_id: data.category_id,
+        userUid: data.userUid,
+      });      
+      
+      let amount = 0;
+      // let commonShopId = null;
+
+      for (const productData of data.products) {
+
+        if (!productData.product_id)
+        {
+          return { code : 718}
+        }
+        if (!productData.quantity)
+        {
+          return { code : 757}
+        }
+
+        const product = await Product.getProductById(productData.product_id);
+
+        if (!product || product.category_id !== data.category_id) {
+          return { code: 741 }; 
+        }
+
+        if (productData.quantity > product.quantity) {
+          return { code: 740 }; 
+        }
+        category_id = product.category_id
+
+        // if (commonShopId === null) {
+        //   commonShopId = product.shop_id;
+        // } else if (commonShopId !== product.shop_id) {
+        //   return { code: 758 }; 
+        // }
+        
+        // shop_id = commonShopId
+
+        // newCart.category_id = product.category_id
+        amount += (product.unit_price * productData.quantity);
+        console.log("productData.unit_price",product.unit_price)
+        newCart.products.push({
+          _id: product._id,
+          product_id : product.product_id,
+          quantity: productData.quantity,
+          shop_id : productData.shop_id
+        });
+
+        // product.quantity -= productData.quantity;
+        // await product.save();
+        // console.log()
+        productsList.push(product.toObject());
+      }
+
+      // await newCart.save();
+      
+      // const product = await Product.getProductById(data.product_id);
       const user =
       (await User.getUserById(data.user_id)) ||
       (await User.getUserByUserUid(data.userUid));
 
-      if (product && user) {
-        // Product
-        if (data.quantity > product.quantity) {
-          return { code: 740 };
-        }
-        if (product.category_id != data.category_id) {
-          return { code: 741 };
-        }
-        const unit_price = product.unit_price;
-        product.cart_id = newCart.cart_id;
-
-        product.quantity -= data.quantity;
-
-        const amount = unit_price * data.quantity;
-        await product.save();
-        // Cart
-        newCart.products.push(product._id);
-
-        // Category ID
-        const categoryId = product.category_id;
-
+      if ( user) {
+        
         await newCart.save();
-
-        const productIds = await Cart.getProdutsByCartId(newCart.cart_id);
-
-        const productObjects = await Cart.findProducts(productIds);
-        if (productObjects && productObjects.length > 0) {
-          productObjects.forEach((product) => {
-            // const item = {
-            //   product_id: product.product_id,
-            //   product_name: product.name || "",
-            // };
-            productsList.push(product);
-          });
-        }
+        user.cart_id = newCart.cart_id;
+        
+        await user.save()
+      
+        
 
         const updatedCart = await Cart.populateCategoryId(
-          categoryId,
+          category_id,
           newCart.cart_id
         );
 
@@ -1620,25 +1905,37 @@ class ApiRepository {
           data.user_id,
           updatedCart.cart_id
         );
+        
+        console.log("amount",amount)
+        const finalUpdateCart = await Cart.populateAmount(
+          amount,
+          newUpdateCart.cart_id
+        );
 
-        await newUpdateCart.save();
+        // const finalUpdateCart = await Cart.populateShopId(
+        //   shop_id,
+        //   newUpdateCart.cart_id
+        // );
+
+        // newUpdateCart.amount = amount;
+        // newUpdateCart.list = productsList;
+        // console.log("newUpdateCart", newUpdateCart)
+
+        await finalUpdateCart.save();
+        
+        const updatedCartWithNewFields = { ...finalUpdateCart.toObject(),'list':productsList  };
+        // console.log("updatedCartWithNewFields",updatedCartWithNewFields)
+        
         return {
-          data: newUpdateCart,
-          amount: amount,
-          productsList: productsList,
+          data: updatedCartWithNewFields,
           code: 669,
         };
-      } else if (!user) {
+      } else  {
         return { code: 404 };
-      } else {
-        return { code: 735 };
-      }
-      // await newProduct.save();
-      // console.log("new newProduct present");
-      // await newProduct.save();
-      // console.log(newProduct);
-    } else if (!data.product_id) {
-      return { code: 718 };
+      } 
+
+    } else if (!(Array.isArray(data.products))) {
+      return { code: 756 };
     } else if (!data.category_id) {
       return { code: 711 };
     } else {
@@ -1648,6 +1945,128 @@ class ApiRepository {
     //   return { code: 670 };
     // }
   }
+
+  async placeOrder(data) {
+    // try {
+      console.log("data incoming" , data)
+      // console.log("placeorder repo")
+      if (data.user_id) {
+        const user =(await User.getUserById(data.user_id)) || (await User.getUserByUserUid(data.userUid));
+        
+        // if (!user)
+        // {
+        //   return {code : 461}
+        // }
+
+        const cart = await Cart.getCartById(user.cart_id)
+        if(!cart)
+        {
+          return {code : 759 }
+        }
+        // const product_id = cart.product_id
+        const products = cart.products
+        console.log("cart Products: ",products)
+        const user_id = cart.user_id
+        const userUid = cart.userUid
+        // const shop_id = cart.shop_id
+        const quantity = cart.quantity
+        const total_amount = cart.amount
+        // for (const productData of products)
+        // {
+          
+        // }
+        console.log("cart details: ", cart)
+        for (const productData of products)
+        {
+          
+          const product = await Product.getProductById(productData.product_id);
+          if (product ) {
+            if (product.quantity > 0) {
+              product.num_of_sale += quantity;
+              product.quantity -= quantity;
+              product.save();
+              user.products_bought.push(product._id);
+            } else {
+              return { code: 734 };
+            }
+          } else {
+            return { code: 735 };
+          }
+        }
+
+        user.save();
+        const newOrder = Order.Order({
+          user_id : user_id,
+          // shop_id : shop_id,
+          products : products,
+          userUid : userUid,
+          total_amount : total_amount,
+          status : "Placed"
+        })
+        await newOrder.save()
+        await Cart.Cart.deleteOne({ cart_id: cart.cart_id });
+        return { code: 753 , data : newOrder};
+
+      } else {
+        return { code: 730 };
+      }
+    // } catch (error) {
+    //   return { code: 1100 };
+    // }
+  }
+
+  
+
+  async completeOrder(data) {
+    try {
+      console.log("completeorder repo")
+      if (data.order_id ) {
+        const order = await Order.getOrderById(data.order_id)
+        
+        if (order)
+        {
+          order.status = "Completed"
+          await order.save()
+          return { code: 754 , data : order };
+        }
+
+      } else {
+        return { code: 755 };
+      }
+    } catch (error) {
+      return { code: 425 };
+    }
+  }
+
+
+  async orderDetails(data) {
+    try {
+      if (data.order_id) {
+        // console.log("name and image present");
+        const order = await Order.getOrderById(data.order_id);
+
+        if (order) {
+          const data = order;
+
+          return {
+            data: data,
+            code: 671,
+          };
+        } else {
+          return { code: 738 };
+        }
+      } else {
+        return { code: 739 };
+      }
+    } catch (error) {
+      console.error(error);
+      return { code: 1100 };
+    }
+  }
+
+
+
+
 
   async cartListing() {
     try {
@@ -1723,9 +2142,7 @@ class ApiRepository {
   async createAdvertisement(data) {
     console.log(data);
     try {
-      // console.log("Create newShop api repo hit");
-      // console.log("name is ", data.name);
-      // console.log("data is ", data);
+
       if (data.name && data.category_id) {
         console.log("name and image present");
         const newAdvertisement = new Advertisement.Advertisement(data);
@@ -1733,7 +2150,6 @@ class ApiRepository {
         if (!category) {
           return { code: 714 };
         }
-        // console.log("new newShop present");
         await newAdvertisement.save();
         console.log(newAdvertisement);
         return { data: newAdvertisement, code: 743 };
@@ -1749,9 +2165,7 @@ class ApiRepository {
 
   async advertisementListing() {
     try {
-      // console.log(Category.Category);
       const advertisementList = await Advertisement.Advertisement.find();
-      console.log("advertisementList", advertisementList);
       return { list: advertisementList, code: 678 };
     } catch (error) {
       return { code: 425 };
@@ -1775,6 +2189,36 @@ class ApiRepository {
     //   return { code: 425 };
     // }
   }
+
+    /*********************************************** FAQ ***********************************/
+
+    async createFaq(data) {
+      try {
+        console.log("Create category api repo hit");
+  
+        if (data.question && data.answer) {
+          const newFaq = new Faq.Faq(data);
+          await newFaq.save();
+          console.log(newFaq);
+          return { data: newFaq, code: 745 };
+        } else if (data.question == "") {
+          return { code: 746 };
+        } else {
+          return { code: 747 };
+        }
+      } catch (error) {
+        return { code: 1100 };
+      }
+    }
+
+    async faqListing() {
+      try {
+        const faqList = await Faq.Faq.find();
+        return { list: faqList, code: 900 };
+      } catch (error) {
+        return { code: 1100 };
+      }
+    }
 
   /******************************************** END OF FUNCTION ********************************************/
 }

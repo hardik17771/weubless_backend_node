@@ -6,11 +6,11 @@ const categorySchema = new mongoose.Schema(
   {
     category_id: { type: Number, unique: true },
     name: { type: String, required: true },
-    banner: String,
-    icon: String,
+    banner: {type: String , default: ""},
+    icon: {type: String, default: ""},
     image: { type: String, required: true },
-    featured: Number,
-    top: Number,
+    featured: {type: Number,default : 0},
+    top: {type: Number, default : ""},
     subCategories: [
       { type: mongoose.Schema.Types.ObjectId, ref: "SubCategory" },
     ],
@@ -36,9 +36,15 @@ categorySchema.pre("save", async function (next) {
       return next();
     }
 
-    // Find the current count of documents and use it as the next category_id
-    const count = await this.constructor.countDocuments({});
-    this.category_id = count + 1;
+  
+    const max = await this.constructor.findOne({}, { category_id: 1 })
+    .sort({ category_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.category_id = max ? max.category_id + 1 : 1;
+
     next();
   } catch (error) {
     next(error);
@@ -98,6 +104,58 @@ const findProducts = async (objectIds) => {
   }
 };
 
+// const getTotalCountsByCategoryId = async (category_id) => {
+//   try {
+//     const category = await Category.findOne({
+//       category_id,
+//     }).exec();
+
+//     if (!category) {
+//       return { productCount: 0, subCategoryCount: 0 };
+//     }
+
+//     const productCount = category.products.length;
+//     const subCategoryCount = category.subCategories.length;
+
+//     return { productCount, subCategoryCount };
+//   } catch (error) {
+//     throw new Error(`Error fetching counts: ${error.message}`);
+//   }
+// };
+
+const getTotalProductsInfoByCategoryId = async (category_id) => {
+  try {
+    const category = await Category.findOne({ category_id }).exec();
+
+    if (!category) {
+      throw new Error(`Category with ID ${category_id} not found`);
+    }
+
+    const productIds = category.products;
+
+    // Calculate total products and sales for the specific category
+    const categoryProducts = await Product.find({ _id: { $in: productIds } });
+    const totalCategoryProducts = categoryProducts.reduce(
+      (total, product) => total + product.num_of_sale,
+      0
+    );
+
+    // Calculate total products and sales for the entire database
+    const allProducts = await Product.find();
+    const totalAllProducts = allProducts.reduce(
+      (total, product) => total + product.num_of_sale,
+      0
+    );
+
+    return {
+      num_of_products_category: totalCategoryProducts,
+      num_of_products_all: totalAllProducts,
+    };
+  } catch (error) {
+    throw new Error(`Error fetching total products info: ${error.message}`);
+  }
+};
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = {
@@ -107,4 +165,6 @@ module.exports = {
   findSubCategories,
   getProdutsByCategoryId,
   findProducts,
+  getTotalProductsInfoByCategoryId
+  // getTotalCountsByCategoryId, // Add the new function to exports
 };

@@ -230,4 +230,98 @@ router.post(
 );
 
 
+/**
+ * @swagger
+ * /api/create-faq:
+ *   post:
+ *     summary: Create a new FAQ
+ *     tags:
+ *       - FAQ
+ *     requestBody:
+ *       description: FAQ information
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               question:
+ *                 type: string
+ *                 description: The question for the FAQ
+ *               answer:
+ *                 type: string
+ *                 description: The answer to the FAQ
+ *     responses:
+ *       200:
+ *         description: New FAQ created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Faq'
+ *                 code:
+ *                   type: integer
+ *                   example: 745
+ *       400:
+ *         description: Bad request, missing question or answer in request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 746
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 1100
+ */
+router.post("/api/create-faq",apiController.createFaq)
+
+/**
+ * @swagger
+ * /api/faq-list:
+ *   get:
+ *     summary: Get a list of FAQs
+ *     tags:
+ *       - FAQ
+ *     responses:
+ *       200:
+ *         description: List of FAQs retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 list:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Faq'
+ *                 code:
+ *                   type: integer
+ *                   example: 900
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 1100
+ */
+router.get("/api/faq-list", apiController.faqListing);
+
+
+
 module.exports = router;

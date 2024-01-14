@@ -11,6 +11,7 @@ const categoryListingMiddleware = async (req, res, next) => {
   //   }
 };
 
+
 /**** CATEGORY ROUTES *****/
 
 /**

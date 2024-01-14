@@ -1,153 +1,183 @@
+
+
 <div class="container-fluid py-4">
-  <!-------------------------------------- START OF SINGLE TABLE ---------------------------------------->
-  <div class="row">
-    <div class="col-12">
-      <div class="card mb-4">
-        <div class="card-header pb-0">
-          <h6>Products table</h6>
-        </div>
-        <div class="card-body px-0 pt-0 pb-2">
-          <div class="table-responsive p-0">
-            <table class="table align-items-center mb-0">
+  <% const tablesData = [
+    { headers: userHeaders, data: userAlteredData, title: "Users" },
+    { headers: productHeaders, data: productAlteredData, title: "Products" },
+    { headers: subCategoryHeaders, data: subCategoryAlteredData, title: "SubCategories" },
+    { headers: categoryHeaders, data: categoryAlteredData, title: "Categories" }
+  ]; %>
 
-              <thead>
-                <tr>
-                  <% const headers = ["Product ID", "Product", "Shop", "MainSubCategory", "Updated At"]; %> 
-                  <% headers.forEach((header,index) => { %>
-                  <th
-                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 sortable-header"
-                    data-column-index="<%= index %>"
-                    data-sort="asc"
-                  >
-                    <a href="javascript:void(0)"><%= header %></a>
-                  </th>
+  <% tablesData.forEach(table => { %>
+    <div class="row">
+      <div class="col-12">
+        <div class="card mb-4">
+          <div class="card-header pb-0">
+            <h6><%= table.title %> table</h6>
+          </div>
+          <div class="card-body px-0 pt-0 pb-2">
+            <div class="table-responsive p-0">
+              <table class="table align-items-center mb-0">
+                <thead>
+                  <tr>
+                    <% table.headers.forEach((header, index) => { %>
+                      <th class="text-left text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 sortable-header" data-column-index="<%= index %>" data-sort="asc">
+                        <a href="javascript:void(0)"><%= header %></a>
+                      </th>
+                    <% }); %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% table.data.forEach(item => { %>
+                    <tr>
+                      <% table.headers.forEach((header, index) => { %>
+                        <td>
+                          <% if (index === 1 && item.name) { %>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <!-- <img src="../assets/img/grocery_img.jpg" class="avatar avatar-xl mx-3" alt="prod-img" /> -->
+                                <% if (table.title === "Users") { %>
+                                  <img src="../assets/img/bruce-mars.jpg" class="avatar avatar-xl mx-3" alt="user-img" />
+                                <% } else { %>
+                                  <img src="../assets/img/grocery_img.jpg" class="avatar avatar-xl mx-3" alt="prod-img" />
+                                <% } %>
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">
+                                  <!-- <% Object.entries(item).forEach(([key, value]) => { %>
+                                    <p><strong><%= key %>:</strong> <%= value %></p>
+                                  <% }); %> -->
+                                </h6>
+                                <h6 class="mb-0 text-sm"><%= item.name %></h6>
+                                <p class="text-xs text-secondary mb-0"><%= item.quantity %></p>
+                              </div>
+                            </div>
+                          <% } else { %>
+                            <!-- <p><%= header %></p> -->
+
+                            <% if (header === "Product Sales") { %>
+                              <!-- <h2>Hello</h2> -->
+                              <div class="d-flex align-items-center justify-content-center flex-column">
+                                <% var percentage = (item['Product Sales']['num_of_products_all'] !== 0) ? (item['Product Sales']['num_of_products_category'] / item['Product Sales']['num_of_products_all']) * 100 : 0; %>
+                                <div class="me-2 text-xs font-weight-bold"><%= item['Product Sales']['num_of_products_category'] %> / <%= item['Product Sales']['num_of_products_all'] %>(<%= percentage.toFixed(2) %>%)</div>
+                                <!-- <div class="me-2 text-xs font-weight-bold"></div> -->
+                                <div>
+                                  <div class="progress">
+                                    <div
+                                      class="progress-bar bg-gradient-info"
+                                      role="progressbar"
+                                      aria-valuenow="<%= percentage %>"
+                                      aria-valuemin="0"
+                                      aria-valuemax="100" 
+                                      style="width: 100px;"
+                                      ></div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <% } else { %>
+                              <p class="text-s font-weight-bold mb-0 mx-5 pl-4">
+                                <p><%= item[header] %></p>
+                                <!-- <p><%= header %></p> -->
+                              </p>
+                            <% } %>
+
+                          <% } %>
+  
+
+                        </td>
+                      <% }); %>
+
+                      
+
+                      <td class="align-middle">
+                        <a href="/admin/detail/<%= item[`modelId`] %>" class="text-secondary font-weight-bold text-xs" data-toggle="tooltip" data-original-title="Edit product">
+                          Edit
+                        </a>
+                      </td>
+                    </tr>
                   <% }); %>
-                </tr>
-              </thead>
-              <tbody>
-                <% productsWithSubcategory.forEach(product => { %>
-
-                <tr>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%= product.product_id %>
-                    </p>
-                  </td>
-                  <td>
-                    <div class="d-flex px-2 py-1">
-                      <div>
-                        <img
-                          src="../assets/img/productImg.jpg"
-                          class="avatar avatar-sm me-3"
-                          alt="user1"
-                        />
-                      </div>
-                      <div class="d-flex flex-column justify-content-center">
-                        <h6 class="mb-0 text-sm"><%= product.name %></h6>
-                        <p class="text-xs text-secondary mb-0">
-                          <%= product.quantity %>
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p class="text-xs font-weight-bold mb-0">
-                      <%= product.shopName %>
-                    </p>
-                    <!-- <p class="text-xs text-secondary mb-0"></p> -->
-                  </td>
-                  <td class="align-middle text-center text-sm">
-                    <span class="badge badge-sm bg-gradient-success"
-                      ><%= product.subcategoryName %></span
-                    >
-                  </td>
-                  <td class="align-middle text-center">
-                    <span class="text-secondary text-xs font-weight-bold"
-                      ><%= product.updatedAt %></span
-                    >
-                  </td>
-
-                  <td class="align-middle">
-                    <a href="/admin/detail/<%= product.product_id %>"
-                       class="text-secondary font-weight-bold text-xs"
-                       data-toggle="tooltip"
-                       data-original-title="Edit product"
-                    >
-                      Edit
-                    </a>
-                  </td>
-                </tr>
-                <% }); %>
-              </tbody>
-            </table>
+                                  </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  <% }); %>
   <!-------------------------------------- END OF SINGLE TABLE ---------------------------------------->
 </div>
+
+
+
+<!-- </div> -->
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".sortable-header").forEach(function (header) {
       header.addEventListener("click", function () {
         var columnIndex = this.getAttribute("data-column-index");
-        sortTable(columnIndex);
+        var table = findParentTable(this);
+        sortTable(table, columnIndex);
       });
     });
   });
 
-  function sortTable(column) {
-    var table,
-      rows,
-      switching,
-      i,
-      x,
-      y,
-      shouldSwitch,
-      dir,
-      switchcount = 0;
-    table = document.querySelector(".table");
-    switching = true;
-    dir = "asc";
+  function findParentTable(element) {
+    while ((element = element.parentElement) && !element.tagName.includes("TABLE")) {}
+    return element;
+  }
 
-    while (switching) {
-      switching = false;
-      rows = table.rows;
+  function sortTable(table, column) {
+  var rows = table.rows,
+    switching,
+    i,
+    x,
+    y,
+    shouldSwitch,
+    dir,
+    switchcount = 0;
 
-      for (i = 1; i < rows.length - 1; i++) {
-        shouldSwitch = false;
+  switching = true;
+  dir = "asc";
 
-        x = rows[i].getElementsByTagName("td")[column];
-        y = rows[i + 1].getElementsByTagName("td")[column];
+  while (switching) {
+    switching = false;
 
-        if (dir == "asc") {
-          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
-        } else if (dir == "desc") {
-          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-            shouldSwitch = true;
-            break;
-          }
+    for (i = 1; i < rows.length - 1; i++) {
+      shouldSwitch = false;
+
+      // Get the values of the specific column for the current and next rows
+      x = rows[i].getElementsByTagName("td")[column].innerText;
+      y = rows[i + 1].getElementsByTagName("td")[column].innerText;
+
+      if (dir == "asc") {
+        if (x.toLowerCase() > y.toLowerCase()) {
+          shouldSwitch = true;
+          break;
         }
-      }
-
-      if (shouldSwitch) {
-        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-        switching = true;
-        switchcount++;
-      } else {
-        if (switchcount == 0 && dir == "asc") {
-          dir = "desc";
-          switching = true;
+      } else if (dir == "desc") {
+        if (x.toLowerCase() < y.toLowerCase()) {
+          shouldSwitch = true;
+          break;
         }
       }
     }
 
-    var currentSort = document.querySelector(".table th[data-sort]");
-    currentSort.setAttribute("data-sort", dir);
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+      switchcount++;
+    } else {
+      if (switchcount == 0 && dir == "asc") {
+        dir = "desc";
+        switching = true;
+      }
+    }
   }
+
+  var currentSort = table.querySelector("th[data-sort]");
+  currentSort.setAttribute("data-sort", dir);
+}
+
 </script>

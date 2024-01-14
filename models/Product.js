@@ -1,65 +1,45 @@
 const mongoose = require("mongoose");
-// const { SubSubCategory } = require("./SubSubCategory");
-
 const productSchema = new mongoose.Schema(
   {
     product_id: { type: Number, unique: true },
     name: { type: String, required: true },
-    quantity: { type: Number, default: 0 },
     added_by: { type: String, default: "" },
     category_id: { type: Number, ref: "Category", default: 0 },
     main_subcategory_id: { type: Number, ref: "SubCategory", required: true },
-    // subcategory_id: { type: Number, ref: "SubSubCategory", required: true },
-    shop_id: { type: Number, ref: "Shop", required: true },
-    latitude: {
-      type: String,
-      // required: [true, "Latitude is required"],
-    },
-    longitude: {
-      type: String,
-      // required: [true, "Longitude is required"],
-    },
-    user_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "users2",
-      default: null,
-    },
+    // shop_id: { type: Number, ref: "Shop", required: true },
+    // latitude: {
+    //   type: String,
+    // },
+    // longitude: {
+    //   type: String,
+    // },
+    shops : [
+      {
+        shop_id : { type: Number, ref: "Shop" },
+        quantity : { type: Number ,default : 0},
+        shop_price : { type: Number,default : 0 },
+        images : [{ type: String,default : "" }],
+      }
+    ],
+
+    // user_id: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "users2",
+    //   default: null,
+    // },
+    isbn_value : {type:Number , default : 0},
+    description : {type : String,default : ""},    
+    total_quantity : {type: Number ,default : 0},
     num_of_sale: { type: Number, default: 0 },
     brand_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Brand",
       default: null,
     },
-    photos: { type: String, default: "" },
+    photos: [{ type: String, default: "" }],
     thumbnail_img: { type: String, default: "" },
-    featured_img: { type: String, default: "" },
-    flash_deal_img: { type: String, default: "" },
-    video_provider: { type: String, default: "" },
-    video_link: { type: String, default: "" },
-    tags: { type: String, default: "" },
-    description: { type: String, default: "" },
     unit_price: { type: Number, default: 0 },
-    purchase_price: { type: Number, default: 0 },
-    choice_options: { type: String, default: "" },
-    colors: { type: String, default: "" },
-    variations: { type: String, default: "" },
-    todays_deal: { type: Number, default: 0 },
-    published: { type: Number, default: 0 },
-    featured: { type: Number, default: 0 },
-    current_stock: { type: Number, default: 0 },
-    unit: { type: String, default: "" },
-    discount: { type: Number, default: 0 },
-    discount_type: { type: String, default: "" },
-    tax: { type: Number, default: 0 },
-    tax_type: { type: String, default: "" },
-    shipping_type: { type: String, default: "" },
-    shipping_cost: { type: Number, default: 0 },
-    meta_title: { type: String, default: "" },
-    meta_description: { type: String, default: "" },
-    meta_img: { type: String, default: "" },
-    pdf: { type: String, default: "" },
-    slug: { type: String, default: "" },
-    rating: { type: Number, default: 0 },
+    mrp_price: { type: Number, default: 0 },
   },
   { timestamps: true },
   {
@@ -80,10 +60,15 @@ productSchema.pre("save", async function (next) {
       return next();
     }
 
-    // Find the current count of documents and use it as the next category_id
-    const count = await this.constructor.countDocuments({});
-    this.product_id = count + 1;
+    const max = await this.constructor.findOne({}, { product_id: 1 })
+    .sort({ product_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.product_id = max ? max.product_id + 1 : 1;
     next();
+
   } catch (error) {
     next(error);
   }
@@ -109,9 +94,10 @@ const getProductById = async (product_id) => {
 
 const populateCategory = async (category_id, product_id) => {
   // try {
-  console.log(category_id);
+  // console.log("category_id" , category_id);
+  // console.log("product_id" , product_id);
   const product = await Product.findOne({ product_id }).exec();
-
+  // console.log("product" , product);
   if (category_id) {
     product.category_id = category_id;
 
@@ -145,7 +131,60 @@ const populateLatLong = async (lat, long, product_id) => {
   // }
 };
 
+const getTotalProductSoldAndSalesAndQuantity = async () => {
+  try {
+    const products = await Product.find().exec();
+
+    let totalProductSold = 0;
+    let totalSales = 0;
+    let totalQuantity = 0;
+
+    products.forEach(product => {
+      totalProductSold += product.num_of_sale;
+      totalSales += product.num_of_sale * product.unit_price;
+      totalQuantity += product.quantity;
+    });
+
+    return {
+      totalProductSold,
+      totalSales,
+      totalQuantity,
+    };
+  } catch (error) {
+    throw new Error(`Error calculating totals: ${error.message}`);
+  }
+};
 productSchema.index({ name: 1 }, { unique: false });
+
+const getTopFourProducts = async () => {
+  try {
+    const topFourProducts = await Product.find({})
+      .sort({ num_of_sale: -1 })
+      .limit(5)
+      .exec();
+
+    const result = topFourProducts.map(product => ({
+      category: product.category_id, 
+      quantity: product.quantity,
+      num_of_sale: product.num_of_sale,
+      totalSales: product.num_of_sale * product.unit_price,
+      name : product.name
+    }));
+
+    return result;
+  } catch (error) {
+    throw new Error(`Error fetching top four products: ${error.message}`);
+  }
+};
+
+const getTotalProductCount = async () => {
+  try {
+    const totalProductCount = await Product.countDocuments().exec();
+    return totalProductCount;
+  } catch (error) {
+    throw new Error(`Error fetching total product count: ${error.message}`);
+  }
+};
 
 const Product = mongoose.model("Product", productSchema);
 
@@ -155,4 +194,7 @@ module.exports = {
   getProductById,
   populateCategory,
   populateLatLong,
+  getTotalProductSoldAndSalesAndQuantity,
+  getTopFourProducts,
+  getTotalProductCount
 };

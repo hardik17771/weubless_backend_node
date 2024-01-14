@@ -8,28 +8,59 @@ const apiController = require("../controllers/APIController");
  * @swagger
  * /api/add-to-cart:
  *   post:
- *     summary: Add a product to the user's cart
+ *     summary: Add products to the user's shopping cart
  *     tags:
  *       - Cart
- *     parameters:
- *       - in: body
- *         name: data
- *         description: Information required to add a product to the cart (Only Required fields are mentioned here)
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             product_id:
- *               type: number
- *             user_id:
- *               type: string
- *             quantity:
- *               type: number
- *             category_id:
- *               type: number
+ *     requestBody:
+ *       description: Object containing user information and products to be added to the cart
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               cart_id:
+ *                 type: number
+ *               product_id:
+ *                 type: number
+ *               user_id:
+ *                 type: number
+ *               userUid:
+ *                 type: string
+ *               category_id:
+ *                 type: number
+ *               products:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product_id:
+ *                       type: number
+ *                     quantity:
+ *                       type: number
+ *                       default: 0
+ *                     shop_id:
+ *                       type: number
+ *               price:
+ *                 type: number
+ *                 default: 0
+ *               tax:
+ *                 type: number
+ *                 default: 0
+ *               quantity:
+ *                 type: number
+ *                 default: 0
+ *               amount:
+ *                 type: number
+ *                 default: 0
+ *             required:
+ *               - user_id
+ *               - userUid
+ *               - category_id
+ *               - products
+ *             additionalProperties: false
  *     responses:
- *       669:
- *         description: Product added to cart successfully
+ *       '200':
+ *         description: Products added to the cart successfully
  *         content:
  *           application/json:
  *             schema:
@@ -37,87 +68,156 @@ const apiController = require("../controllers/APIController");
  *               properties:
  *                 data:
  *                   $ref: '#/components/schemas/Cart'
- *                 amount:
+ *                 code:
  *                   type: number
- *                 productsList:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Product'
- *                 code:
- *                   type: integer
- *                   enum: [669]
- *       740:
- *         description: Insufficient quantity in stock
+ *       '404':
+ *         description: User not found or invalid data provided
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 code:
- *                   type: integer
- *                   enum: [740]
- *       741:
- *         description: Invalid category for the product
+ *                   type: number
+ *       '500':
+ *         description: Internal server error
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
  *                 code:
- *                   type: integer
- *                   enum: [741]
- *       718:
- *         description: Missing product_id
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [718]
- *       711:
- *         description: Missing category_id
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [711]
- *       730:
- *         description: Missing user_id or quantity
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [730]
- *       404:
- *         description: User not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [404]
- *       735:
- *         description: Product not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: integer
- *                   enum: [735]
+ *                   type: number
  */
 router.post("/api/add-to-cart", apiController.addToCart);
+
+
+/**
+ * @swagger
+ * /api/place-order:
+ *   post:
+ *     summary: Place an order for the products in the user's cart
+ *     tags:
+ *       - Order
+ *     requestBody:
+ *       description: Object containing user information and cart details for placing an order
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               order_id:
+ *                 type: number
+ *               user_id:
+ *                 type: number
+ *               userUid:
+ *                 type: string
+ *               products:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product_id:
+ *                       type: number
+ *                     quantity:
+ *                       type: number
+ *                       default: 0
+ *                     shop_id:
+ *                       type: number
+ *               cart_id:
+ *                 type: number
+ *               total_amount:
+ *                 type: number
+ *                 default: 0
+ *               status:
+ *                 type: string
+ *             required:
+ *               - user_id
+ *               - userUid
+ *             additionalProperties: false
+ *     responses:
+ *       '200':
+ *         description: Order placed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
+ *                 code:
+ *                   type: number
+ *       '404':
+ *         description: User or cart not found, or invalid data provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ */
+router.post("/api/place-order", apiController.placeOrder);
+
+
+/**
+ * @swagger
+ * /api/order-complete:
+ *   post:
+ *     summary: Mark an order as completed
+ *     tags:
+ *       - Order
+ *     requestBody:
+ *       description: Object containing order ID for marking the order as completed
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               order_id:
+ *                 type: number
+ *     responses:
+ *       '200':
+ *         description: Order marked as completed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Order'
+ *                 code:
+ *                   type: number
+ *       '404':
+ *         description: Order not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ */
+router.post("/api/order-complete", apiController.completeOrder);
 
 /**
  * @swagger
@@ -276,6 +376,6 @@ router.post("/api/cart-details", apiController.cartDetails);
  *                   type: integer
  *                   enum: [670]
  */
-router.post("/api/checkout", apiController.checkout);
+// router.post("/api/checkout", apiController.checkout);
 
 module.exports = router;

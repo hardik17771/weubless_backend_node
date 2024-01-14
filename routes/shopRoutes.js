@@ -73,6 +73,131 @@ router.post("/api/create-shop", apiController.createShop);
 
 /**
  * @swagger
+ * /api/add-products-to-shop:
+ *   post:
+ *     summary: Add products to a shop
+ *     tags:
+ *       - Shop
+ *     requestBody:
+ *       description: Shop and product information
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               shop_id:
+ *                 type: number
+ *               products:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     product_id:
+ *                       type: number
+ *                     quantity:
+ *                       type: number
+ *                     shop_price:
+ *                       type: number
+ *     responses:
+ *       '200':
+ *         description: Products added to the shop successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   $ref: '#/components/schemas/Shop'
+ *                 code:
+ *                   type: integer
+ *                   enum: [763]
+ *       '400':
+ *         description: Bad Request. Check the response for specific error codes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [718, 723, 756]
+ *       '500':
+ *         description: Internal Server Error. Check the response for specific error codes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [721]
+ */
+router.post("/api/add-products-to-shop", apiController.addProductsToShop);
+
+
+/**
+ * @swagger
+ * /api/delete-product-of-shop:
+ *   post:
+ *     summary: Delete a product from a shop
+ *     tags:
+ *       - Shop
+ *     requestBody:
+ *       description: Shop and product information
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               product_id:
+ *                 type: number
+ *               shop_id:
+ *                 type: number
+ *     responses:
+ *       '200':
+ *         description: Product deleted from the shop successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     shop:
+ *                       $ref: '#/components/schemas/Shop'
+ *                     product:
+ *                       $ref: '#/components/schemas/Product'
+ *                 code:
+ *                   type: integer
+ *                   enum: [767]
+ *       '400':
+ *         description: Bad Request. Check the response for specific error codes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [718, 723, 722, 735]
+ *       '500':
+ *         description: Internal Server Error. Check the response for specific error codes.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   enum: [721]
+ */
+router.post("/api/delete-product-of-shop", apiController.deleteProductOfShop);
+
+/**
+ * @swagger
  * /api/shop-list:
  *   get:
  *     summary: Get a list of shops

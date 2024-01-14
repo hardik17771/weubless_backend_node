@@ -3,7 +3,8 @@ const { Product, getProductByMongoId } = require("./Product");
 
 const shopSchema = new mongoose.Schema(
   {
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    // user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    seller_id: { type: Number, ref: "Seller" },
     shop_id: { type: Number, unique: true },
     name: { type: String, required: true },
     latitude: {
@@ -14,16 +15,22 @@ const shopSchema = new mongoose.Schema(
       type: String,
       required: [true, "Longitude is required"],
     },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    // products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+    products : [
+      {
+        product_id : {type : Number},
+        quantity : {type: Number , default : 0},
+        shop_price : {type:Number , default : 0},
+        images : [ { type:String , default : ""}]
+      }
+    ],
     logo: { type: String, default: null },
-    sliders: { type: String, default: null },
     address: { type: String, default: null },
     facebook: { type: String, default: null },
     google: { type: String, default: null },
     twitter: { type: String, default: null },
     youtube: { type: String, default: null },
     instagram: { type: String, default: null },
-    slug: { type: String, default: null },
   },
   { timestamps: true },
   {
@@ -42,8 +49,14 @@ shopSchema.pre("save", async function (next) {
     if (!this.isNew) {
       return next();
     }
-    const count = await this.constructor.countDocuments({});
-    this.shop_id = count + 1;
+    const max = await this.constructor.findOne({}, { shop_id: 1 })
+    .sort({ shop_id: -1 })
+    .limit(1)
+    .lean();
+
+  
+    this.shop_id = max ? max.shop_id + 1 : 1;
+
     next();
   } catch (error) {
     next(error);

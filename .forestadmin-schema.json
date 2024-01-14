@@ -1,9 +1,0 @@
-{
-  "collections": [],
-  "meta": {
-    "liana": "forest-nodejs-agent",
-    "liana_version": "1.36.0",
-    "liana_features": null,
-    "stack": {"engine": "nodejs", "engine_version": "18.16.1"}
-  }
-}
