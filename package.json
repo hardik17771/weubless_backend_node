@@ -10,7 +10,6 @@
     "restart": "pm2 restart weucart-backend",
     "delete": "pm2 delete weucart-backend",
     "status": "pm2 status",
-    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "",
